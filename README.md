@@ -8,7 +8,7 @@ Inspired by the [X/Twitter post](https://twitter.com/parveza77753284/status/1774
 
 **Program Name**: Filter-Uniq-Ints
 
-**Purpose**: filter out unique integers from an integer array. E.g. {1,2,1,3} should be filtered to {1,2,3}
+**Purpose**: filter out unique integers from an **unsorted** integer array. E.g. {1,2,1,3} should be filtered to {1,2,3}
 
 **License**: MIT
 
