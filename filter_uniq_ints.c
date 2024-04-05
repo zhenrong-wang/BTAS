@@ -9,9 +9,29 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
+#include "filter_uniq_ints.h"
 
-#define NUM_ELEMS 262144 /* Please adjust this MACRO */
+/**
+ * @brief Convert a string to a posivie number
+ *  The string cannot contain characters other than 0~9
+ * 
+ * @returns
+ *  -1 if illegal chars found
+ *  A positive number if succeeded
+ */
+int convert_string_to_positive_num(const char* string) {
+    size_t str_length = strlen(string);
+    int result = 0;
+    for(size_t i = 0; i < str_length; i++) {
+        if(string[i] < 48 || string[i] > 56) {
+            return -1;
+        }
+        result = result * 10 + (string[i] - 48);
+    }
+    return result;
+}
 
 /**
  * 
@@ -114,17 +134,14 @@ int* filter_unique_elems(const int *input_arr, const unsigned int num_elems, uns
     max_current = input_arr[0];
     min_current = input_arr[0];
     output_arr[0] = input_arr[0];
-    //int ii = 0;
     for(i = 1; i < num_elems; i++) {
         tmp = input_arr[i];
         tmp_diff_to_max = max_current - tmp;
         tmp_diff_to_min = tmp - min_current;
         if(tmp_diff_to_max == 0 || tmp_diff_to_min == 0 || tmp_diff_to_max == diff_to_max || tmp_diff_to_min == diff_to_min) {
-            //ii++;
             continue;
         }
         if(tmp_diff_to_max < 0 || tmp_diff_to_min < 0) {
-            //ii++;
             output_arr[j] = tmp;
             if(tmp_diff_to_max < 0) {
                 diff_to_max = -tmp_diff_to_max;
@@ -138,7 +155,6 @@ int* filter_unique_elems(const int *input_arr, const unsigned int num_elems, uns
             continue;
         }
         if(tmp_diff_to_min < diff_to_min || tmp_diff_to_max < diff_to_max) {
-            //ii++;
             output_arr[j] = tmp;
             if(tmp_diff_to_min < diff_to_min) {
                 diff_to_min = tmp_diff_to_min;
@@ -194,6 +210,21 @@ void print_arr(int *arr, unsigned int num_elems) {
         }
     }
     printf("\n\n");
+}
+
+int compare_arr(int *arr_a, int *arr_b, unsigned int num_elems) {
+    if(arr_a == NULL || arr_b == NULL) {
+        return -3;
+    }
+    if(num_elems < 1) {
+        return -1;
+    }
+    for(unsigned int i = 0; i < num_elems; i++) {
+        if(arr_a[i] != arr_b[i]) {
+            return 1;
+        }
+    }
+    return 0;
 }
 
 /**
@@ -266,40 +297,73 @@ int generate_growing_arr(int *arr, unsigned int num_elems) {
     return 0;
 }
 
+
+/**
+ * @brief
+ *  usage: ./command argv[1] argv[2]
+ *  argv[1] indicates the size (number of elems) of the input array
+ *  argv[2] indicates the maximun of the random number generated
+ *      NOTE: argv[2] doesn't affect the Round 2 of benchmark
+ * 
+ * @returns
+ *  0 if everything goes well
+ *  
+ */
 int main(int argc, char** argv) {
-    int arr_input[NUM_ELEMS] = {0,};
+    if(argc < 3) {
+        printf("ERROR: not enough args. USAGE: ./command argv[1] argv[2].\n");
+        return 1;
+    }
+
+    int num_elems = convert_string_to_positive_num(argv[1]), rand_max = convert_string_to_positive_num(argv[2]);
+    printf("%d\t%d\n",num_elems, rand_max);
+    if(num_elems < 0 || rand_max < 0) {
+        printf("ERROR: arguments illegal. Make sure they are plain positive numbers.\n");
+        return 3;
+    }
+
+    int *arr_input = (int *)malloc(sizeof(int) * num_elems);
+    if(arr_input == NULL) {
+        printf("ERROR: Failed to allocate memory for input array.\n");
+        return 5;
+    }
     int err_flag = 0;
     unsigned int num_elems_out = 0;
     clock_t start, end;
     int *out = NULL, *out_naive = NULL;
-    generate_random_input_arr(arr_input,NUM_ELEMS,NUM_ELEMS>>11);
+    generate_random_input_arr(arr_input,num_elems,rand_max);
 
-    printf("RANDOM:\n");
+    printf("RANDOM ARRAY INPUT:\n");
     start = clock();
-    out = filter_unique_elems(arr_input, NUM_ELEMS, &num_elems_out, &err_flag);
+    out = filter_unique_elems(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("NEW:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
-    free(out);
+    printf("NEW_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
     
     start = clock();
-    out_naive = filter_unique_elems_naive(arr_input, NUM_ELEMS, &num_elems_out, &err_flag);
+    out_naive = filter_unique_elems_naive(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("NAIVE:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("NAIVE_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+    printf("COMPARE:\t%d\n\n", compare_arr(out, out_naive, num_elems_out));
+    free(out);
     free(out_naive);
 
-    generate_growing_arr(arr_input,NUM_ELEMS);
-    printf("GROWING:\n");
+    generate_growing_arr(arr_input,num_elems);
+    printf("GROWING ARRAY INPUT:\n");
     start = clock();
-    out = filter_unique_elems(arr_input, NUM_ELEMS, &num_elems_out, &err_flag);
+    out = filter_unique_elems(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("NEW:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
-    free(out);
+    printf("NEW_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
     
     start = clock();
-    out_naive = filter_unique_elems_naive(arr_input, NUM_ELEMS, &num_elems_out, &err_flag);
+    out_naive = filter_unique_elems_naive(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("NAIVE:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
-    free(out_naive);
+    printf("NAIVE_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
+    printf("COMPARE:\t%d\n", compare_arr(out, out_naive, num_elems_out));
+    free(out);
+    free(out_naive);
+    
+    free(arr_input);
     return 0;
 }
