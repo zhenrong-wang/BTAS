@@ -26,8 +26,9 @@ You need a C compiler to build.
 
 ### 3.1.2 Build Guide
 
-1. Use git to clone this code: `git clone https://github.com/zhenrong-wang/filter-uniq-elems.git`
-2. Build command example: `gcc filter_uniq_ints.c -o my_program_name -Wall -Ofast`
+1. Use git to clone this code: `git clone https://github.com/zhenrong-wang/filter-uniq-ints.git`
+2. Change your directory: `cd filter-uniq-ints`
+3. Build command example: `gcc filter_uniq_ints.c -o my_program_name -Wall -Ofast`
 
 ## 3.2 Run
 
