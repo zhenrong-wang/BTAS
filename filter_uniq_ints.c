@@ -18,10 +18,13 @@
  *  The string cannot contain characters other than 0~9
  * 
  * @returns
- *  -1 if illegal chars found
+ *  -1 if illegal chars found or NULL pointer
  *  A positive number if succeeded
  */
 int convert_string_to_positive_num(const char* string) {
+    if(string == NULL) {
+        return -1;
+    }
     size_t str_length = strlen(string);
     int result = 0;
     for(size_t i = 0; i < str_length; i++) {
@@ -316,7 +319,7 @@ int main(int argc, char** argv) {
     }
 
     int num_elems = convert_string_to_positive_num(argv[1]), rand_max = convert_string_to_positive_num(argv[2]);
-    printf("%d\t%d\n",num_elems, rand_max);
+    printf("INPUT_ELEMS:\t%d\nRANDOM_MAX:\t%d\n\n",num_elems, rand_max);
     if(num_elems < 0 || rand_max < 0) {
         printf("ERROR: arguments illegal. Make sure they are plain positive numbers.\n");
         return 3;
