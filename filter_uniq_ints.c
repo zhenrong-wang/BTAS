@@ -434,6 +434,7 @@ int main(int argc, char** argv) {
     generate_random_input_arr(arr_input,num_elems,rand_max);
 
     printf("RANDOM ARRAY INPUT:\n");
+    printf("ALGO_TYPE\tTIME_IN_SEC\tUNIQUE_INTEGERS%d\n");
     start = clock();
     out = filter_unique_elems(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
@@ -456,6 +457,7 @@ int main(int argc, char** argv) {
 
     generate_growing_arr(arr_input,num_elems);
     printf("GROWING ARRAY INPUT:\n");
+    printf("ALGO_TYPE\tTIME_IN_SEC\tUNIQUE_INTEGERS%d\n");
     start = clock();
     out = filter_unique_elems(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
