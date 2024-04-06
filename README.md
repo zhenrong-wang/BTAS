@@ -92,7 +92,7 @@ I propose a simple data structure using 2 pointer arrays: one for the positive e
 
 Given the range of signed int (usially is 32-bit) has a range of [ -2^31 , 2^31 ], we can use 65536 (2^16) as the constant M to divide and mod. The quotient would be in [ 0, 32768 ], and the mod would be [ -65535, 65535 ]. So, we can define the size of `hash_table_base_p[]` and `hash_table_base_n[]` to 32769. Let's check the `hash_table_base_p[]` because `hash_table_base_n[]` is the designed with the same logic.
 
-For `hash_table_base_p[i]`, the initial value is NULL. If `( (a = N/M) == i )`, a mod array with size 65536 would be allocated to store the mod value `b = N Mod M`. 
+For `hash_table_base_p[i]`, the initial value is NULL. If `( (a = N / M) == i )`, a mod array with size 65536 would be allocated to store the mod value `b = N Mod M`. 
 
 For example if `tmp_elem = 65537` and **it is NOT duplicate**, that is, `a = tmp_elem / 65536 = 1`, `b = tmp_elem % 65536 = 1`, the `hash_table_base_p[1]` would point to an allocated `mod_array[65536]`, and `mod_array[1]` would be set to 1.
 
