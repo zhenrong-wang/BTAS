@@ -24,11 +24,6 @@
 #define HASH_TABLE_SIZE 32769
 #define MOD_TABLE_SIZE  65536
 
-typedef struct {
-    int mod_branch_max;
-    int *mod_branch_array;
-} hash_table_base_node;
-
 /**
  * @brief Convert a string to a posivie number
  *  The string cannot contain characters other than 0~9
@@ -204,6 +199,123 @@ int* filter_unique_elems_naive_improved(const int *input_arr, const unsigned int
     return final_output_arr;
 }
 
+void free_hash_table_new(hash_table_base_node hash_table_new[], unsigned int num_elems) {
+    for(unsigned int i = 0; i < num_elems; i++) {
+        if(hash_table_new[i].ptr_branch_p != NULL) {
+            free(hash_table_new[i].ptr_branch_p);
+        }
+        if(hash_table_new[i].ptr_branch_n != NULL) {
+            free(hash_table_new[i].ptr_branch_n);
+        }
+    }
+}
+
+int* filter_unique_elems_ht_new(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag) {
+    unsigned int i, j = 0;
+    unsigned int tmp_quotient = 0, tmp_mod = 0;
+    int tmp = 0;
+    int *final_output_arr = NULL;
+    int *tmp_realloc_ptr = NULL;
+    hash_table_base_node hash_table_base[HASH_TABLE_SIZE] = {{0, 0, NULL, NULL},};
+    *err_flag = 0;
+    *num_elems_out = 0;
+    if (input_arr == NULL) {
+        *err_flag = -5;
+        return NULL;
+    }
+    if (num_elems < 1){
+        *err_flag = -3;
+        return NULL;
+    }
+    int *output_arr = (int *)calloc(num_elems, sizeof(int));
+    if (output_arr == NULL) {
+        *err_flag = -1;
+        return NULL;
+    }
+    for(i = 0; i < num_elems; i++) {
+        tmp = input_arr[i];
+        tmp_quotient = abs(tmp / MOD_TABLE_SIZE);
+        tmp_mod = abs(tmp % MOD_TABLE_SIZE);
+        if(tmp > 0) {
+            if(hash_table_base[tmp_quotient].ptr_branch_p == NULL) {
+                if((hash_table_base[tmp_quotient].ptr_branch_p = (int *)calloc(tmp_mod + 1, sizeof(int))) == NULL) {
+                    *err_flag = 1;
+                    goto free_memory;
+                }
+                else {
+                    hash_table_base[tmp_quotient].branch_size_p = tmp_mod + 1;
+                }
+            }
+            else {
+                if(hash_table_base[tmp_quotient].branch_size_p < (tmp_mod + 1)){
+                    if((tmp_realloc_ptr = (int *)realloc(hash_table_base[tmp_quotient].ptr_branch_p, (tmp_mod + 1)*sizeof(int))) == NULL) {
+                        *err_flag = 1;
+                        goto free_memory;
+                    }
+                    else {
+                        hash_table_base[tmp_quotient].ptr_branch_p = tmp_realloc_ptr;
+                        memset(tmp_realloc_ptr + hash_table_base[tmp_quotient].branch_size_p, 0, sizeof(int) * (tmp_mod + 1 - hash_table_base[tmp_quotient].branch_size_p));
+                        hash_table_base[tmp_quotient].branch_size_p = tmp_mod + 1;
+                    }
+                }
+            }
+            if(hash_table_base[tmp_quotient].ptr_branch_p != NULL && (hash_table_base[tmp_quotient].ptr_branch_p)[tmp_mod] != 0) {
+                continue;
+            }
+        }
+        else {
+            if(hash_table_base[tmp_quotient].ptr_branch_n == NULL) {
+                if((hash_table_base[tmp_quotient].ptr_branch_n = (int *)calloc(tmp_mod + 1, sizeof(int))) == NULL) {
+                    *err_flag = 1;
+                    goto free_memory;
+                }
+                else {
+                    hash_table_base[tmp_quotient].branch_size_n = tmp_mod + 1;
+                }
+            }
+            else {
+                if(hash_table_base[tmp_quotient].branch_size_n < (tmp_mod + 1)){
+                    if((tmp_realloc_ptr = (int *)realloc(hash_table_base[tmp_quotient].ptr_branch_n, (tmp_mod + 1)*sizeof(int))) == NULL) {
+                        *err_flag = 1;
+                        goto free_memory;
+                    }
+                    else {
+                        hash_table_base[tmp_quotient].ptr_branch_n = tmp_realloc_ptr;
+                        memset(tmp_realloc_ptr + hash_table_base[tmp_quotient].branch_size_n , 0, sizeof(int) * (tmp_mod + 1 - hash_table_base[tmp_quotient].branch_size_n));
+                        hash_table_base[tmp_quotient].branch_size_n = tmp_mod + 1;
+                    }
+                }
+            }
+            if(hash_table_base[tmp_quotient].ptr_branch_n != NULL && (hash_table_base[tmp_quotient].ptr_branch_n)[tmp_mod] != 0) {
+                continue;
+            }
+        }
+        output_arr[j] = tmp;
+        j++;
+        if(tmp > 0) {
+            (hash_table_base[tmp_quotient].ptr_branch_p)[tmp_mod] = 1;
+        }
+        else {
+            (hash_table_base[tmp_quotient].ptr_branch_n)[tmp_mod] = 1;
+        }
+    }
+
+free_memory:
+    free_hash_table_new(hash_table_base, HASH_TABLE_SIZE);
+    if(*err_flag != 0) {
+        free(output_arr);
+        return NULL;
+    }
+    final_output_arr = (int *)realloc(output_arr, j*sizeof(int));
+    if(final_output_arr == NULL) {
+        free(output_arr);
+        *err_flag = 3;
+        return NULL;
+    }
+    *num_elems_out = j;
+    return final_output_arr;
+}
+
 void free_hash_table(int *hash_table[], unsigned int num_elems) {
     for(unsigned int i = 0; i < num_elems; i++) {
         if(hash_table[i] != NULL) {
@@ -211,7 +323,6 @@ void free_hash_table(int *hash_table[], unsigned int num_elems) {
         }
     }
 }
-
 
 int* filter_unique_elems_ht(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag) {
     unsigned int i, j = 0;
@@ -371,6 +482,7 @@ int generate_random_input_arr(int *arr, unsigned int num_elems, unsigned int ran
             arr[i] = 0 - rand_num;
         }
     }
+    //print_arr(arr, num_elems);
     return 0;
 }
 
@@ -435,7 +547,7 @@ int main(int argc, char** argv) {
     int err_flag = 0;
     unsigned int num_elems_out = 0;
     clock_t start, end;
-    int *out = NULL, *out_naive = NULL, *out_ht = NULL;
+    int *out = NULL, *out_naive = NULL, *out_ht = NULL, *out_ht_new = NULL;
     generate_random_input_arr(arr_input,num_elems,rand_max);
 
     printf("RANDOM ARRAY INPUT:\n");
@@ -455,10 +567,16 @@ int main(int argc, char** argv) {
     end = clock();
     printf("HASH_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
-    printf("COMPARE:\t%d\t%d\n\n", compare_arr(out, out_naive, num_elems_out), compare_arr(out, out_ht, num_elems_out));
+    start = clock();
+    out_ht_new = filter_unique_elems_ht_new(arr_input, num_elems, &num_elems_out, &err_flag);
+    end = clock();
+    printf("HASH_ALGO_NEW:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+    printf("COMPARISON:\t%d\t%d\t%d\n\n", compare_arr(out, out_naive, num_elems_out), compare_arr(out, out_ht, num_elems_out),compare_arr(out, out_ht_new, num_elems_out));
     free(out);
     free(out_naive);
     free(out_ht);
+    free(out_ht_new);
 
     generate_growing_arr(arr_input,num_elems);
     printf("GROWING ARRAY INPUT:\n");
@@ -478,9 +596,17 @@ int main(int argc, char** argv) {
     end = clock();
     printf("HASH_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
-    printf("COMPARE:\t%d\t%d\n\n", compare_arr(out, out_naive, num_elems_out), compare_arr(out, out_ht, num_elems_out));
+    start = clock();
+    out_ht_new = filter_unique_elems_ht_new(arr_input, num_elems, &num_elems_out, &err_flag);
+    end = clock();
+    printf("HASH_ALGO_NEW:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+
+    printf("COMPARISON:\t%d\t%d\t%d\n\n", compare_arr(out, out_naive, num_elems_out), compare_arr(out, out_ht, num_elems_out),compare_arr(out, out_ht_new, num_elems_out));
     free(out);
+    free(out_naive);
     free(out_ht);
+    free(out_ht_new);
     
     free(arr_input);
     return 0;
