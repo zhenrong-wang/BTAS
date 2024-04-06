@@ -119,7 +119,7 @@ Obviously, this algorithm is able to improve and guarantee the performance espec
 
 The preliminery benchmark suppports the analysis of the algorithms above. See the screenshot below.
 
-[preliminery_benchmark](./assets/benchmark-0406.png)
+![preliminery_benchmark](./assets/benchmark-0406.png)
 
 The HASH algorithm is 10000x faster than the other 2 algorithms.
 
