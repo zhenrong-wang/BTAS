@@ -8,7 +8,7 @@ This program aims to solving a classic question: eliminate the duplicate element
 
 For an original array with 9 elements: {16, 17, 2, **17**, 4, **2**, 97, **4**, **17**}
 
-The program should process it to {16, 17, 2, 4, 97} with 5 unique elements, and the duplicate elements (in this case, **17**, **2**, **4**) are skipped.
+The program should process it to {16, 17, 2, 4, 97} with 5 unique elements, and the extra duplicate elements (in this case, **17**, **2**, **4**) are skipped.
 
 ## 1.2 Algorithms
 
