@@ -24,7 +24,7 @@ One can use a 2-layer loop algorithm:
 ```
 j = 0; /* The index for output array. */
 for (i = 0; i < NUM_ELEMS; i++) {
-    tmp_elem = input_arr_input[i];
+    tmp_elem = int_arr_input[i];
     for (k = 0; k < j; k++) {
         if(int_arr_output[k] == tmp_elem) {
             break; /* If duplication found, break the loop */
@@ -45,23 +45,23 @@ It is clear, this algorithm would be very slow when the input integer array is v
 The brute algorithm can be improved. One can record the current `maximum`, `minimum`, `diff-to-maximum`, `diff-to-minimum` of the **int_arr_output[ NUM_ELEMS_OUTPUT ]**, the next element of **int_arr_input** (**tmp_elem**) can be compared with these 4 values before the brute comparison:
 
 ```
-tmp_elem = input_arr[i];
+tmp_elem = int_arr_input[i];
 tmp_diff_to_max = max_current - tmp_elem;
 tmp_diff_to_min = tmp_elem - min_current;
 ```
 
-If `tmp_diff_to_max == 0` OR `tmp_diff_to_min == 0` OR `tmp_diff_to_max == prev_diff_to_max` OR `tmp_diff_to_min == prev_diff_to_min`, the `tmp_elem` is duplicate, skip it and go to the next `input_arr[i]`
+If `tmp_diff_to_max == 0` OR `tmp_diff_to_min == 0` OR `tmp_diff_to_max == prev_diff_to_max` OR `tmp_diff_to_min == prev_diff_to_min`, the `tmp_elem` is duplicate, skip it and go to the next `int_arr_input[i]`
 
-If `tmp_diff_to_max < 0` OR `tmp_diff_to_min < 0`, meaning that the `tmp_elem` is out of the previous range and it must be NOT duplicate. Store it, update `maximum`, `minimum`, `diff-to-maximum`, `diff-to-minimum` because the range has been expanded by `tmp_elem`, and go to the next `input_arr[i]`.
+If `tmp_diff_to_max < 0` OR `tmp_diff_to_min < 0`, meaning that the `tmp_elem` is out of the previous range and it must be NOT duplicate. Store it, update `maximum`, `minimum`, `diff-to-maximum`, `diff-to-minimum` because the range has been expanded by `tmp_elem`, and go to the next `int_arr_input[i]`.
 
-If `tmp_diff_to_min < diff_to_min` OR `tmp_diff_to_max < diff_to_max`, meaning that the `tmp_elem` is not duplicate because it is closer to the `maximum` or `minimum` than the previously stored elements. Store it, update `diff-to-maximum`, `diff-to-minimum`, and go to the next `input_arr[i]`.
+If `tmp_diff_to_min < diff_to_min` OR `tmp_diff_to_max < diff_to_max`, meaning that the `tmp_elem` is not duplicate because it is closer to the `maximum` or `minimum` than the previously stored elements. Store it, update `diff-to-maximum`, `diff-to-minimum`, and go to the next `int_arr_input[i]`.
 
 All other cases should go to the brute comparison loop, that is:
 
 ```
 j = 0; /* The index for output array. */
 for (i = 0; i < NUM_ELEMS; i++) {
-    tmp_elem = input_arr_input[i];
+    tmp_elem = int_arr_input[i];
     ...
     /* handling the conditions described above. */
     ...
@@ -99,6 +99,7 @@ For example if `tmp_elem = 65537` and **it is NOT duplicate**, that is, `a = tmp
 To check whether `tmp_elem` is duplicate or not, it is quite simple, the psudo code:
 
 ```
+tmp_elem = int_arr_input[i]
 If tmp_elem > 0 {
     a = tmp_elem / 65536
     b = tmp_elem % 65536
