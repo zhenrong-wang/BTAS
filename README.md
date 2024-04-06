@@ -6,9 +6,9 @@
 
 This program aims to solving a classic question: eliminate the duplicate elements from an unsorted integer array. For example:
 
-For an original array with 9 elements: {16, 17, 2, *17*, 4, *2*, 97, *4*, *17*}
+For an original array with 9 elements: {16, 17, 2, **17**, 4, **2**, 97, **4**, **17**}
 
-The program should process it to {16, 17, 2, 4, 97} with 5 unique elements, and the duplicate elements (in this case, are *17*, *4*, *2*) are skipped.
+The program should process it to {16, 17, 2, 4, 97} with 5 unique elements, and the duplicate elements (in this case, **17**, **2**, **4**) are skipped.
 
 ## 1.2 Algorithms
 
