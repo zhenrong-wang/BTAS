@@ -24,6 +24,11 @@
 #define HASH_TABLE_SIZE 32769
 #define MOD_TABLE_SIZE  65536
 
+typedef struct {
+    int mod_branch_max;
+    int *mod_branch_array;
+} hash_table_base_node;
+
 /**
  * @brief Convert a string to a posivie number
  *  The string cannot contain characters other than 0~9
@@ -125,7 +130,7 @@ int* filter_unique_elems_naive(const int *input_arr, const unsigned int num_elem
  *  NULL if any error happens
  * 
  */
-int* filter_unique_elems(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag){
+int* filter_unique_elems_naive_improved(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag){
     unsigned int i, j = 1, k;
     int max_current, min_current, diff_to_max = 0, diff_to_min = 0, tmp_diff_to_max = 0, tmp_diff_to_min = 0;
     int tmp = 0;
@@ -436,9 +441,9 @@ int main(int argc, char** argv) {
     printf("RANDOM ARRAY INPUT:\n");
     printf("ALGO_TYPE\tTIME_IN_SEC\tUNIQUE_INTEGERS\n");
     start = clock();
-    out = filter_unique_elems(arr_input, num_elems, &num_elems_out, &err_flag);
+    out = filter_unique_elems_naive_improved(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("NEW_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("NAIVE_ALGO_NEW:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
     
     start = clock();
     out_naive = filter_unique_elems_naive(arr_input, num_elems, &num_elems_out, &err_flag);
@@ -459,9 +464,9 @@ int main(int argc, char** argv) {
     printf("GROWING ARRAY INPUT:\n");
     printf("ALGO_TYPE\tTIME_IN_SEC\tUNIQUE_INTEGERS\n");
     start = clock();
-    out = filter_unique_elems(arr_input, num_elems, &num_elems_out, &err_flag);
+    out = filter_unique_elems_naive_improved(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("NEW_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("NAIVE_ALGO_NEW:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
     
     start = clock();
     out_naive = filter_unique_elems_naive(arr_input, num_elems, &num_elems_out, &err_flag);

@@ -12,7 +12,7 @@
 
 int convert_string_to_positive_num(const char* string);
 int* filter_unique_elems_naive(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag);
-int* filter_unique_elems(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag);
+int* filter_unique_elems_naive_improved(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag);
 void free_hash_table(int *hash_table[], unsigned int num_elems);
 int* filter_unique_elems_ht(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag);
 void print_arr(int *arr, unsigned int num_elems);
