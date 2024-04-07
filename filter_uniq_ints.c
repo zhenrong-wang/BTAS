@@ -29,6 +29,7 @@
  * cover the range of -2097152 to 2097152
  */
 #define HT_DYN_INI_SIZE 32
+#define BIT_HT_INI_SIZE 64
 
 /**
  * @brief Convert a string to a posivie number
@@ -697,6 +698,176 @@ int generate_growing_arr(int *arr, unsigned int num_elems) {
     return 0;
 }
 
+/**
+ * 
+ * @brief Flip a bit from 0 to 1
+ * 
+ * @param [in]
+ *  *byte_a is a given 8-bit number
+ *  bit_position should be in the range [0, 7]
+ * 
+ * @returns void
+ * 
+ */
+void flip_bit(unsigned char *byte_a, unsigned char bit_position) {
+    *byte_a |= (0x80 >> bit_position);
+}
+
+/**
+ * 
+ * @brief Check a bit is 0 or not
+ * 
+ * @param [in]
+ *  byte_a is a given 8-bit number
+ *  bit_position should be in the range [0, 7]
+ * 
+ * @returns
+ *  0 if the bit is 0
+ *  1 if the bit is 1
+ * 
+ */
+int check_bit(unsigned char byte_a, unsigned char bit_position) {
+    return byte_a & (0x80 >> bit_position);
+}
+
+void free_bit_hash_table(bit_hash_table_node hash_table_new[], unsigned int num_elems) {
+    for(unsigned int i = 0; i < num_elems; i++) {
+        if(hash_table_new[i].ptr_branch_p != NULL) {
+            free(hash_table_new[i].ptr_branch_p);
+        }
+        if(hash_table_new[i].ptr_branch_n != NULL) {
+            free(hash_table_new[i].ptr_branch_n);
+        }
+    }
+}
+
+int* filter_unique_elems_ht_bit(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag) {
+    unsigned int i, j = 0;
+    unsigned int tmp_quotient = 0, tmp_mod = 0, tmp_branch_size_byte = 0;
+    int tmp = 0;
+    int *final_output_arr = NULL;
+    unsigned char *tmp_realloc_ptr = NULL;
+    bit_hash_table_node *hash_table_base = NULL, *tmp_ht_realloc_ptr = NULL;
+    unsigned int ht_base_length = BIT_HT_INI_SIZE;
+    unsigned short tmp_byte_index = 0;
+    unsigned char tmp_bit_position = 0;
+    *err_flag = 0;
+    *num_elems_out = 0;
+    if (input_arr == NULL) {
+        *err_flag = -5;
+        return NULL;
+    }
+    if (num_elems < 1){
+        *err_flag = -3;
+        return NULL;
+    }
+    hash_table_base = (bit_hash_table_node *)calloc(BIT_HT_INI_SIZE, sizeof(bit_hash_table_node));
+    if(hash_table_base == NULL) {
+        *err_flag = 5;
+        return NULL;
+    }
+    int *output_arr = (int *)calloc(num_elems, sizeof(int));
+    if (output_arr == NULL) {
+        free(hash_table_base);
+        *err_flag = -1;
+        return NULL;
+    }
+    for(i = 0; i < num_elems; i++) {
+        tmp = input_arr[i];
+        tmp_quotient = abs(tmp / MOD_TABLE_SIZE);
+        tmp_mod = abs(tmp % MOD_TABLE_SIZE);
+        tmp_byte_index = tmp_mod / 8;
+        tmp_bit_position = tmp_mod % 8;
+        tmp_branch_size_byte = tmp_byte_index + 1;
+        if((tmp_quotient + 1) > ht_base_length) {
+            tmp_ht_realloc_ptr = (bit_hash_table_node *)realloc(hash_table_base, (tmp_quotient + 1) * sizeof(bit_hash_table_node));
+            if(tmp_ht_realloc_ptr == NULL) {
+                *err_flag = 7;
+                goto free_memory;
+            }
+            memset(tmp_ht_realloc_ptr + ht_base_length, 0, (tmp_quotient + 1 - ht_base_length) * sizeof(bit_hash_table_node));
+            hash_table_base = tmp_ht_realloc_ptr;
+            ht_base_length = (tmp_quotient + 1);
+        }
+        if(tmp > 0) {
+            if(hash_table_base[tmp_quotient].ptr_branch_p == NULL) {
+                if((hash_table_base[tmp_quotient].ptr_branch_p = (unsigned char *)calloc(tmp_branch_size_byte, sizeof(unsigned char))) == NULL) {
+                    *err_flag = 1;
+                    goto free_memory;
+                }
+                else {
+                    hash_table_base[tmp_quotient].branch_size_p = tmp_branch_size_byte;
+                }
+            }
+            else {
+                if(hash_table_base[tmp_quotient].branch_size_p < tmp_branch_size_byte) {
+                    if((tmp_realloc_ptr = (unsigned char *)realloc(hash_table_base[tmp_quotient].ptr_branch_p, tmp_branch_size_byte * sizeof(unsigned char))) == NULL) {
+                        *err_flag = 1;
+                        goto free_memory;
+                    }
+                    else {
+                        hash_table_base[tmp_quotient].ptr_branch_p = tmp_realloc_ptr;
+                        memset(tmp_realloc_ptr + hash_table_base[tmp_quotient].branch_size_p, 0, sizeof(unsigned char) * (tmp_branch_size_byte - hash_table_base[tmp_quotient].branch_size_p));
+                        hash_table_base[tmp_quotient].branch_size_p = tmp_branch_size_byte;
+                    }
+                }
+            }
+            if(hash_table_base[tmp_quotient].ptr_branch_p != NULL && check_bit((hash_table_base[tmp_quotient].ptr_branch_p)[tmp_byte_index], tmp_bit_position) != 0) {
+                continue;
+            }
+        }
+        else {
+            if(hash_table_base[tmp_quotient].ptr_branch_n == NULL) {
+                if((hash_table_base[tmp_quotient].ptr_branch_n = (unsigned char *)calloc(tmp_branch_size_byte, sizeof(unsigned char))) == NULL) {
+                    *err_flag = 1;
+                    goto free_memory;
+                }
+                else {
+                    hash_table_base[tmp_quotient].branch_size_n = tmp_branch_size_byte;
+                }
+            }
+            else {
+                if(hash_table_base[tmp_quotient].branch_size_n < tmp_branch_size_byte) {
+                    if((tmp_realloc_ptr = (unsigned char *)realloc(hash_table_base[tmp_quotient].ptr_branch_n, tmp_branch_size_byte * sizeof(unsigned char))) == NULL) {
+                        *err_flag = 1;
+                        goto free_memory;
+                    }
+                    else {
+                        hash_table_base[tmp_quotient].ptr_branch_n = tmp_realloc_ptr;
+                        memset(tmp_realloc_ptr + hash_table_base[tmp_quotient].branch_size_n, 0, sizeof(unsigned char) * (tmp_branch_size_byte - hash_table_base[tmp_quotient].branch_size_n));
+                        hash_table_base[tmp_quotient].branch_size_n = tmp_branch_size_byte;
+                    }
+                }
+            }
+            if(hash_table_base[tmp_quotient].ptr_branch_n != NULL && check_bit((hash_table_base[tmp_quotient].ptr_branch_n)[tmp_byte_index], tmp_bit_position) != 0) {
+                continue;
+            }
+        }
+        output_arr[j] = tmp;
+        j++;
+        if(tmp > 0) {
+            flip_bit(hash_table_base[tmp_quotient].ptr_branch_p + tmp_byte_index, tmp_bit_position);
+        }
+        else {
+            flip_bit(hash_table_base[tmp_quotient].ptr_branch_n + tmp_byte_index, tmp_bit_position);
+        }
+    }
+free_memory:
+    free_bit_hash_table(hash_table_base, ht_base_length);
+    free(hash_table_base);
+    if(*err_flag != 0) {
+        free(output_arr);
+        return NULL;
+    }
+    final_output_arr = (int *)realloc(output_arr, j * sizeof(int));
+    if(final_output_arr == NULL) {
+        free(output_arr);
+        *err_flag = 3;
+        return NULL;
+    }
+    *num_elems_out = j;
+    return final_output_arr;
+}
 
 /**
  * @brief
@@ -730,20 +901,15 @@ int main(int argc, char** argv) {
     int err_flag = 0;
     unsigned int num_elems_out = 0;
     clock_t start, end;
-    int *out = NULL, *out_naive = NULL, *out_ht = NULL, *out_ht_new = NULL, *out_ht_dyn = NULL;
+    int *out_naive_improved = NULL, *out_naive = NULL, *out_ht = NULL, *out_ht_new = NULL, *out_ht_dyn = NULL, *out_ht_bit = NULL;
+    
     generate_random_input_arr(arr_input,num_elems,rand_max);
-
     printf("RANDOM ARRAY INPUT:\n");
     printf("ALGO_TYPE\tTIME_IN_SEC\tUNIQUE_INTEGERS\n");
     start = clock();
-    out = filter_unique_elems_naive_improved(arr_input, num_elems, &num_elems_out, &err_flag);
+    out_ht_bit = filter_unique_elems_ht_bit(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("NAIVE_ALGO_NEW:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
-    
-    start = clock();
-    out_naive = filter_unique_elems_naive(arr_input, num_elems, &num_elems_out, &err_flag);
-    end = clock();
-    printf("NAIVE_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("HASH_ALGO_BIT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     start = clock();
     out_ht = filter_unique_elems_ht(arr_input, num_elems, &num_elems_out, &err_flag);
@@ -760,25 +926,33 @@ int main(int argc, char** argv) {
     end = clock();
     printf("HASH_ALGO_DYN:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
-    printf("COMPARISON:\t%d\t%d\t%d\t%d\n\n", compare_arr(out, out_naive, num_elems_out), compare_arr(out, out_ht, num_elems_out), compare_arr(out, out_ht_new, num_elems_out), compare_arr(out, out_ht_dyn, num_elems_out));
-    free(out);
+    start = clock();
+    out_naive_improved = filter_unique_elems_naive_improved(arr_input, num_elems, &num_elems_out, &err_flag);
+    end = clock();
+    printf("NAIVE_ALGO_NEW:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    
+    start = clock();
+    out_naive = filter_unique_elems_naive(arr_input, num_elems, &num_elems_out, &err_flag);
+    end = clock();
+    printf("NAIVE_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    
+    printf("COMPARISON:\t%d\t%d\t%d\t%d\t%d\n\n", compare_arr(out_ht_bit, out_ht, num_elems_out), compare_arr(out_ht_bit, out_ht_new, num_elems_out), compare_arr(out_ht_bit, out_ht_dyn, num_elems_out), compare_arr(out_ht_bit, out_naive_improved, num_elems_out), compare_arr(out_ht_bit, out_naive, num_elems_out));
+    free(out_naive_improved);
     free(out_naive);
     free(out_ht);
     free(out_ht_new);
     free(out_ht_dyn);
+    free(out_ht_bit);
+    free(arr_input);
 
-    generate_growing_arr(arr_input,num_elems);
+    generate_growing_arr(arr_input, num_elems);
     printf("GROWING ARRAY INPUT:\n");
     printf("ALGO_TYPE\tTIME_IN_SEC\tUNIQUE_INTEGERS\n");
-    start = clock();
-    out = filter_unique_elems_naive_improved(arr_input, num_elems, &num_elems_out, &err_flag);
-    end = clock();
-    printf("NAIVE_ALGO_NEW:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
     
     start = clock();
-    out_naive = filter_unique_elems_naive(arr_input, num_elems, &num_elems_out, &err_flag);
+    out_ht_bit = filter_unique_elems_ht_bit(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("NAIVE_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("HASH_ALGO_BIT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     start = clock();
     out_ht = filter_unique_elems_ht(arr_input, num_elems, &num_elems_out, &err_flag);
@@ -795,12 +969,24 @@ int main(int argc, char** argv) {
     end = clock();
     printf("HASH_ALGO_DYN:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
-    printf("COMPARISON:\t%d\t%d\t%d\t%d\n\n", compare_arr(out, out_naive, num_elems_out), compare_arr(out, out_ht, num_elems_out), compare_arr(out, out_ht_new, num_elems_out), compare_arr(out, out_ht_dyn, num_elems_out));
-    free(out);
-    free(out_naive);
+    start = clock();
+    out_naive_improved = filter_unique_elems_naive_improved(arr_input, num_elems, &num_elems_out, &err_flag);
+    end = clock();
+    printf("NAIVE_ALGO_NEW:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    
+    /* The NAIVE algo is unacceptable for this case. Skip it. */
+    /*start = clock();
+    out_naive = filter_unique_elems_naive(arr_input, num_elems, &num_elems_out, &err_flag);
+    end = clock();
+    printf("NAIVE_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);*/
+    
+    printf("COMPARISON:\t%d\t%d\t%d\t%d\n\n", compare_arr(out_ht_bit, out_ht, num_elems_out), compare_arr(out_ht_bit, out_ht_new, num_elems_out), compare_arr(out_ht_bit, out_ht_dyn, num_elems_out), compare_arr(out_ht_bit, out_naive_improved, num_elems_out));
+    free(out_naive_improved);
+    //free(out_naive);
     free(out_ht);
     free(out_ht_new);
     free(out_ht_dyn);
+    free(out_ht_bit);
     
     free(arr_input);
     return 0;

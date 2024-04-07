@@ -30,4 +30,19 @@ int compare_arr(int *arr_a, int *arr_b, unsigned int num_elems);
 int generate_random_input_arr(int *arr, unsigned int num_elems, unsigned int rand_max);
 int generate_growing_arr(int *arr, unsigned int num_elems);
 
+/**
+ * Testing the bit-based hash table algorithm
+ * This algorithm would save 8x memory usage
+ */
+typedef struct {
+    unsigned int branch_size_p;
+    unsigned int branch_size_n;
+    unsigned char *ptr_branch_p;
+    unsigned char *ptr_branch_n;
+} bit_hash_table_node;
+
+void flip_bit(unsigned char *byte_a, unsigned char bit_position);
+int check_bit(unsigned char byte_a, unsigned char bit_position);
+int* filter_unique_elems_ht_bit(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag);
+
 #endif
