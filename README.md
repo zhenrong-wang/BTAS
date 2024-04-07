@@ -199,12 +199,14 @@ You need a C compiler to build.
 - For Microsoft Windows users, [mingw-w64](https://sourceforge.net/projects/mingw-w64/) is recommended
 - For GNU/Linux Distro or other *nix users, the [GNU Compiler Collections](https://gcc.gnu.org/), known as gcc, is a perfect one
 - For macOS users, [clang](https://clang.llvm.org/) is easy to install and use (brew is not needed to install clang on macOS).
+- [CMake](https://cmake.org/) > 3.20
 
 ### 3.1.2 Build Guide
 
 1. Use git to clone this code: `git clone https://github.com/zhenrong-wang/filter-uniq-ints.git`
 2. Change your directory: `cd filter-uniq-ints`
-3. Build command example: `gcc filter_uniq_ints.c -o my_program_name -Wall -Ofast`
+3. Configure CMake: `cmake -B cmake-build-release -DCMAKE_BUILD_TYPE=Release`
+4. Build command example: `cmake --build cmake-build-release --config Release --target all`
 
 ## 3.2 Run
 
