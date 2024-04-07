@@ -709,7 +709,7 @@ int generate_growing_arr(int *arr, unsigned int num_elems) {
  * @returns void
  * 
  */
-void flip_bit(unsigned char *byte_a, unsigned char bit_position) {
+inline void flip_bit(unsigned char *byte_a, unsigned char bit_position) {
     *byte_a |= (0x80 >> bit_position);
 }
 
@@ -726,7 +726,7 @@ void flip_bit(unsigned char *byte_a, unsigned char bit_position) {
  *  1 if the bit is 1
  * 
  */
-int check_bit(unsigned char byte_a, unsigned char bit_position) {
+inline int check_bit(unsigned char byte_a, unsigned char bit_position) {
     return byte_a & (0x80 >> bit_position);
 }
 
