@@ -116,6 +116,31 @@ If tmp_elem > 0 {
 
 Obviously, this algorithm is able to improve and guarantee the performance especially when the **int_arr_input[ NUM_ELEMS ]** is big.
 
+### 1.2.4 Hash Table Algorithm - Fully Dynamic
+
+The original hash table algorithm is not memory efficient. It creates 2 large base pointer arrays `hash_table_base_p[32769]` and `hash_table_base_n[32769]` at the very beginning; and each branch has a fixed length `65536`. We can improve the design.
+
+Firstly, we introduce a new data structure:
+
+```
+typedef struct {
+    unsigned int branch_size_p; /* The positive mod branch size */
+    unsigned int branch_size_n; /* The negative mod branch size */
+    int *ptr_branch_p;          /* Pointer to the positive mode branch */
+    int *ptr_branch_n;          /* Pointer to the negative mode branch */
+} hash_table_base_node;
+```
+
+Then, we define a initial size of the dynamic hash table:
+
+```
+#define HT_DYN_INI_SIZE 32
+```
+
+Then, we can get the required hash table base size and the branch size at each step, and scale the base size and branch size accordingly by using `realloc()` and `memset()` and update the base size and branch size.
+
+Obviously, this dynamic hash table algorithm is memory efficient and avoid over allocation of memory.
+
 ## 1.3 Preliminery Benchmark
 
 The preliminery benchmark suppports the analysis of the algorithms above. See the screenshot below.
