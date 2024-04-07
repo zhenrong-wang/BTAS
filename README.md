@@ -141,6 +141,37 @@ Then, we can get the required hash table base size and the branch size at each s
 
 Obviously, this dynamic hash table algorithm is memory efficient and avoid over allocation of memory.
 
+### 1.2.5 Hash Table Algorithm - Bit Flip & Check
+
+The hash table algorithms above have a general drawback - memory inefficient. To tag whether an integer occured or not, we only need one bit information, that is 0 or 1. But those algorithms use an integer to store a 1 bit information! That is really a super waste of memory. We can improve it and suppress the memory usage to 32x smaller.
+
+Firstly, we can define a new structure:
+
+```
+typedef struct {
+    unsigned int branch_size_p;
+    unsigned int branch_size_n;
+    unsigned char *ptr_branch_p;
+    unsigned char *ptr_branch_n;
+} bit_hash_table_node;
+```
+
+Then, we define 2 inline functions to flip and check the bit of a byte:
+
+```
+inline void flip_bit(unsigned char *byte_a, unsigned char bit_position) {
+    *byte_a |= (0x80 >> bit_position);
+}
+
+inline int check_bit(unsigned char byte_a, unsigned char bit_position) {
+    return byte_a & (0x80 >> bit_position);
+}
+```
+
+Then, to tag an integer, we only need to flip the corresponding bit from 0 to 1; to check an integer, we only need to check whether the corresponding bit is 0 or 1.
+
+32x memory suppressed with this method so that it can handle super large randomness space (up to the RAND_MAX defined as 2147483647).
+
 ## 1.3 Preliminery Benchmark
 
 The preliminery benchmark suppports the analysis of the algorithms above. See the screenshot below.
