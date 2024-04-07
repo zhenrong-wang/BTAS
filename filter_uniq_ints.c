@@ -595,7 +595,7 @@ void print_arr(int *arr, unsigned int num_elems) {
     printf("\n\n");
 }
 
-int compare_arr(int *arr_a, int *arr_b, unsigned int num_elems) {
+int compare_arr(const int *arr_a, const int *arr_b, unsigned int num_elems) {
     if(arr_a == NULL || arr_b == NULL) {
         return -3;
     }

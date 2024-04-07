@@ -7,6 +7,8 @@ extern "C" {
 #include "filter_uniq_ints.h"
 }
 
+#include "filter_uniq_ints_cpp.hpp"
+
 /**
  * @brief
  *  usage: ./command argv[1] argv[2]
@@ -52,12 +54,12 @@ int main(int argc, char** argv) {
     start = clock();
     out_naive = filter_unique_elems_naive(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("NAIVE_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("NAIVE_ALGO:\t\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     start = clock();
     out_ht = filter_unique_elems_ht(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("HASH_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("HASH_ALGO:\t\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     start = clock();
     out_ht_new = filter_unique_elems_ht_new(arr_input, num_elems, &num_elems_out, &err_flag);
@@ -69,7 +71,13 @@ int main(int argc, char** argv) {
     end = clock();
     printf("HASH_ALGO_DYN:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
-    printf("COMPARISON:\t%d\t%d\t%d\t%d\n\n", compare_arr(out, out_naive, num_elems_out), compare_arr(out, out_ht, num_elems_out), compare_arr(out, out_ht_new, num_elems_out), compare_arr(out, out_ht_dyn, num_elems_out));
+    start = clock();
+    const auto out_cpp_1 = filter_uniq_cpp(std::span{arr_input, static_cast<size_t>(num_elems)});
+    out_ht_dyn = filter_unique_elems_ht_dyn(arr_input, num_elems, &num_elems_out, &err_flag);
+    end = clock();
+    printf("CPP:\t\t\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+    printf("COMPARISON:\t%d\t%d\t%d\t%d\t%d\n\n", compare_arr(out, out_naive, num_elems_out), compare_arr(out, out_ht, num_elems_out), compare_arr(out, out_ht_new, num_elems_out), compare_arr(out, out_ht_dyn, num_elems_out), compare_arr(out, out_cpp_1.data(), num_elems_out));
     free(out);
     free(out_naive);
     free(out_ht);
@@ -87,12 +95,12 @@ int main(int argc, char** argv) {
     start = clock();
     out_naive = filter_unique_elems_naive(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("NAIVE_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("NAIVE_ALGO:\t\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     start = clock();
     out_ht = filter_unique_elems_ht(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("HASH_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("HASH_ALGO:\t\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     start = clock();
     out_ht_new = filter_unique_elems_ht_new(arr_input, num_elems, &num_elems_out, &err_flag);
@@ -104,7 +112,12 @@ int main(int argc, char** argv) {
     end = clock();
     printf("HASH_ALGO_DYN:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
-    printf("COMPARISON:\t%d\t%d\t%d\t%d\n\n", compare_arr(out, out_naive, num_elems_out), compare_arr(out, out_ht, num_elems_out), compare_arr(out, out_ht_new, num_elems_out), compare_arr(out, out_ht_dyn, num_elems_out));
+    start = clock();
+    const auto out_cpp_2 = filter_uniq_cpp(std::span{arr_input, static_cast<size_t>(num_elems)});
+    end = clock();
+    printf("CPP:\t\t\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+    printf("COMPARISON:\t%d\t%d\t%d\t%d\t%d\n\n", compare_arr(out, out_naive, num_elems_out), compare_arr(out, out_ht, num_elems_out), compare_arr(out, out_ht_new, num_elems_out), compare_arr(out, out_ht_dyn, num_elems_out), compare_arr(out, out_cpp_2.data(), num_elems_out));
     free(out);
     free(out_naive);
     free(out_ht);
