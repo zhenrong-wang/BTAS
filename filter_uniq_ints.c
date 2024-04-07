@@ -24,6 +24,10 @@
 #define HASH_TABLE_SIZE 32769
 #define MOD_TABLE_SIZE  65536
 
+/**
+ * With the initial size of 32, the initial hash table is able
+ * cover the range of -2097152 to 2097152
+ */
 #define HT_DYN_INI_SIZE 32
 
 /**
