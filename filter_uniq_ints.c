@@ -201,6 +201,111 @@ int* filter_unique_elems_naive_improved(const int *input_arr, const unsigned int
     return final_output_arr;
 }
 
+void free_hash_table(int *hash_table[], unsigned int num_elems) {
+    for(unsigned int i = 0; i < num_elems; i++) {
+        if(hash_table[i] != NULL) {
+            free(hash_table[i]);
+        }
+    }
+}
+
+/**
+ * 
+ * @brief Filter out the unique integers from a given array 
+ *  Using the basic hash table algorithm
+ * 
+ * @param [in]
+ *  *input_arr is the given array pointer
+ *  num_elems is the number of the integer elems in the given array
+ *  
+ * @param [out]
+ *  *num_elems_out is the number of the output unique integers
+ *  *err_flag is for debugging errors
+ * 
+ * @returns
+ *  The pointer of the allocated output array if succeeded
+ *  NULL if any error happens
+ * 
+ */
+int* filter_unique_elems_ht(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag) {
+    unsigned int i, j = 0;
+    unsigned int tmp_quotient = 0, tmp_mod = 0;
+    int tmp = 0;
+    int *final_output_arr = NULL;
+
+    int *hash_table_base_p[HASH_TABLE_SIZE] = {NULL,};
+    int *hash_table_base_n[HASH_TABLE_SIZE] = {NULL,};
+
+    *err_flag = 0;
+    *num_elems_out = 0;
+
+    if (input_arr == NULL) {
+        *err_flag = -5;
+        return NULL;
+    }
+    if (num_elems < 1){
+        *err_flag = -3;
+        return NULL;
+    }
+    int *output_arr = (int *)calloc(num_elems, sizeof(int));
+    if (output_arr == NULL) {
+        *err_flag = -1;
+        return NULL;
+    }
+    for(i = 0; i < num_elems; i++) {
+        tmp = input_arr[i];
+        tmp_quotient = abs(tmp / MOD_TABLE_SIZE);
+        tmp_mod = abs(tmp % MOD_TABLE_SIZE);
+        if(tmp > 0) {
+            if(hash_table_base_p[tmp_quotient] == NULL) {
+                if((hash_table_base_p[tmp_quotient] = (int *)calloc(MOD_TABLE_SIZE, sizeof(int))) == NULL) {
+                    *err_flag = 1;
+                    goto free_memory;
+                }
+            }
+            if(hash_table_base_p[tmp_quotient] != NULL && (hash_table_base_p[tmp_quotient])[tmp_mod] != 0) {
+                continue;
+            }
+        }
+        else {
+            if(hash_table_base_n[tmp_quotient] == NULL) {
+                if((hash_table_base_n[tmp_quotient] = (int *)calloc(MOD_TABLE_SIZE, sizeof(int))) == NULL) {
+                    *err_flag = 1;
+                    goto free_memory;
+                }
+            }
+            if(hash_table_base_n[tmp_quotient] != NULL && (hash_table_base_n[tmp_quotient])[tmp_mod] != 0) {
+                continue;
+            }
+        }
+        output_arr[j] = tmp;
+        j++;
+        if(tmp > 0) {
+            (hash_table_base_p[tmp_quotient])[tmp_mod] = 1;
+        }
+        else {
+            (hash_table_base_n[tmp_quotient])[tmp_mod] = 1;
+        }
+    }
+
+free_memory:
+    free_hash_table(hash_table_base_p, HASH_TABLE_SIZE);
+    free_hash_table(hash_table_base_n, HASH_TABLE_SIZE);
+    if(*err_flag != 0) {
+        free(output_arr);
+        return NULL;
+    }
+
+    final_output_arr = (int *)realloc(output_arr, j*sizeof(int));
+    if(final_output_arr == NULL) {
+        free(output_arr);
+        *err_flag = 3;
+        return NULL;
+    }
+    *num_elems_out = j;
+    return final_output_arr;
+}
+
 void free_hash_table_new(hash_table_base_node hash_table_new[], unsigned int num_elems) {
     for(unsigned int i = 0; i < num_elems; i++) {
         if(hash_table_new[i].ptr_branch_p != NULL) {
@@ -212,6 +317,24 @@ void free_hash_table_new(hash_table_base_node hash_table_new[], unsigned int num
     }
 }
 
+/**
+ * 
+ * @brief Filter out the unique integers from a given array 
+ *  Using the single base hash table algorithm
+ * 
+ * @param [in]
+ *  *input_arr is the given array pointer
+ *  num_elems is the number of the integer elems in the given array
+ *  
+ * @param [out]
+ *  *num_elems_out is the number of the output unique integers
+ *  *err_flag is for debugging errors
+ * 
+ * @returns
+ *  The pointer of the allocated output array if succeeded
+ *  NULL if any error happens
+ * 
+ */
 int* filter_unique_elems_ht_new(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag) {
     unsigned int i, j = 0;
     unsigned int tmp_quotient = 0, tmp_mod = 0;
@@ -318,6 +441,25 @@ free_memory:
     return final_output_arr;
 }
 
+/**
+ * 
+ * @brief Filter out the unique integers from a given array 
+ *  Using the single base hash table algorithm with fully dynamic 
+ *  memory allocation
+ * 
+ * @param [in]
+ *  *input_arr is the given array pointer
+ *  num_elems is the number of the integer elems in the given array
+ *  
+ * @param [out]
+ *  *num_elems_out is the number of the output unique integers
+ *  *err_flag is for debugging errors
+ * 
+ * @returns
+ *  The pointer of the allocated output array if succeeded
+ *  NULL if any error happens
+ * 
+ */
 int* filter_unique_elems_ht_dyn(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag) {
     unsigned int i, j = 0;
     unsigned int tmp_quotient = 0, tmp_mod = 0;
@@ -430,93 +572,6 @@ free_memory:
         free(output_arr);
         return NULL;
     }
-    final_output_arr = (int *)realloc(output_arr, j*sizeof(int));
-    if(final_output_arr == NULL) {
-        free(output_arr);
-        *err_flag = 3;
-        return NULL;
-    }
-    *num_elems_out = j;
-    return final_output_arr;
-}
-
-void free_hash_table(int *hash_table[], unsigned int num_elems) {
-    for(unsigned int i = 0; i < num_elems; i++) {
-        if(hash_table[i] != NULL) {
-            free(hash_table[i]);
-        }
-    }
-}
-
-int* filter_unique_elems_ht(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag) {
-    unsigned int i, j = 0;
-    unsigned int tmp_quotient = 0, tmp_mod = 0;
-    int tmp = 0;
-    int *final_output_arr = NULL;
-
-    int *hash_table_base_p[HASH_TABLE_SIZE] = {NULL,};
-    int *hash_table_base_n[HASH_TABLE_SIZE] = {NULL,};
-
-    *err_flag = 0;
-    *num_elems_out = 0;
-
-    if (input_arr == NULL) {
-        *err_flag = -5;
-        return NULL;
-    }
-    if (num_elems < 1){
-        *err_flag = -3;
-        return NULL;
-    }
-    int *output_arr = (int *)calloc(num_elems, sizeof(int));
-    if (output_arr == NULL) {
-        *err_flag = -1;
-        return NULL;
-    }
-    for(i = 0; i < num_elems; i++) {
-        tmp = input_arr[i];
-        tmp_quotient = abs(tmp / MOD_TABLE_SIZE);
-        tmp_mod = abs(tmp % MOD_TABLE_SIZE);
-        if(tmp > 0) {
-            if(hash_table_base_p[tmp_quotient] == NULL) {
-                if((hash_table_base_p[tmp_quotient] = (int *)calloc(MOD_TABLE_SIZE, sizeof(int))) == NULL) {
-                    *err_flag = 1;
-                    goto free_memory;
-                }
-            }
-            if(hash_table_base_p[tmp_quotient] != NULL && (hash_table_base_p[tmp_quotient])[tmp_mod] != 0) {
-                continue;
-            }
-        }
-        else {
-            if(hash_table_base_n[tmp_quotient] == NULL) {
-                if((hash_table_base_n[tmp_quotient] = (int *)calloc(MOD_TABLE_SIZE, sizeof(int))) == NULL) {
-                    *err_flag = 1;
-                    goto free_memory;
-                }
-            }
-            if(hash_table_base_n[tmp_quotient] != NULL && (hash_table_base_n[tmp_quotient])[tmp_mod] != 0) {
-                continue;
-            }
-        }
-        output_arr[j] = tmp;
-        j++;
-        if(tmp > 0) {
-            (hash_table_base_p[tmp_quotient])[tmp_mod] = 1;
-        }
-        else {
-            (hash_table_base_n[tmp_quotient])[tmp_mod] = 1;
-        }
-    }
-
-free_memory:
-    free_hash_table(hash_table_base_p, HASH_TABLE_SIZE);
-    free_hash_table(hash_table_base_n, HASH_TABLE_SIZE);
-    if(*err_flag != 0) {
-        free(output_arr);
-        return NULL;
-    }
-
     final_output_arr = (int *)realloc(output_arr, j*sizeof(int));
     if(final_output_arr == NULL) {
         free(output_arr);
