@@ -913,7 +913,7 @@ int main(int argc, char** argv) {
         free(out_naive_improved);
         free(out_naive);
     }
-    
+
     memset(arr_input, 0, num_elems);
     generate_growing_arr(arr_input, num_elems);
     file_p=fopen("growing.csv","wb+");
