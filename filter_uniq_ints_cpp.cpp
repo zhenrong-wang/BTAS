@@ -34,39 +34,27 @@ constexpr auto MOD_TABLE_SIZE = size_t{65536};
         return {};
     }
 
-    std::vector<int> hash_table_base_p[HASH_TABLE_SIZE];
-    std::vector<int> hash_table_base_n[HASH_TABLE_SIZE];
+    std::vector<bool> hash_table_base_p[HASH_TABLE_SIZE];
+    std::vector<bool> hash_table_base_n[HASH_TABLE_SIZE];
 
     auto out = std::vector<int>{};
     out.reserve(in.size());
 
     for(auto value : in) {
-        const auto quotient = abs(value / MOD_TABLE_SIZE);
-        const auto modulus = abs(value % MOD_TABLE_SIZE);
-        if(value > 0) {
-            if(hash_table_base_p[quotient].empty()) {
-                hash_table_base_p[quotient].resize(MOD_TABLE_SIZE, 0);
-            }
-            if(hash_table_base_p[quotient][modulus] != 0) {
-                continue;
-            }
+        const auto quotient = (value & 0x7fff'ffff) >> 16;
+        const auto modulus = value & 0x0000'ffff;
+
+        auto& lookup = value > 0 ? hash_table_base_p : hash_table_base_n;
+        if(lookup[quotient].empty()) {
+            lookup[quotient].resize(MOD_TABLE_SIZE, false);
         }
-        else {
-            if(hash_table_base_n[quotient].empty()) {
-                hash_table_base_n[quotient].resize(MOD_TABLE_SIZE, 0);
-            }
-            if(hash_table_base_n[quotient][modulus] != 0) {
-                continue;
-            }
+        if(lookup[quotient][modulus] != 0) {
+            continue;
         }
 
         out.push_back(value);
-        if(value > 0) {
-            hash_table_base_p[quotient][modulus] = 1;
-        }
-        else {
-            hash_table_base_n[quotient][modulus] = 1;
-        }
+
+        lookup[quotient][modulus] = true;
     }
 
     out.shrink_to_fit();

@@ -97,7 +97,7 @@ int main(int argc, char** argv) {
     start = clock();
     std::ignore = cpp::filter_uniq_ht(std::span{arr_input, static_cast<size_t>(num_elems)});
     end = clock();
-    printf("CPP (HT):\t\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("CPP (HT-BIT):\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     free(out_ht);
     free(out_ht_new);
@@ -159,7 +159,7 @@ int main(int argc, char** argv) {
     start = clock();
     std::ignore = cpp::filter_uniq_ht(std::span{arr_input, static_cast<size_t>(num_elems)});
     end = clock();
-    printf("CPP (HT):\t\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("CPP (HT-BIT):\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
 
     printf("\nBenchmark done.\n\n");
