@@ -24,7 +24,7 @@
 #define HASH_TABLE_SIZE 32769
 #define MOD_TABLE_SIZE  65536
 
-#define HT_DYN_INI_SIZE 1
+#define HT_DYN_INI_SIZE 32
 
 /**
  * @brief Convert a string to a posivie number
