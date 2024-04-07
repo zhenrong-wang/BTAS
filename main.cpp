@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
     }
 
     int num_elems = convert_string_to_positive_num(argv[1]), rand_max = convert_string_to_positive_num(argv[2]);
-    printf("INPUT_ELEMS:\t%d\nRANDOM_MAX:\t%d\n\n",num_elems, rand_max);
+    printf("INPUT_ELEMS:\t%d\nRANDOM_MAX:\t\t%d\n\n",num_elems, rand_max);
     if(num_elems < 0 || rand_max < 0) {
         printf("ERROR: arguments illegal. Make sure they are plain positive numbers.\n");
         return 3;
