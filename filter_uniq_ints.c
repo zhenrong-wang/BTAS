@@ -971,6 +971,7 @@ int main(int argc, char** argv) {
     free(out_ht_dyn);
     free(out_bit);
     free(out_bit_stc);
+    
     free(arr_input);
     return 0;
 }
