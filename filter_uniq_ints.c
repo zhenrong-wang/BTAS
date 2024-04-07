@@ -890,7 +890,7 @@ int main(int argc, char** argv) {
         with_brute = 1;
     }
     unsigned int num_elems = convert_string_to_positive_num(argv[1]), rand_max = convert_string_to_positive_num(argv[2]);
-    printf("INPUT_ELEMS:\t%d\nRANDOM_MAX:\t%ld\n\n",num_elems, rand_max);
+    printf("INPUT_ELEMS:\t%u\nRANDOM_MAX:\t%u\n\n",num_elems, rand_max);
     if(num_elems < 0 || rand_max < 0) {
         printf("ERROR: arguments illegal. Make sure they are plain positive numbers.\n");
         return 3;
