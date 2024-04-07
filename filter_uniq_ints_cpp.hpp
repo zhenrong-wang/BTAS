@@ -5,5 +5,6 @@
 #include <span>
 
 [[nodiscard]] std::vector<int> filter_uniq_cpp(std::span<const int> in);
+[[nodiscard]] std::vector<int> filter_uniq_cpp_sort(std::span<const int> in);
 
 #endif //FILTER_UNIQ_INTS_CPP_HPP
