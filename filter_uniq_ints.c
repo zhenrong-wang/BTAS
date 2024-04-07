@@ -952,7 +952,7 @@ int main(int argc, char** argv) {
     //free(arr_input);
     memset(arr_input, 0, num_elems);
     generate_growing_arr(arr_input, num_elems);
-    printf("GROWING ARRAY INPUT:\n");
+    printf("\nGROWING ARRAY INPUT:\n");
     printf("ALGO_TYPE\tTIME_IN_SEC\tUNIQUE_INTEGERS\n");
     
     start = clock();
@@ -987,7 +987,7 @@ int main(int argc, char** argv) {
         printf("NAIVE_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
         free(out_naive);
     }
-    
+    printf("\nBenchmark done.\n\n");
     free(out_naive_improved);
     free(out_ht);
     free(out_ht_new);
