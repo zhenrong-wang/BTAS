@@ -17,7 +17,7 @@ typedef struct {
     int *ptr_branch_n;
 } hash_table_base_node;
 
-int convert_string_to_positive_num(const char* string);
+unsigned int convert_string_to_positive_num(const char* string);
 int* filter_unique_elems_naive(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag);
 int* filter_unique_elems_naive_improved(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag);
 void free_hash_table(int *hash_table[], unsigned int num_elems);

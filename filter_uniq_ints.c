@@ -39,7 +39,7 @@
  *  -1 if illegal chars found or NULL pointer
  *  A positive number if succeeded
  */
-int convert_string_to_positive_num(const char* string) {
+unsigned int convert_string_to_positive_num(const char* string) {
     if(string == NULL) {
         return -1;
     }
@@ -889,7 +889,7 @@ int main(int argc, char** argv) {
     if (argc > 3 && strcmp(argv[3], "brute") == 0) {
         with_brute = 1;
     }
-    int num_elems = convert_string_to_positive_num(argv[1]), rand_max = convert_string_to_positive_num(argv[2]);
+    unsigned int num_elems = convert_string_to_positive_num(argv[1]), rand_max = convert_string_to_positive_num(argv[2]);
     printf("INPUT_ELEMS:\t%d\nRANDOM_MAX:\t%d\n\n",num_elems, rand_max);
     if(num_elems < 0 || rand_max < 0) {
         printf("ERROR: arguments illegal. Make sure they are plain positive numbers.\n");
