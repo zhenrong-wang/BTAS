@@ -846,7 +846,6 @@ int main(int argc, char** argv) {
         printf("ERROR: arguments illegal. Make sure they are plain positive numbers.\n");
         return 3;
     }
-
     int *arr_input = (int *)malloc(sizeof(int) * num_elems);
     if(arr_input == NULL) {
         printf("ERROR: Failed to allocate memory for input array.\n");
@@ -856,8 +855,16 @@ int main(int argc, char** argv) {
     unsigned int num_elems_out = 0;
     clock_t start, end;
     int *out_naive_improved = NULL, *out_naive = NULL, *out_ht = NULL, *out_ht_new = NULL, *out_ht_dyn = NULL, *out_bit = NULL, *out_bit_stc = NULL;
-    
     generate_random_input_arr(arr_input,num_elems,rand_max);
+    FILE* file_p=fopen("random.csv","wb+");
+    if(file_p == NULL){
+        free(arr_input);
+        return 7;
+    }
+    for(unsigned int i = 0; i < num_elems; i++) {
+        fprintf(file_p, "%d\n", arr_input[i]);
+    }
+    fclose(file_p);
     printf("RANDOM ARRAY INPUT:\n");
     printf("ALGO_TYPE\tTIME_IN_SEC\tUNIQUE_INTEGERS\n");
     start = clock();
@@ -909,6 +916,15 @@ int main(int argc, char** argv) {
     
     memset(arr_input, 0, num_elems);
     generate_growing_arr(arr_input, num_elems);
+    file_p=fopen("growing.csv","wb+");
+    if(file_p == NULL){
+        free(arr_input);
+        return 7;
+    }
+    for(unsigned int i = 0; i < num_elems; i++) {
+        fprintf(file_p, "%d\n", arr_input[i]);
+    }
+    fclose(file_p);
     printf("\nGROWING ARRAY INPUT:\n");
     printf("ALGO_TYPE\tTIME_IN_SEC\tUNIQUE_INTEGERS\n");
     
@@ -941,7 +957,6 @@ int main(int argc, char** argv) {
     out_naive_improved = filter_unique_elems_naive_improved(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
     printf("NAIVE_ALGO_NEW:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
-    
     if(with_brute == 1) {
         start = clock();
         out_naive = filter_unique_elems_naive(arr_input, num_elems, &num_elems_out, &err_flag);
@@ -956,7 +971,6 @@ int main(int argc, char** argv) {
     free(out_ht_dyn);
     free(out_bit);
     free(out_bit_stc);
-    
     free(arr_input);
     return 0;
 }
