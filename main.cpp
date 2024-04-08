@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
         with_brute = 1;
     }
     unsigned int num_elems = convert_string_to_positive_num(argv[1]), rand_max = convert_string_to_positive_num(argv[2]);
-    printf("INPUT_ELEMS:\t%u\nRANDOM_MAX:\t\t%u\n\n",num_elems, rand_max);
+    printf("INPUT_ELEMS:\t%u\nRANDOM_MAX:\t%u\n\n",num_elems, rand_max);
     if(num_elems < 0 || rand_max < 0) {
         printf("ERROR: arguments illegal. Make sure they are plain positive numbers.\n");
         return 3;
@@ -56,58 +56,59 @@ int main(int argc, char** argv) {
     out_ht_bit = filter_unique_elems_ht_bit(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
     printf("HASH_ALGO_BIT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    free(out_ht_bit);
 
     start = clock();
     out_ht = filter_unique_elems_ht(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("HASH_ALGO:\t\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
-
-    start = clock();
-    out_ht_new = filter_unique_elems_ht_new(arr_input, num_elems, &num_elems_out, &err_flag);
-    end = clock();
-    printf("HASH_ALGO_NEW:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
-
-    start = clock();
-    out_ht_dyn = filter_unique_elems_ht_dyn(arr_input, num_elems, &num_elems_out, &err_flag);
-    end = clock();
-    printf("HASH_ALGO_DYN:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
-
-    if(with_brute == 1) {
-        start = clock();
-        out_naive_improved = filter_unique_elems_naive_improved(arr_input, num_elems, &num_elems_out, &err_flag);
-        end = clock();
-        printf("NAIVE_ALGO_NEW:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
-
-        start = clock();
-        out_naive = filter_unique_elems_naive(arr_input, num_elems, &num_elems_out, &err_flag);
-        end = clock();
-        printf("NAIVE_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
-    }
-
-    start = clock();
-    std::ignore = cpp::filter_uniq(std::span{arr_input, static_cast<size_t>(num_elems)});
-    end = clock();
-    printf("CPP:\t\t\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
-
-    start = clock();
-    std::ignore = cpp::filter_uniq_sort(std::span{arr_input, static_cast<size_t>(num_elems)});
-    end = clock();
-    printf("CPP (SORT):\t\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
-
-    start = clock();
-    std::ignore = cpp::filter_uniq_ht(std::span{arr_input, static_cast<size_t>(num_elems)});
-    end = clock();
-    printf("CPP (HT-BIT):\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
-
+    printf("HASH_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
     free(out_ht);
-    free(out_ht_new);
-    free(out_ht_dyn);
-    free(out_ht_bit);
-    if(with_brute == 1) {
-        free(out_naive_improved);
-        free(out_naive);
-    }
-    //free(arr_input);
+
+ //   start = clock();
+ //   out_ht_new = filter_unique_elems_ht_new(arr_input, num_elems, &num_elems_out, &err_flag);
+ //   end = clock();
+ //   printf("HASH_ALGO_NEW:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+ //   free(out_ht_new);
+//
+ //   start = clock();
+ //   out_ht_dyn = filter_unique_elems_ht_dyn(arr_input, num_elems, &num_elems_out, &err_flag);
+ //   end = clock();
+ //   printf("HASH_ALGO_DYN:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+ //   free(out_ht_dyn);
+//
+ //   if(with_brute == 1) {
+ //       start = clock();
+ //       out_naive_improved = filter_unique_elems_naive_improved(arr_input, num_elems, &num_elems_out, &err_flag);
+ //       end = clock();
+ //       printf("NAIVE_ALGO_NEW:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+ //       free(out_naive_improved);
+//
+ //       start = clock();
+ //       out_naive = filter_unique_elems_naive(arr_input, num_elems, &num_elems_out, &err_flag);
+ //       end = clock();
+ //       printf("NAIVE_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+ //       free(out_naive);
+ //   }
+
+ //   start = clock();
+ //   std::ignore = cpp::filter_uniq(std::span{arr_input, static_cast<size_t>(num_elems)});
+ //   end = clock();
+ //   printf("CPP:\t\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+  {
+      start = clock();
+      const auto out = cpp::filter_uniq_sort(std::span{arr_input, static_cast<size_t>(num_elems)});
+      end = clock();
+      printf("CPP (SORT):\t%lf\t%lu\n", (double)(end - start)/CLOCKS_PER_SEC, out.size());
+  }
+
+  {
+      start = clock();
+      const auto out = cpp::filter_uniq_ht(std::span{arr_input, static_cast<size_t>(num_elems)});
+      end = clock();
+      printf("CPP (HT-BIT):\t%lf\t%lu\n", (double)(end - start)/CLOCKS_PER_SEC, out.size());
+  }
+
     memset(arr_input, 0, num_elems);
     generate_growing_arr(arr_input, num_elems);
     printf("\nGROWING ARRAY INPUT:\n");
@@ -117,57 +118,60 @@ int main(int argc, char** argv) {
     out_ht_bit = filter_unique_elems_ht_bit(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
     printf("HASH_ALGO_BIT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    free(out_ht_bit);
 
     start = clock();
     out_ht = filter_unique_elems_ht(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("HASH_ALGO:\t\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("HASH_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    free(out_ht);
 
+//    start = clock();
+//    out_ht_new = filter_unique_elems_ht_new(arr_input, num_elems, &num_elems_out, &err_flag);
+//    end = clock();
+//    printf("HASH_ALGO_NEW:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+//    free(out_ht_new);
+//
+//    start = clock();
+//    out_ht_dyn = filter_unique_elems_ht_dyn(arr_input, num_elems, &num_elems_out, &err_flag);
+//    end = clock();
+//    printf("HASH_ALGO_DYN:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+//    free(out_ht_dyn);
+//
+//    if(with_brute == 1) {
+//        start = clock();
+//        out_naive_improved = filter_unique_elems_naive_improved(arr_input, num_elems, &num_elems_out, &err_flag);
+//        end = clock();
+//        printf("NAIVE_ALGO_NEW:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+//        free(out_naive_improved);
+//
+//        start = clock();
+//        out_naive = filter_unique_elems_naive(arr_input, num_elems, &num_elems_out, &err_flag);
+//        end = clock();
+//        printf("NAIVE_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+//        free(out_naive);
+//    }
+
+ //   start = clock();
+ //   std::ignore = cpp::filter_uniq(std::span{arr_input, static_cast<size_t>(num_elems)});
+ //   end = clock();
+ //   printf("CPP:\t\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+  {
     start = clock();
-    out_ht_new = filter_unique_elems_ht_new(arr_input, num_elems, &num_elems_out, &err_flag);
-    end = clock();
-    printf("HASH_ALGO_NEW:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+      const auto out = cpp::filter_uniq_sort(std::span{arr_input, static_cast<size_t>(num_elems)});
+      end = clock();
+      printf("CPP (SORT):\t%lf\t%lu\n", (double)(end - start)/CLOCKS_PER_SEC, out.size());
+  }
 
+  {
     start = clock();
-    out_ht_dyn = filter_unique_elems_ht_dyn(arr_input, num_elems, &num_elems_out, &err_flag);
-    end = clock();
-    printf("HASH_ALGO_DYN:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
-
-    start = clock();
-    out_naive_improved = filter_unique_elems_naive_improved(arr_input, num_elems, &num_elems_out, &err_flag);
-    end = clock();
-    printf("NAIVE_ALGO_NEW:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
-
-    if(with_brute == 1) {
-        start = clock();
-        out_naive = filter_unique_elems_naive(arr_input, num_elems, &num_elems_out, &err_flag);
-        end = clock();
-        printf("NAIVE_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
-        free(out_naive);
-    }
-
-    start = clock();
-    std::ignore = cpp::filter_uniq(std::span{arr_input, static_cast<size_t>(num_elems)});
-    end = clock();
-    printf("CPP:\t\t\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
-
-    start = clock();
-    std::ignore = cpp::filter_uniq_sort(std::span{arr_input, static_cast<size_t>(num_elems)});
-    end = clock();
-    printf("CPP (SORT):\t\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
-
-    start = clock();
-    std::ignore = cpp::filter_uniq_ht(std::span{arr_input, static_cast<size_t>(num_elems)});
-    end = clock();
-    printf("CPP (HT-BIT):\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
-
+      const auto out = cpp::filter_uniq_ht(std::span{arr_input, static_cast<size_t>(num_elems)});
+      end = clock();
+      printf("CPP (HT-BIT):\t%lf\t%lu\n", (double)(end - start)/CLOCKS_PER_SEC, out.size());
+  }
 
     printf("\nBenchmark done.\n\n");
-    free(out_naive_improved);
-    free(out_ht);
-    free(out_ht_new);
-    free(out_ht_dyn);
-    free(out_ht_bit);
 
     free(arr_input);
     return 0;
