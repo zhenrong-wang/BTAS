@@ -575,7 +575,7 @@ free_memory:
  *  void
  * 
  */
-void print_arr(int *arr, u32bit num_elems) {
+void print_arr(const int *arr, u32bit num_elems) {
     if(arr == NULL || num_elems < 1) {
         printf("ERROR: NULL array input.\n");
         return;
@@ -589,7 +589,7 @@ void print_arr(int *arr, u32bit num_elems) {
     printf("\n\n");
 }
 
-int compare_arr(int *arr_a, int *arr_b, u32bit num_elems) {
+int compare_arr(const int *arr_a, const int *arr_b, u32bit num_elems) {
     if(arr_a == NULL || arr_b == NULL) {
         return -3;
     }

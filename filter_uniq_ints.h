@@ -57,8 +57,16 @@ void free_hash_table_new(htable_base hash_table_new[], u32bit num_elems);
 int* filter_unique_elems_ht(const int *input_arr, const u32bit num_elems, u32bit *num_elems_out, int *err_flag);
 int* filter_unique_elems_ht_new(const int *input_arr, const u32bit num_elems, u32bit *num_elems_out, int *err_flag);
 int* filter_unique_elems_ht_dyn(const int *input_arr, const u32bit num_elems, u32bit *num_elems_out, int *err_flag);
-void print_arr(int *arr, u32bit num_elems);
-int compare_arr(int *arr_a, int *arr_b, u32bit num_elems);
+
+/**
+ * Auxiliary functions, e.g.
+ *  - Print out an array (Caution: when the array is very big, don't use it)
+ *  - Compare 2 arrays
+ *  - Generate a RANDOM input integer array
+ *  - Generate a GROWING input integer array
+*/
+void print_arr(const int *arr, u32bit num_elems);
+int compare_arr(const int *arr_a, const int *arr_b, u32bit num_elems);
 int generate_random_input_arr(int *arr, u32bit num_elems, u32bit rand_max);
 int generate_growing_arr(int *arr, u32bit num_elems);
 
