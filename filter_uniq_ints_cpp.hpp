@@ -13,10 +13,6 @@ namespace cpp {
 [[nodiscard]] std::vector<int> filter_uniq(std::span<const int> in);
 [[nodiscard]] std::vector<int> filter_uniq_sort(std::span<const int> in);
 
-
-constexpr auto HASH_TABLE_SIZE = size_t{32769};
-constexpr auto MOD_TABLE_SIZE = size_t{65536};
-
 namespace detail {
 
 template<std::integral Value_T>
@@ -76,7 +72,7 @@ requires(std::is_integral_v<typename Range_T::value_type>)
     auto& quotient_lookup = value > 0 ? quotient_lookup_p : quotient_lookup_n;
 
     if(quotient_lookup[quotient].empty()) {
-      quotient_lookup[quotient].resize(MOD_TABLE_SIZE, false);
+      quotient_lookup[quotient].resize(Properties::modulus_lookup_size, false);
     }
 
     if(not quotient_lookup[quotient][modulus]) {

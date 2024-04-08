@@ -897,7 +897,7 @@ int main(int argc, char** argv) {
         out_naive_improved = filter_unique_elems_naive_improved(arr_input, num_elems, &num_elems_out, &err_flag);
         end = clock();
         printf("NAIVE_ALGO_NEW:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
-    
+
         start = clock();
         out_naive = filter_unique_elems_naive(arr_input, num_elems, &num_elems_out, &err_flag);
         end = clock();
@@ -927,7 +927,7 @@ int main(int argc, char** argv) {
     fclose(file_p);
     printf("\nGROWING ARRAY INPUT:\n");
     printf("ALGO_TYPE\tTIME_IN_SEC\tUNIQUE_INTEGERS\n");
-    
+
     start = clock();
     out_bit = fui_bitmap_base_dyn(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
