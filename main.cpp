@@ -50,6 +50,15 @@ int main(int argc, char** argv) {
     int *out_naive_improved = NULL, *out_naive = NULL, *out_ht = NULL, *out_ht_new = NULL, *out_ht_dyn = NULL, *out_bit = NULL, *out_bit_stc = NULL;
 
     generate_random_input_arr(arr_input,num_elems,rand_max);
+    FILE* file_p=fopen("random.csv","wb+");
+    if(file_p == NULL){
+        free(arr_input);
+        return 7;
+    }
+    for(unsigned int i = 0; i < num_elems; i++) {
+        fprintf(file_p, "%d\n", arr_input[i]);
+    }
+    fclose(file_p);
     printf("RANDOM ARRAY INPUT:\n");
     printf("ALGO_TYPE\tTIME_IN_SEC\tUNIQUE_INTEGERS\n");
     start = clock();
@@ -117,6 +126,15 @@ int main(int argc, char** argv) {
 
     memset(arr_input, 0, num_elems);
     generate_growing_arr(arr_input, num_elems);
+    file_p=fopen("growing.csv","wb+");
+    if(file_p == NULL){
+        free(arr_input);
+        return 7;
+    }
+    for(unsigned int i = 0; i < num_elems; i++) {
+        fprintf(file_p, "%d\n", arr_input[i]);
+    }
+    fclose(file_p);
     printf("\nGROWING ARRAY INPUT:\n");
     printf("ALGO_TYPE\tTIME_IN_SEC\tUNIQUE_INTEGERS\n");
 
