@@ -1,10 +1,12 @@
-# Filter-Uniq-Ints: A small practice to filter out unique integers from an integer array
+# Filter-Uniq-Ints: Ultra-fast Algorithms for Removing Duplicate Integers/Filtering Unique Integers
+
+*Up-to 1000x faster than the performance of industrial standard databases, able to handle 100 million data items with randomness of 4,294,967,296!*
 
 # 1. Background
 
 ## 1.1 Problem description
 
-This program aims to solving a classic question: eliminate the duplicate elements from an unsorted integer array. For example:
+This program aims to solving the classic question: eliminate the duplicate elements from an unsorted integer array. For example:
 
 For an original array with 9 elements: {16, 17, 2, **17**, 4, **2**, 97, **4**, **17**}
 
@@ -178,8 +180,6 @@ The preliminery benchmark suppports the analysis of the algorithms above. See th
 
 ![preliminery_benchmark](./assets/benchmark-0406.png)
 
-The HASH algorithm is 10000x faster than the other 2 algorithms.
-
 # 2. Brief Intro
 
 **Program Name**: Filter-Uniq-Ints
@@ -194,7 +194,9 @@ The HASH algorithm is 10000x faster than the other 2 algorithms.
 
 ### 3.1.1 Prerequisites
 
-You need a C compiler to build. 
+You need a C and Cpp compiler to build this project along with [CMake](https://cmake.org/) > **3.20** to build the **main branch**.
+
+There is also a **c-branch** which contains only C implementations and doesn't require [CMake](https://cmake.org/). Those C implementations updates are syncronized to the **main branch**.
 
 - For Microsoft Windows users, [mingw-w64](https://sourceforge.net/projects/mingw-w64/) is recommended
 - For GNU/Linux Distro or other *nix users, the [GNU Compiler Collections](https://gcc.gnu.org/), known as gcc, is a perfect one
@@ -202,9 +204,21 @@ You need a C compiler to build.
 
 ### 3.1.2 Build Guide
 
+**NOTE**: Please choose a branch before build this project.
+
 1. Use git to clone this code: `git clone https://github.com/zhenrong-wang/filter-uniq-ints.git`
 2. Change your directory: `cd filter-uniq-ints`
-3. Build command example: `gcc filter_uniq_ints.c -o my_program_name -Wall -Ofast`
+
+**For the main branch:**
+
+3. a. Configure CMake: `cmake -B cmake-build-release -DCMAKE_BUILD_TYPE=Release`
+4. a. Build command example: `cmake --build cmake-build-release --config Release --target all`
+5. a. Change your directory: `cd cmake-build-release`
+6. a. Build with make: `make`
+
+**For the c-branch**
+
+3. b. Build with the C compiler: `gcc filter-uniq-ints.c -Ofast -Wall -o YOUR_PROGRAM_NAME`
 
 ## 3.2 Run
 
@@ -215,6 +229,4 @@ Command Format: `cmd argv[1] argv[2]`
 
 # 4 Bugs and Communications
 
-Any bugs or problems found, please submit issues to this repo. I'd be glad to communicate on any issues.
-
-Or, you can also email me: zhenrongwang@live.com
+Any bugs or problems found, please submit issues to this repo. We'd be glad to communicate on any issues.
