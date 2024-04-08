@@ -73,7 +73,7 @@ typedef struct {
     unsigned short branch_size_p;
     unsigned char *ptr_branch_n;
     unsigned char *ptr_branch_p;
-} bitmap_base_node_double;
+} bitmap_dbase_node;
 
 inline void flip_bit(unsigned char *byte_a, unsigned char bit_position);
 inline int check_bit(unsigned char byte_a, unsigned char bit_position);
