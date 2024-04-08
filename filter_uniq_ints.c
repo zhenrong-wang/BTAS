@@ -680,38 +680,6 @@ int generate_growing_arr(int *arr, unsigned int num_elems) {
     return 0;
 }
 
-/**
- * 
- * @brief Flip a bit from 0 to 1
- * 
- * @param [in]
- *  *byte_a is a given 8-bit number
- *  bit_position should be in the range [0, 7]
- * 
- * @returns void
- * 
- */
-inline void flip_bit(unsigned char *byte_a, unsigned char bit_position) {
-    *byte_a |= (0x80 >> bit_position);
-}
-
-/**
- * 
- * @brief Check a bit is 0 or not
- * 
- * @param [in]
- *  byte_a is a given 8-bit number
- *  bit_position should be in the range [0, 7]
- * 
- * @returns
- *  0 if the bit is 0
- *  1 if the bit is 1
- * 
- */
-inline int check_bit(unsigned char byte_a, unsigned char bit_position) {
-    return byte_a & (0x80 >> bit_position);
-}
-
 void free_bitmap(bitmap_base_node *bitmap_head, unsigned short num_elems) {
     for(unsigned int i = 0; i < num_elems; i++) {
         if(bitmap_head[i].ptr_branch != NULL) {
@@ -754,12 +722,12 @@ unsigned int i, j = 0;
                 goto free_memory;
             }
         }
-        if(bitmap_head[tmp_quotient].ptr_branch != NULL && check_bit((bitmap_head[tmp_quotient].ptr_branch)[tmp_byte_index], tmp_bit_position) != 0) {
+        if(bitmap_head[tmp_quotient].ptr_branch != NULL && check_bit((bitmap_head[tmp_quotient].ptr_branch)[tmp_byte_index], tmp_bit_position)) {
             continue;
         }
         output_arr[j] = tmp;
         j++;
-        flip_bit(bitmap_head[tmp_quotient].ptr_branch + tmp_byte_index, tmp_bit_position);
+        flip_bit((bitmap_head[tmp_quotient].ptr_branch)[tmp_byte_index], tmp_bit_position);
     }
 free_memory:
     free_bitmap(bitmap_head, BITMAP_LENGTH_MAX);
@@ -828,12 +796,12 @@ int* fui_bitmap_base_dyn(const int *input_arr, const unsigned int num_elems, uns
                 goto free_memory;
             }
         }
-        if(bitmap_head[tmp_quotient].ptr_branch != NULL && check_bit((bitmap_head[tmp_quotient].ptr_branch)[tmp_byte_index], tmp_bit_position) != 0) {
+        if(bitmap_head[tmp_quotient].ptr_branch != NULL && check_bit((bitmap_head[tmp_quotient].ptr_branch)[tmp_byte_index], tmp_bit_position)) {
             continue;
         }
         output_arr[j] = tmp;
         j++;
-        flip_bit(bitmap_head[tmp_quotient].ptr_branch + tmp_byte_index, tmp_bit_position);
+        flip_bit((bitmap_head[tmp_quotient].ptr_branch)[tmp_byte_index], tmp_bit_position);
     }
 free_memory:
     free_bitmap(bitmap_head, bitmap_base_size);

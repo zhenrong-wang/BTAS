@@ -75,8 +75,9 @@ typedef struct {
     unsigned char *ptr_branch_p;
 } bitmap_dbase_node;
 
-inline void flip_bit(unsigned char *byte_a, unsigned char bit_position);
-inline int check_bit(unsigned char byte_a, unsigned char bit_position);
+#define flip_bit(byte_a, bit_position) ((byte_a) |= (0x80 >> (bit_position)))
+#define check_bit(byte_a, bit_position) ((byte_a) & (0x80 >> (bit_position)))
+
 int* fui_bitmap_stc(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag);
 int* fui_bitmap_base_dyn(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag);
 
