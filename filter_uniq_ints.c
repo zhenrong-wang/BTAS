@@ -14,24 +14,6 @@
 #include "filter_uniq_ints.h"
 
 /**
- * The maximum 32-bit signed integer is -2^31 - 2^31, 
- * aka, -32768 x 65536 to 32768 x 65536
- * So, any given integer x, x / 65536 < = 32768, and the mod
- * x % 65536 < 65536, Therefore, the HASH_TABLE_SIZE 
- * should be 32769 to cover 0 ~ 32768, and the MOD_TABLE_SIZE
- * should be 65536 to cover 0 ~ 65535
- */
-#define HASH_TABLE_SIZE 32769
-#define MOD_TABLE_SIZE  65536
-
-/**
- * With the initial size of 32, the initial hash table is able
- * cover the range of -2097152 to 2097152
- */
-#define HT_DYN_INI_SIZE 32
-#define BIT_HT_INI_SIZE 64
-
-/**
  * @brief Convert a string to a posivie number
  *  The string cannot contain characters other than 0~9
  * 
@@ -730,25 +712,19 @@ inline int check_bit(unsigned char byte_a, unsigned char bit_position) {
     return byte_a & (0x80 >> bit_position);
 }
 
-void free_bit_hash_table(bit_hash_table_node hash_table_new[], unsigned int num_elems) {
+void free_bitmap(bitmap_base_node *bitmap_head, unsigned short num_elems) {
     for(unsigned int i = 0; i < num_elems; i++) {
-        if(hash_table_new[i].ptr_branch_p != NULL) {
-            free(hash_table_new[i].ptr_branch_p);
-        }
-        if(hash_table_new[i].ptr_branch_n != NULL) {
-            free(hash_table_new[i].ptr_branch_n);
+        if(bitmap_head[i].ptr_branch != NULL) {
+            free(bitmap_head[i].ptr_branch);
         }
     }
 }
 
-int* filter_unique_elems_ht_bit(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag) {
-    unsigned int i, j = 0;
-    unsigned int tmp_quotient = 0, tmp_mod = 0, tmp_branch_size_byte = 0;
-    int tmp = 0;
-    int *final_output_arr = NULL;
-    unsigned char *tmp_realloc_ptr = NULL;
-    bit_hash_table_node *hash_table_base = NULL, *tmp_ht_realloc_ptr = NULL;
-    unsigned int ht_base_length = BIT_HT_INI_SIZE;
+int* fui_bitmap_stc(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag) {
+unsigned int i, j = 0;
+    unsigned int tmp_quotient = 0, tmp_mod = 0;
+    int tmp = 0, *final_output_arr = NULL;
+    bitmap_base_node bitmap_head[BITMAP_LENGTH_MAX] = {{0, NULL},};
     unsigned short tmp_byte_index = 0;
     unsigned char tmp_bit_position = 0;
     *err_flag = 0;
@@ -761,100 +737,107 @@ int* filter_unique_elems_ht_bit(const int *input_arr, const unsigned int num_ele
         *err_flag = -3;
         return NULL;
     }
-    hash_table_base = (bit_hash_table_node *)calloc(BIT_HT_INI_SIZE, sizeof(bit_hash_table_node));
-    if(hash_table_base == NULL) {
-        *err_flag = 5;
-        return NULL;
-    }
     int *output_arr = (int *)calloc(num_elems, sizeof(int));
     if (output_arr == NULL) {
-        free(hash_table_base);
         *err_flag = -1;
         return NULL;
     }
     for(i = 0; i < num_elems; i++) {
         tmp = input_arr[i];
-        tmp_quotient = abs(tmp / MOD_TABLE_SIZE);
-        tmp_mod = abs(tmp % MOD_TABLE_SIZE);
-        tmp_byte_index = tmp_mod / 8;
+        tmp_quotient = abs(tmp / BIT_MOD_DIV_FACTOR);
+        tmp_mod = abs(tmp % BIT_MOD_DIV_FACTOR);
+        tmp_byte_index = (tmp < 0) ? (NEGATIVE_START_POS + (tmp_mod / 8)) : (tmp_mod / 8);
         tmp_bit_position = tmp_mod % 8;
-        tmp_branch_size_byte = tmp_byte_index + 1;
-        if((tmp_quotient + 1) > ht_base_length) {
-            tmp_ht_realloc_ptr = (bit_hash_table_node *)realloc(hash_table_base, (tmp_quotient + 1) * sizeof(bit_hash_table_node));
-            if(tmp_ht_realloc_ptr == NULL) {
-                *err_flag = 7;
+        if(bitmap_head[tmp_quotient].ptr_branch == NULL) {
+            if((bitmap_head[tmp_quotient].ptr_branch = (unsigned char *)calloc(BIT_MOD_TABLE_SIZE, sizeof(unsigned char))) == NULL) {
+                *err_flag = 1;
                 goto free_memory;
             }
-            memset(tmp_ht_realloc_ptr + ht_base_length, 0, (tmp_quotient + 1 - ht_base_length) * sizeof(bit_hash_table_node));
-            hash_table_base = tmp_ht_realloc_ptr;
-            ht_base_length = (tmp_quotient + 1);
         }
-        if(tmp > 0) {
-            if(hash_table_base[tmp_quotient].ptr_branch_p == NULL) {
-                if((hash_table_base[tmp_quotient].ptr_branch_p = (unsigned char *)calloc(tmp_branch_size_byte, sizeof(unsigned char))) == NULL) {
-                    *err_flag = 1;
-                    goto free_memory;
-                }
-                else {
-                    hash_table_base[tmp_quotient].branch_size_p = tmp_branch_size_byte;
-                }
-            }
-            else {
-                if(hash_table_base[tmp_quotient].branch_size_p < tmp_branch_size_byte) {
-                    if((tmp_realloc_ptr = (unsigned char *)realloc(hash_table_base[tmp_quotient].ptr_branch_p, tmp_branch_size_byte * sizeof(unsigned char))) == NULL) {
-                        *err_flag = 1;
-                        goto free_memory;
-                    }
-                    else {
-                        hash_table_base[tmp_quotient].ptr_branch_p = tmp_realloc_ptr;
-                        memset(tmp_realloc_ptr + hash_table_base[tmp_quotient].branch_size_p, 0, sizeof(unsigned char) * (tmp_branch_size_byte - hash_table_base[tmp_quotient].branch_size_p));
-                        hash_table_base[tmp_quotient].branch_size_p = tmp_branch_size_byte;
-                    }
-                }
-            }
-            if(hash_table_base[tmp_quotient].ptr_branch_p != NULL && check_bit((hash_table_base[tmp_quotient].ptr_branch_p)[tmp_byte_index], tmp_bit_position) != 0) {
-                continue;
-            }
-        }
-        else {
-            if(hash_table_base[tmp_quotient].ptr_branch_n == NULL) {
-                if((hash_table_base[tmp_quotient].ptr_branch_n = (unsigned char *)calloc(tmp_branch_size_byte, sizeof(unsigned char))) == NULL) {
-                    *err_flag = 1;
-                    goto free_memory;
-                }
-                else {
-                    hash_table_base[tmp_quotient].branch_size_n = tmp_branch_size_byte;
-                }
-            }
-            else {
-                if(hash_table_base[tmp_quotient].branch_size_n < tmp_branch_size_byte) {
-                    if((tmp_realloc_ptr = (unsigned char *)realloc(hash_table_base[tmp_quotient].ptr_branch_n, tmp_branch_size_byte * sizeof(unsigned char))) == NULL) {
-                        *err_flag = 1;
-                        goto free_memory;
-                    }
-                    else {
-                        hash_table_base[tmp_quotient].ptr_branch_n = tmp_realloc_ptr;
-                        memset(tmp_realloc_ptr + hash_table_base[tmp_quotient].branch_size_n, 0, sizeof(unsigned char) * (tmp_branch_size_byte - hash_table_base[tmp_quotient].branch_size_n));
-                        hash_table_base[tmp_quotient].branch_size_n = tmp_branch_size_byte;
-                    }
-                }
-            }
-            if(hash_table_base[tmp_quotient].ptr_branch_n != NULL && check_bit((hash_table_base[tmp_quotient].ptr_branch_n)[tmp_byte_index], tmp_bit_position) != 0) {
-                continue;
-            }
+        if(bitmap_head[tmp_quotient].ptr_branch != NULL && check_bit((bitmap_head[tmp_quotient].ptr_branch)[tmp_byte_index], tmp_bit_position) != 0) {
+            continue;
         }
         output_arr[j] = tmp;
         j++;
-        if(tmp > 0) {
-            flip_bit(hash_table_base[tmp_quotient].ptr_branch_p + tmp_byte_index, tmp_bit_position);
-        }
-        else {
-            flip_bit(hash_table_base[tmp_quotient].ptr_branch_n + tmp_byte_index, tmp_bit_position);
-        }
+        flip_bit(bitmap_head[tmp_quotient].ptr_branch + tmp_byte_index, tmp_bit_position);
     }
 free_memory:
-    free_bit_hash_table(hash_table_base, ht_base_length);
-    free(hash_table_base);
+    free_bitmap(bitmap_head, BITMAP_LENGTH_MAX);
+    if(*err_flag != 0) {
+        free(output_arr);
+        return NULL;
+    }
+    final_output_arr = (int *)realloc(output_arr, j * sizeof(int));
+    if(final_output_arr == NULL) {
+        free(output_arr);
+        *err_flag = 3;
+        return NULL;
+    }
+    *num_elems_out = j;
+    return final_output_arr;
+}
+
+int* fui_bitmap_base_dyn(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag) {
+    unsigned int i, j = 0;
+    unsigned int tmp_quotient = 0, tmp_mod = 0;
+    int tmp = 0, *final_output_arr = NULL;
+    bitmap_base_node *bitmap_head = NULL, *tmp_bitmap_realloc = NULL;
+    unsigned short tmp_byte_index = 0, bitmap_base_size = BITMAP_INIT_LENGTH;
+    unsigned char tmp_bit_position = 0;
+    *err_flag = 0;
+    *num_elems_out = 0;
+    if (input_arr == NULL) {
+        *err_flag = -5;
+        return NULL;
+    }
+    if (num_elems < 1){
+        *err_flag = -3;
+        return NULL;
+    }
+    bitmap_head = (bitmap_base_node *)calloc(BITMAP_INIT_LENGTH, sizeof(bitmap_base_node));
+    if(bitmap_head == NULL) {
+        *err_flag = 5;
+        return NULL;
+    }
+    int *output_arr = (int *)calloc(num_elems, sizeof(int));
+    if (output_arr == NULL) {
+        free(bitmap_head);
+        *err_flag = -1;
+        return NULL;
+    }
+    for(i = 0; i < num_elems; i++) {
+        tmp = input_arr[i];
+        tmp_quotient = abs(tmp / BIT_MOD_DIV_FACTOR);
+        tmp_mod = abs(tmp % BIT_MOD_DIV_FACTOR);
+        tmp_byte_index = (tmp < 0) ? (NEGATIVE_START_POS + (tmp_mod / 8)) : (tmp_mod / 8);
+        tmp_bit_position = tmp_mod % 8;
+
+        /* Grow the tree if needed. */
+        if((tmp_quotient + 1) > bitmap_base_size) {
+            if((tmp_bitmap_realloc = (bitmap_base_node *)realloc(bitmap_head, (tmp_quotient + 1) * sizeof(bitmap_base_node))) == NULL) {
+                *err_flag = 7;
+                goto free_memory;
+            }
+            memset(tmp_bitmap_realloc + bitmap_base_size, 0, (tmp_quotient + 1 - bitmap_base_size) * sizeof(bitmap_base_node));
+            bitmap_head = tmp_bitmap_realloc;
+            bitmap_base_size = (tmp_quotient + 1);
+        }
+        if(bitmap_head[tmp_quotient].ptr_branch == NULL) {
+            if((bitmap_head[tmp_quotient].ptr_branch = (unsigned char *)calloc(BIT_MOD_TABLE_SIZE, sizeof(unsigned char))) == NULL) {
+                *err_flag = 1;
+                goto free_memory;
+            }
+        }
+        if(bitmap_head[tmp_quotient].ptr_branch != NULL && check_bit((bitmap_head[tmp_quotient].ptr_branch)[tmp_byte_index], tmp_bit_position) != 0) {
+            continue;
+        }
+        output_arr[j] = tmp;
+        j++;
+        flip_bit(bitmap_head[tmp_quotient].ptr_branch + tmp_byte_index, tmp_bit_position);
+    }
+free_memory:
+    free_bitmap(bitmap_head, bitmap_base_size);
+    free(bitmap_head);
     if(*err_flag != 0) {
         free(output_arr);
         return NULL;
@@ -904,15 +887,20 @@ int main(int argc, char** argv) {
     int err_flag = 0;
     unsigned int num_elems_out = 0;
     clock_t start, end;
-    int *out_naive_improved = NULL, *out_naive = NULL, *out_ht = NULL, *out_ht_new = NULL, *out_ht_dyn = NULL, *out_ht_bit = NULL;
+    int *out_naive_improved = NULL, *out_naive = NULL, *out_ht = NULL, *out_ht_new = NULL, *out_ht_dyn = NULL, *out_bit = NULL, *out_bit_stc = NULL;
     
     generate_random_input_arr(arr_input,num_elems,rand_max);
     printf("RANDOM ARRAY INPUT:\n");
     printf("ALGO_TYPE\tTIME_IN_SEC\tUNIQUE_INTEGERS\n");
     start = clock();
-    out_ht_bit = filter_unique_elems_ht_bit(arr_input, num_elems, &num_elems_out, &err_flag);
+    out_bit = fui_bitmap_base_dyn(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("HASH_ALGO_BIT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("BITMAP_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+    start = clock();
+    out_bit_stc = fui_bitmap_stc(arr_input, num_elems, &num_elems_out, &err_flag);
+    end = clock();
+    printf("BITMAP_STC:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     start = clock();
     out_ht = filter_unique_elems_ht(arr_input, num_elems, &num_elems_out, &err_flag);
@@ -944,21 +932,27 @@ int main(int argc, char** argv) {
     free(out_ht);
     free(out_ht_new);
     free(out_ht_dyn);
-    free(out_ht_bit);
+    free(out_bit);
+    free(out_bit_stc);
     if(with_brute == 1) {
         free(out_naive_improved);
         free(out_naive);
     }
-    //free(arr_input);
+    
     memset(arr_input, 0, num_elems);
     generate_growing_arr(arr_input, num_elems);
     printf("\nGROWING ARRAY INPUT:\n");
     printf("ALGO_TYPE\tTIME_IN_SEC\tUNIQUE_INTEGERS\n");
     
     start = clock();
-    out_ht_bit = filter_unique_elems_ht_bit(arr_input, num_elems, &num_elems_out, &err_flag);
+    out_bit = fui_bitmap_base_dyn(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("HASH_ALGO_BIT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("BITMAP_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+    start = clock();
+    out_bit_stc = fui_bitmap_stc(arr_input, num_elems, &num_elems_out, &err_flag);
+    end = clock();
+    printf("BITMAP_STC:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     start = clock();
     out_ht = filter_unique_elems_ht(arr_input, num_elems, &num_elems_out, &err_flag);
@@ -992,7 +986,8 @@ int main(int argc, char** argv) {
     free(out_ht);
     free(out_ht_new);
     free(out_ht_dyn);
-    free(out_ht_bit);
+    free(out_bit);
+    free(out_bit_stc);
     
     free(arr_input);
     return 0;

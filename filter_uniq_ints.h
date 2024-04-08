@@ -10,6 +10,24 @@
 #ifndef FILTER_UNIQ_INTS_H
 #define FILTER_UNIQ_INTS_H
 
+/**
+ * The maximum 32-bit signed integer is -2^31 - 2^31, 
+ * aka, -32768 x 65536 to 32768 x 65536
+ * So, any given integer x, x / 65536 < = 32768, and the mod
+ * x % 65536 < 65536, Therefore, the HASH_TABLE_SIZE 
+ * should be 32769 to cover 0 ~ 32768, and the MOD_TABLE_SIZE
+ * should be 65536 to cover 0 ~ 65535
+ */
+#define HASH_TABLE_SIZE 32769
+#define MOD_TABLE_SIZE  65536
+
+/**
+ * With the initial size of 32, the initial hash table is able
+ * cover the range of -2097152 to 2097152
+ */
+#define HT_DYN_INI_SIZE 32
+#define BIT_HT_INI_SIZE 64
+
 typedef struct {
     unsigned int branch_size_p;
     unsigned int branch_size_n;
@@ -34,15 +52,39 @@ int generate_growing_arr(int *arr, unsigned int num_elems);
  * Testing the bit-based hash table algorithm
  * This algorithm would save 8x memory usage
  */
-typedef struct {
-    unsigned int branch_size_p;
-    unsigned int branch_size_n;
-    unsigned char *ptr_branch_p;
-    unsigned char *ptr_branch_n;
-} bit_hash_table_node;
 
-void flip_bit(unsigned char *byte_a, unsigned char bit_position);
-int check_bit(unsigned char byte_a, unsigned char bit_position);
-int* filter_unique_elems_ht_bit(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag);
+#define NEGATIVE_START_POS  8192
+#define BIT_MOD_TABLE_SIZE  16384
+#define BIT_MOD_DIV_FACTOR  65536
+#define BITMAP_INIT_LENGTH  128
+#define BITMAP_LENGTH_MAX   32769
+
+/* STATIC BITMAP SIZE */
+#define BITMAP_STATIC_ROW   4096
+#define BITMAP_STATIC_COL   16384
+
+typedef struct {
+    unsigned short branch_size;
+    unsigned char *ptr_branch;
+} bitmap_base_node;
+
+typedef struct {
+    unsigned short branch_size_n;
+    unsigned short branch_size_p;
+    unsigned char *ptr_branch_n;
+    unsigned char *ptr_branch_p;
+} bitmap_base_node_double;
+
+inline void flip_bit(unsigned char *byte_a, unsigned char bit_position);
+inline int check_bit(unsigned char byte_a, unsigned char bit_position);
+int* fui_bitmap_stc(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag);
+int* fui_bitmap_base_dyn(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag);
+
+/* To be continued. */
+int* fui_bitmap_full_dyn(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag);
+int* fui_bitmap_dbase(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag);
+int* fui_bitmap_dbase_dyn(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag);
+int* fui_bitmap_array(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag);
+int* fui_bitmap_array_dyn(const int *input_arr, const unsigned int num_elems, unsigned int *num_elems_out, int *err_flag);
 
 #endif
