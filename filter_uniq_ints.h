@@ -13,15 +13,15 @@
 /**
  *  Use aliases to make the code clear and short
  */
-typedef     unsigned char       u8bit;
-typedef     unsigned short      u16bit;
-typedef     unsigned int        u32bit;
+typedef     unsigned char       uint_8;
+typedef     unsigned short      uint_16;
+typedef     unsigned int        uint_32;
 #ifdef _WIN32
-typedef     long long           i64bit;
-typedef     unsigned long long  u64bit;
+typedef     long long           int_64bit;
+typedef     unsigned long long  uint_64bit;
 #else
-typedef     long                i64bit;
-typedef     unsigned long       u64bit;
+typedef     long                int_64bit;
+typedef     unsigned long       uint_64bit;
 #endif
 
 /**
@@ -43,20 +43,20 @@ typedef     unsigned long       u64bit;
 #define BIT_HT_INI_SIZE 64
 
 typedef struct {
-    u32bit branch_size_p;
-    u32bit branch_size_n;
-    u8bit *ptr_branch_p;
-    u8bit *ptr_branch_n;
+    uint_32 branch_size_p;
+    uint_32 branch_size_n;
+    uint_8 *ptr_branch_p;
+    uint_8 *ptr_branch_n;
 } htable_base;
 
-u32bit convert_string_to_positive_num(const char* string);
-int* filter_unique_elems_naive(const int *input_arr, const u32bit num_elems, u32bit *num_elems_out, int *err_flag);
-int* filter_unique_elems_naive_improved(const int *input_arr, const u32bit num_elems, u32bit *num_elems_out, int *err_flag);
-void free_hash_table(u8bit *hash_table[], u32bit num_elems);
-void free_hash_table_new(htable_base hash_table_new[], u32bit num_elems);
-int* filter_unique_elems_ht(const int *input_arr, const u32bit num_elems, u32bit *num_elems_out, int *err_flag);
-int* filter_unique_elems_ht_new(const int *input_arr, const u32bit num_elems, u32bit *num_elems_out, int *err_flag);
-int* filter_unique_elems_ht_dyn(const int *input_arr, const u32bit num_elems, u32bit *num_elems_out, int *err_flag);
+uint_32 convert_string_to_positive_num(const char* string);
+int* filter_unique_elems_naive(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
+int* filter_unique_elems_naive_improved(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
+void free_hash_table(uint_8 *hash_table[], uint_32 num_elems);
+void free_hash_table_new(htable_base hash_table_new[], uint_32 num_elems);
+int* filter_unique_elems_ht(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
+int* filter_unique_elems_ht_new(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
+int* filter_unique_elems_ht_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
 
 /**
  * Auxiliary functions, e.g.
@@ -65,10 +65,10 @@ int* filter_unique_elems_ht_dyn(const int *input_arr, const u32bit num_elems, u3
  *  - Generate a RANDOM input integer array
  *  - Generate a GROWING input integer array
 */
-void print_arr(const int *arr, u32bit num_elems);
-int compare_arr(const int *arr_a, const int *arr_b, u32bit num_elems);
-int generate_random_input_arr(int *arr, u32bit num_elems, u32bit rand_max);
-int generate_growing_arr(int *arr, u32bit num_elems);
+void print_arr(const int *arr, uint_32 num_elems);
+int compare_arr(const int *arr_a, const int *arr_b, uint_32 num_elems);
+int generate_random_input_arr(int *arr, uint_32 num_elems, uint_32 rand_max);
+int generate_growing_arr(int *arr, uint_32 num_elems);
 
 /**
  * Testing the bit-based hash table algorithm
@@ -86,29 +86,29 @@ int generate_growing_arr(int *arr, u32bit num_elems);
 #define BITMAP_STATIC_COL   16384
 
 typedef struct {
-    u16bit branch_size;
-    u8bit *ptr_branch;
+    uint_16 branch_size;
+    uint_8 *ptr_branch;
 } bitmap_base;
 
 typedef struct {
-    u16bit branch_size_n;
-    u16bit branch_size_p;
-    u8bit *ptr_branch_n;
-    u8bit *ptr_branch_p;
+    uint_16 branch_size_n;
+    uint_16 branch_size_p;
+    uint_8 *ptr_branch_n;
+    uint_8 *ptr_branch_p;
 } bitmap_dbase;
 
 #define flip_bit(byte_a, bit_position) ((byte_a) |= (0x80 >> (bit_position)))
 #define check_bit(byte_a, bit_position) ((byte_a) & (0x80 >> (bit_position)))
 
-void free_bitmap(bitmap_base *bitmap_head, u16bit num_elems);
-int* fui_bitmap_stc(const int *input_arr, const u32bit num_elems, u32bit *num_elems_out, int *err_flag);
-int* fui_bitmap_base_dyn(const int *input_arr, const u32bit num_elems, u32bit *num_elems_out, int *err_flag);
+void free_bitmap(bitmap_base *bitmap_head, uint_16 num_elems);
+int* fui_bitmap_stc(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
+int* fui_bitmap_base_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
 
 /* To be continued. */
-int* fui_bitmap_full_dyn(const int *input_arr, const u32bit num_elems, u32bit *num_elems_out, int *err_flag);
-int* fui_bitmap_dbase(const int *input_arr, const u32bit num_elems, u32bit *num_elems_out, int *err_flag);
-int* fui_bitmap_dbase_dyn(const int *input_arr, const u32bit num_elems, u32bit *num_elems_out, int *err_flag);
-int* fui_bitmap_array(const int *input_arr, const u32bit num_elems, u32bit *num_elems_out, int *err_flag);
-int* fui_bitmap_array_dyn(const int *input_arr, const u32bit num_elems, u32bit *num_elems_out, int *err_flag);
+int* fui_bitmap_full_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
+int* fui_bitmap_dbase(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
+int* fui_bitmap_dbase_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
+int* fui_bitmap_array(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
+int* fui_bitmap_array_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
 
 #endif

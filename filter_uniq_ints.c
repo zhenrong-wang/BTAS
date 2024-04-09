@@ -21,7 +21,7 @@
  *  -1 if illegal chars found or NULL pointer
  *  A positive number if succeeded
  */
-u32bit convert_string_to_positive_num(const char* string) {
+uint_32 convert_string_to_positive_num(const char* string) {
     if(string == NULL) {
         return -1;
     }
@@ -54,8 +54,8 @@ u32bit convert_string_to_positive_num(const char* string) {
  *  NULL if any error happens
  * 
  */
-int* filter_unique_elems_naive(const int *input_arr, const u32bit num_elems, u32bit *num_elems_out, int *err_flag){
-    u32bit i, j = 1, k;
+int* filter_unique_elems_naive(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag){
+    uint_32 i, j = 1, k;
     int tmp = 0;
     int *final_output_arr = NULL;
     *err_flag = 0;
@@ -114,8 +114,8 @@ int* filter_unique_elems_naive(const int *input_arr, const u32bit num_elems, u32
  *  NULL if any error happens
  * 
  */
-int* filter_unique_elems_naive_improved(const int *input_arr, const u32bit num_elems, u32bit *num_elems_out, int *err_flag){
-    u32bit i, j = 1, k;
+int* filter_unique_elems_naive_improved(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag){
+    uint_32 i, j = 1, k;
     int max_current, min_current, diff_to_max = 0, diff_to_min = 0, tmp_diff_to_max = 0, tmp_diff_to_min = 0;
     int tmp = 0;
     int *final_output_arr = NULL;
@@ -188,8 +188,8 @@ int* filter_unique_elems_naive_improved(const int *input_arr, const u32bit num_e
     return final_output_arr;
 }
 
-void free_hash_table(u8bit *hash_table[], u32bit num_elems) {
-    for(u32bit i = 0; i < num_elems; i++) {
+void free_hash_table(uint_8 *hash_table[], uint_32 num_elems) {
+    for(uint_32 i = 0; i < num_elems; i++) {
         if(hash_table[i] != NULL) {
             free(hash_table[i]);
         }
@@ -214,13 +214,13 @@ void free_hash_table(u8bit *hash_table[], u32bit num_elems) {
  *  NULL if any error happens
  * 
  */
-int* filter_unique_elems_ht(const int *input_arr, const u32bit num_elems, u32bit *num_elems_out, int *err_flag) {
-    u32bit i, j = 0;
-    u32bit tmp_quotient = 0, tmp_mod = 0;
+int* filter_unique_elems_ht(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag) {
+    uint_32 i, j = 0;
+    uint_32 tmp_quotient = 0, tmp_mod = 0;
     int tmp = 0;
     int *final_output_arr = NULL;
-    u8bit *hash_table_base_p[HASH_TABLE_SIZE] = {NULL,};
-    u8bit *hash_table_base_n[HASH_TABLE_SIZE] = {NULL,};
+    uint_8 *hash_table_base_p[HASH_TABLE_SIZE] = {NULL,};
+    uint_8 *hash_table_base_n[HASH_TABLE_SIZE] = {NULL,};
     *err_flag = 0;
     *num_elems_out = 0;
     if (input_arr == NULL) {
@@ -242,7 +242,7 @@ int* filter_unique_elems_ht(const int *input_arr, const u32bit num_elems, u32bit
         tmp_mod = abs(tmp % MOD_TABLE_SIZE);
         if(tmp > 0) {
             if(hash_table_base_p[tmp_quotient] == NULL) {
-                if((hash_table_base_p[tmp_quotient] = (u8bit *)calloc(MOD_TABLE_SIZE, sizeof(u8bit))) == NULL) {
+                if((hash_table_base_p[tmp_quotient] = (uint_8 *)calloc(MOD_TABLE_SIZE, sizeof(uint_8))) == NULL) {
                     *err_flag = 1;
                     goto free_memory;
                 }
@@ -253,7 +253,7 @@ int* filter_unique_elems_ht(const int *input_arr, const u32bit num_elems, u32bit
         }
         else {
             if(hash_table_base_n[tmp_quotient] == NULL) {
-                if((hash_table_base_n[tmp_quotient] = (u8bit *)calloc(MOD_TABLE_SIZE, sizeof(u8bit))) == NULL) {
+                if((hash_table_base_n[tmp_quotient] = (uint_8 *)calloc(MOD_TABLE_SIZE, sizeof(uint_8))) == NULL) {
                     *err_flag = 1;
                     goto free_memory;
                 }
@@ -288,8 +288,8 @@ free_memory:
     return final_output_arr;
 }
 
-void free_hash_table_new(htable_base hash_table_new[], u32bit num_elems) {
-    for(u32bit i = 0; i < num_elems; i++) {
+void free_hash_table_new(htable_base hash_table_new[], uint_32 num_elems) {
+    for(uint_32 i = 0; i < num_elems; i++) {
         if(hash_table_new[i].ptr_branch_p != NULL) {
             free(hash_table_new[i].ptr_branch_p);
         }
@@ -317,12 +317,12 @@ void free_hash_table_new(htable_base hash_table_new[], u32bit num_elems) {
  *  NULL if any error happens
  * 
  */
-int* filter_unique_elems_ht_new(const int *input_arr, const u32bit num_elems, u32bit *num_elems_out, int *err_flag) {
-    u32bit i, j = 0;
-    u32bit tmp_quotient = 0, tmp_mod = 0;
+int* filter_unique_elems_ht_new(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag) {
+    uint_32 i, j = 0;
+    uint_32 tmp_quotient = 0, tmp_mod = 0;
     int tmp = 0;
     int *final_output_arr = NULL;
-    u8bit *tmp_realloc_ptr = NULL;
+    uint_8 *tmp_realloc_ptr = NULL;
     htable_base hash_table_base[HASH_TABLE_SIZE] = {{0, 0, NULL, NULL},};
     *err_flag = 0;
     *num_elems_out = 0;
@@ -345,7 +345,7 @@ int* filter_unique_elems_ht_new(const int *input_arr, const u32bit num_elems, u3
         tmp_mod = abs(tmp % MOD_TABLE_SIZE);
         if(tmp > 0) {
             if(hash_table_base[tmp_quotient].ptr_branch_p == NULL) {
-                if((hash_table_base[tmp_quotient].ptr_branch_p = (u8bit *)calloc(tmp_mod + 1, sizeof(u8bit))) == NULL) {
+                if((hash_table_base[tmp_quotient].ptr_branch_p = (uint_8 *)calloc(tmp_mod + 1, sizeof(uint_8))) == NULL) {
                     *err_flag = 1;
                     goto free_memory;
                 }
@@ -355,13 +355,13 @@ int* filter_unique_elems_ht_new(const int *input_arr, const u32bit num_elems, u3
             }
             else {
                 if(hash_table_base[tmp_quotient].branch_size_p < (tmp_mod + 1)){
-                    if((tmp_realloc_ptr = (u8bit *)realloc(hash_table_base[tmp_quotient].ptr_branch_p, (tmp_mod + 1)*sizeof(u8bit))) == NULL) {
+                    if((tmp_realloc_ptr = (uint_8 *)realloc(hash_table_base[tmp_quotient].ptr_branch_p, (tmp_mod + 1)*sizeof(uint_8))) == NULL) {
                         *err_flag = 1;
                         goto free_memory;
                     }
                     else {
                         hash_table_base[tmp_quotient].ptr_branch_p = tmp_realloc_ptr;
-                        memset(tmp_realloc_ptr + hash_table_base[tmp_quotient].branch_size_p, 0, sizeof(u8bit) * (tmp_mod + 1 - hash_table_base[tmp_quotient].branch_size_p));
+                        memset(tmp_realloc_ptr + hash_table_base[tmp_quotient].branch_size_p, 0, sizeof(uint_8) * (tmp_mod + 1 - hash_table_base[tmp_quotient].branch_size_p));
                         hash_table_base[tmp_quotient].branch_size_p = tmp_mod + 1;
                     }
                 }
@@ -372,7 +372,7 @@ int* filter_unique_elems_ht_new(const int *input_arr, const u32bit num_elems, u3
         }
         else {
             if(hash_table_base[tmp_quotient].ptr_branch_n == NULL) {
-                if((hash_table_base[tmp_quotient].ptr_branch_n = (u8bit *)calloc(tmp_mod + 1, sizeof(u8bit))) == NULL) {
+                if((hash_table_base[tmp_quotient].ptr_branch_n = (uint_8 *)calloc(tmp_mod + 1, sizeof(uint_8))) == NULL) {
                     *err_flag = 1;
                     goto free_memory;
                 }
@@ -382,13 +382,13 @@ int* filter_unique_elems_ht_new(const int *input_arr, const u32bit num_elems, u3
             }
             else {
                 if(hash_table_base[tmp_quotient].branch_size_n < (tmp_mod + 1)){
-                    if((tmp_realloc_ptr = (u8bit *)realloc(hash_table_base[tmp_quotient].ptr_branch_n, (tmp_mod + 1) * sizeof(u8bit))) == NULL) {
+                    if((tmp_realloc_ptr = (uint_8 *)realloc(hash_table_base[tmp_quotient].ptr_branch_n, (tmp_mod + 1) * sizeof(uint_8))) == NULL) {
                         *err_flag = 1;
                         goto free_memory;
                     }
                     else {
                         hash_table_base[tmp_quotient].ptr_branch_n = tmp_realloc_ptr;
-                        memset(tmp_realloc_ptr + hash_table_base[tmp_quotient].branch_size_n , 0, sizeof(u8bit) * (tmp_mod + 1 - hash_table_base[tmp_quotient].branch_size_n));
+                        memset(tmp_realloc_ptr + hash_table_base[tmp_quotient].branch_size_n , 0, sizeof(uint_8) * (tmp_mod + 1 - hash_table_base[tmp_quotient].branch_size_n));
                         hash_table_base[tmp_quotient].branch_size_n = tmp_mod + 1;
                     }
                 }
@@ -441,14 +441,14 @@ free_memory:
  *  NULL if any error happens
  * 
  */
-int* filter_unique_elems_ht_dyn(const int *input_arr, const u32bit num_elems, u32bit *num_elems_out, int *err_flag) {
-    u32bit i, j = 0;
-    u32bit tmp_quotient = 0, tmp_mod = 0;
+int* filter_unique_elems_ht_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag) {
+    uint_32 i, j = 0;
+    uint_32 tmp_quotient = 0, tmp_mod = 0;
     int tmp = 0;
     int *final_output_arr = NULL;
-    u8bit *tmp_realloc_ptr = NULL;
+    uint_8 *tmp_realloc_ptr = NULL;
     htable_base *hash_table_base = NULL, *tmp_ht_realloc_ptr = NULL;
-    u32bit ht_base_length = HT_DYN_INI_SIZE;
+    uint_32 ht_base_length = HT_DYN_INI_SIZE;
     *err_flag = 0;
     *num_elems_out = 0;
     if (input_arr == NULL) {
@@ -486,7 +486,7 @@ int* filter_unique_elems_ht_dyn(const int *input_arr, const u32bit num_elems, u3
         }
         if(tmp > 0) {
             if(hash_table_base[tmp_quotient].ptr_branch_p == NULL) {
-                if((hash_table_base[tmp_quotient].ptr_branch_p = (u8bit *)calloc(tmp_mod + 1, sizeof(u8bit))) == NULL) {
+                if((hash_table_base[tmp_quotient].ptr_branch_p = (uint_8 *)calloc(tmp_mod + 1, sizeof(uint_8))) == NULL) {
                     *err_flag = 1;
                     goto free_memory;
                 }
@@ -496,13 +496,13 @@ int* filter_unique_elems_ht_dyn(const int *input_arr, const u32bit num_elems, u3
             }
             else {
                 if(hash_table_base[tmp_quotient].branch_size_p < (tmp_mod + 1)){
-                    if((tmp_realloc_ptr = (u8bit *)realloc(hash_table_base[tmp_quotient].ptr_branch_p, (tmp_mod + 1) * sizeof(u8bit))) == NULL) {
+                    if((tmp_realloc_ptr = (uint_8 *)realloc(hash_table_base[tmp_quotient].ptr_branch_p, (tmp_mod + 1) * sizeof(uint_8))) == NULL) {
                         *err_flag = 1;
                         goto free_memory;
                     }
                     else {
                         hash_table_base[tmp_quotient].ptr_branch_p = tmp_realloc_ptr;
-                        memset(tmp_realloc_ptr + hash_table_base[tmp_quotient].branch_size_p, 0, sizeof(u8bit) * (tmp_mod + 1 - hash_table_base[tmp_quotient].branch_size_p));
+                        memset(tmp_realloc_ptr + hash_table_base[tmp_quotient].branch_size_p, 0, sizeof(uint_8) * (tmp_mod + 1 - hash_table_base[tmp_quotient].branch_size_p));
                         hash_table_base[tmp_quotient].branch_size_p = tmp_mod + 1;
                     }
                 }
@@ -513,7 +513,7 @@ int* filter_unique_elems_ht_dyn(const int *input_arr, const u32bit num_elems, u3
         }
         else {
             if(hash_table_base[tmp_quotient].ptr_branch_n == NULL) {
-                if((hash_table_base[tmp_quotient].ptr_branch_n = (u8bit *)calloc(tmp_mod + 1, sizeof(u8bit))) == NULL) {
+                if((hash_table_base[tmp_quotient].ptr_branch_n = (uint_8 *)calloc(tmp_mod + 1, sizeof(uint_8))) == NULL) {
                     *err_flag = 1;
                     goto free_memory;
                 }
@@ -523,13 +523,13 @@ int* filter_unique_elems_ht_dyn(const int *input_arr, const u32bit num_elems, u3
             }
             else {
                 if(hash_table_base[tmp_quotient].branch_size_n < (tmp_mod + 1)){
-                    if((tmp_realloc_ptr = (u8bit *)realloc(hash_table_base[tmp_quotient].ptr_branch_n, (tmp_mod + 1)*sizeof(u8bit))) == NULL) {
+                    if((tmp_realloc_ptr = (uint_8 *)realloc(hash_table_base[tmp_quotient].ptr_branch_n, (tmp_mod + 1)*sizeof(uint_8))) == NULL) {
                         *err_flag = 1;
                         goto free_memory;
                     }
                     else {
                         hash_table_base[tmp_quotient].ptr_branch_n = tmp_realloc_ptr;
-                        memset(tmp_realloc_ptr + hash_table_base[tmp_quotient].branch_size_n , 0, sizeof(u8bit) * (tmp_mod + 1 - hash_table_base[tmp_quotient].branch_size_n));
+                        memset(tmp_realloc_ptr + hash_table_base[tmp_quotient].branch_size_n , 0, sizeof(uint_8) * (tmp_mod + 1 - hash_table_base[tmp_quotient].branch_size_n));
                         hash_table_base[tmp_quotient].branch_size_n = tmp_mod + 1;
                     }
                 }
@@ -575,12 +575,12 @@ free_memory:
  *  void
  * 
  */
-void print_arr(const int *arr, u32bit num_elems) {
+void print_arr(const int *arr, uint_32 num_elems) {
     if(arr == NULL || num_elems < 1) {
         printf("ERROR: NULL array input.\n");
         return;
     }
-    for(u32bit i = 0; i < num_elems; i++) {
+    for(uint_32 i = 0; i < num_elems; i++) {
         printf("%d\t", arr[i]);
         if((i+1)%10 == 0) {
             printf("\n");
@@ -589,14 +589,14 @@ void print_arr(const int *arr, u32bit num_elems) {
     printf("\n\n");
 }
 
-int compare_arr(const int *arr_a, const int *arr_b, u32bit num_elems) {
+int compare_arr(const int *arr_a, const int *arr_b, uint_32 num_elems) {
     if(arr_a == NULL || arr_b == NULL) {
         return -3;
     }
     if(num_elems < 1) {
         return -1;
     }
-    for(u32bit i = 0; i < num_elems; i++) {
+    for(uint_32 i = 0; i < num_elems; i++) {
         if(arr_a[i] != arr_b[i]) {
             return 1;
         }
@@ -620,7 +620,7 @@ int compare_arr(const int *arr_a, const int *arr_b, u32bit num_elems) {
  *  -1 if the rand_max is 0
  * 
  */
-int generate_random_input_arr(int *arr, u32bit num_elems, u32bit rand_max) {
+int generate_random_input_arr(int *arr, uint_32 num_elems, uint_32 rand_max) {
     int sign_flag, rand_num;
     if(arr == NULL) {
         return -5;
@@ -632,7 +632,7 @@ int generate_random_input_arr(int *arr, u32bit num_elems, u32bit rand_max) {
         return -1;
     }
     srand(time(0));
-    for(u32bit i = 0; i < num_elems; i++) {
+    for(uint_32 i = 0; i < num_elems; i++) {
         sign_flag = rand();
         rand_num = rand()%rand_max;
         if(sign_flag%2 == 0) {
@@ -661,34 +661,34 @@ int generate_random_input_arr(int *arr, u32bit num_elems, u32bit rand_max) {
  *  -3 if the num_elems is 0
  * 
  */
-int generate_growing_arr(int *arr, u32bit num_elems) {
+int generate_growing_arr(int *arr, uint_32 num_elems) {
     if(arr == NULL) {
         return -5;
     }
     if(num_elems < 1) {
         return -3;
     }
-    for(u32bit i = 0; i < num_elems; i++) {
+    for(uint_32 i = 0; i < num_elems; i++) {
         arr[i] = i;
     }
     return 0;
 }
 
-void free_bitmap(bitmap_base *bitmap_head, u16bit num_elems) {
-    for(u32bit i = 0; i < num_elems; i++) {
+void free_bitmap(bitmap_base *bitmap_head, uint_16 num_elems) {
+    for(uint_32 i = 0; i < num_elems; i++) {
         if(bitmap_head[i].ptr_branch != NULL) {
             free(bitmap_head[i].ptr_branch);
         }
     }
 }
 
-int* fui_bitmap_stc(const int *input_arr, const u32bit num_elems, u32bit *num_elems_out, int *err_flag) {
-    u32bit i, j = 0;
-    u32bit tmp_quotient = 0, tmp_mod = 0;
+int* fui_bitmap_stc(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag) {
+    uint_32 i, j = 0;
+    uint_32 tmp_quotient = 0, tmp_mod = 0;
     int tmp = 0, *final_output_arr = NULL;
     bitmap_base bitmap_head[BITMAP_LENGTH_MAX] = {{0, NULL},};
-    u16bit tmp_byte_index = 0;
-    u8bit tmp_bit_position = 0;
+    uint_16 tmp_byte_index = 0;
+    uint_8 tmp_bit_position = 0;
     *err_flag = 0;
     *num_elems_out = 0;
     if (input_arr == NULL) {
@@ -711,7 +711,7 @@ int* fui_bitmap_stc(const int *input_arr, const u32bit num_elems, u32bit *num_el
         tmp_byte_index = (tmp < 0) ? (NEGATIVE_START_POS + (tmp_mod / 8)) : (tmp_mod / 8);
         tmp_bit_position = tmp_mod % 8;
         if(bitmap_head[tmp_quotient].ptr_branch == NULL) {
-            if((bitmap_head[tmp_quotient].ptr_branch = (u8bit *)calloc(BIT_MOD_TABLE_SIZE, sizeof(u8bit))) == NULL) {
+            if((bitmap_head[tmp_quotient].ptr_branch = (uint_8 *)calloc(BIT_MOD_TABLE_SIZE, sizeof(uint_8))) == NULL) {
                 *err_flag = 1;
                 goto free_memory;
             }
@@ -739,13 +739,13 @@ free_memory:
     return final_output_arr;
 }
 
-int* fui_bitmap_base_dyn(const int *input_arr, const u32bit num_elems, u32bit *num_elems_out, int *err_flag) {
-    u32bit i, j = 0;
-    u32bit tmp_quotient = 0, tmp_mod = 0;
+int* fui_bitmap_base_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag) {
+    uint_32 i, j = 0;
+    uint_32 tmp_quotient = 0, tmp_mod = 0;
     int tmp = 0, *final_output_arr = NULL;
     bitmap_base *bitmap_head = NULL, *tmp_bitmap_realloc = NULL;
-    u16bit tmp_byte_index = 0, bitmap_base_size = BITMAP_INIT_LENGTH;
-    u8bit tmp_bit_position = 0;
+    uint_16 tmp_byte_index = 0, bitmap_base_size = BITMAP_INIT_LENGTH;
+    uint_8 tmp_bit_position = 0;
     *err_flag = 0;
     *num_elems_out = 0;
     if (input_arr == NULL) {
@@ -785,7 +785,7 @@ int* fui_bitmap_base_dyn(const int *input_arr, const u32bit num_elems, u32bit *n
             bitmap_base_size = (tmp_quotient + 1);
         }
         if(bitmap_head[tmp_quotient].ptr_branch == NULL) {
-            if((bitmap_head[tmp_quotient].ptr_branch = (u8bit *)calloc(BIT_MOD_TABLE_SIZE, sizeof(u8bit))) == NULL) {
+            if((bitmap_head[tmp_quotient].ptr_branch = (uint_8 *)calloc(BIT_MOD_TABLE_SIZE, sizeof(uint_8))) == NULL) {
                 *err_flag = 1;
                 goto free_memory;
             }
@@ -834,7 +834,7 @@ int main(int argc, char** argv) {
     if(argc > 3 && strcmp(argv[3], "brute") == 0) {
         with_brute = 1;
     }
-    u32bit num_elems = convert_string_to_positive_num(argv[1]), rand_max = convert_string_to_positive_num(argv[2]);
+    uint_32 num_elems = convert_string_to_positive_num(argv[1]), rand_max = convert_string_to_positive_num(argv[2]);
     printf("INPUT_ELEMS:\t%u\nRANDOM_MAX:\t%u\n\n",num_elems, rand_max);
     if(num_elems < 0 || rand_max < 0) {
         printf("ERROR: arguments illegal. Make sure they are plain positive numbers.\n");
@@ -846,7 +846,7 @@ int main(int argc, char** argv) {
         return 5;
     }
     int err_flag = 0;
-    u32bit num_elems_out = 0;
+    uint_32 num_elems_out = 0;
     clock_t start, end;
     int *out_naive_improved = NULL, *out_naive = NULL, *out_ht = NULL, *out_ht_new = NULL, *out_ht_dyn = NULL, *out_bit = NULL, *out_bit_stc = NULL;
     generate_random_input_arr(arr_input,num_elems,rand_max);
@@ -855,7 +855,7 @@ int main(int argc, char** argv) {
         free(arr_input);
         return 7;
     }
-    for(u32bit i = 0; i < num_elems; i++) {
+    for(uint_32 i = 0; i < num_elems; i++) {
         fprintf(file_p, "%d\n", arr_input[i]);
     }
     fclose(file_p);*/
@@ -915,7 +915,7 @@ int main(int argc, char** argv) {
         free(arr_input);
         return 7;
     }
-    for(u32bit i = 0; i < num_elems; i++) {
+    for(uint_32 i = 0; i < num_elems; i++) {
         fprintf(file_p, "%d\n", arr_input[i]);
     }
     fclose(file_p);*/
