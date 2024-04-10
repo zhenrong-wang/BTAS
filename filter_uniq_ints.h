@@ -87,20 +87,12 @@ int* fui_htable_stree_dyn(const int *input_arr, const uint_32 num_elems, uint_32
 #define UINT_8_MAX          256
 #define IDX_ADJ_BRCH_SIZE   65536
 
-struct bmap_idx_tbl_struct {
-    uint_16 byte_index;
-    uint_8 bit_position;
-    uint_32 raw_index;
-    struct bmap_idx_tbl_struct *ptr_next;
-};
-
 struct dup_idx_struct {
     uint_32 index_a;
     uint_32 index_b;
     struct dup_idx_struct *ptr_next;
 };
 
-typedef struct bmap_idx_tbl_struct  bmap_idx_brch;
 typedef struct dup_idx_struct       dup_idx_list;
 
 typedef struct {
@@ -117,12 +109,6 @@ typedef struct {
     uint_16 branch_size[2];
     uint_8 *ptr_branch[2];
 } bitmap_dtree;
-
-typedef struct {
-    uint_16 bit_branch_size;
-    uint_8 *ptr_bit_branch;
-    bmap_idx_brch *ptr_idx_branch;
-} bitmap_idx_base;
 
 /* Adjacent index hashtable */
 typedef struct {
@@ -143,16 +129,39 @@ typedef struct {
 #define flip_bit(byte_a, bit_position) ((byte_a) |= (0x80 >> (bit_position)))
 #define check_bit(byte_a, bit_position) ((byte_a) & (0x80 >> (bit_position)))
 
-void free_bmap_idx_branch(bmap_idx_brch *bmap_idx_head);
+/**
+ * Using linked-list makes the performance really bad when the 
+ * Original inpu array is medium and large. Abandon it. If you
+ * would like to test this algorithm (int* fui_bitmap_idx_llist),
+ * Please uncomment the contents below. * 
+ * 
+struct bmap_idx_tbl_struct {
+    uint_16 byte_index;
+    uint_8 bit_position;
+    uint_32 raw_index;
+    struct bmap_idx_tbl_struct *ptr_next;
+};*/
+
+/* typedef struct bmap_idx_tbl_struct  bmap_idx_brch; */
+
+/* typedef struct {
+    uint_16 bit_branch_size;
+    uint_8 *ptr_bit_branch;
+    bmap_idx_brch *ptr_idx_branch;
+} bitmap_idx_base; */
+
+/* void free_bmap_idx_branch(bmap_idx_brch *bmap_idx_head); */
+/* int insert_idx_branch(bmap_idx_brch **bmap_idx_head, uint_16 byte_idx, uint_8 bit_pos, uint_32 raw_idx); */
+/* int get_raw_idx(bmap_idx_brch *bmap_idx_head, uint_16 byte_idx, uint_8 bit_pos, uint_32 *raw_idx); */
+/* void free_bitmap_idx(bitmap_idx_base *bitmap_head, uint_16 num_elems); */
+/* int* fui_bitmap_idx_llist(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head); */
+
 void free_dup_idx_list(dup_idx_list *dup_idx_head);
-int insert_idx_branch(bmap_idx_brch **bmap_idx_head, uint_16 byte_idx, uint_8 bit_pos, uint_32 raw_idx);
 int insert_dup_idx_list(dup_idx_list **dup_idx_head, uint_32 idx_a, uint_32 idx_b);
-int get_raw_idx(bmap_idx_brch *bmap_idx_head, uint_16 byte_idx, uint_8 bit_pos, uint_32 *raw_idx);
 void print_dup_idx_list(dup_idx_list *dup_idx_head, uint_32 max_nodes);
+void print_out_idx(out_idx *output_index, uint_32 num_elems, uint_32 max_elems);
 
 void free_bitmap(bitmap_base *bitmap_head, uint_16 num_elems);
-void free_bitmap_idx(bitmap_idx_base *bitmap_head, uint_16 num_elems);
-
 void free_bitmap_dtree(bitmap_dtree *bitmap_head, uint_16 num_elems);
 void free_idx_ht_8(idx_ht_8 *idx_ht_head, uint_16 num_elems);
 void free_idx_ht_16(idx_ht_16 *idx_ht_head, uint_16 num_elems);
@@ -160,9 +169,8 @@ void free_idx_ht_32(idx_ht_32 *idx_ht_head, uint_16 num_elems);
 
 int* fui_bitmap_stc(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
 int* fui_bitmap_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
+out_idx* fui_bitmap_dtree_idx(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head);
 
-int* fui_bitmap_dtree_idx(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head);
-int* fui_bitmap_idx_llist(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head);
 
 /* To be continued. */
 int* fui_bitmap_full_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);

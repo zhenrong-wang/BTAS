@@ -678,6 +678,12 @@ int generate_growing_arr(int *arr, uint_32 num_elems) {
     return 0;
 }
 
+/**
+ * Using linked-list makes the performance really bad when the 
+ * Original inpu array is medium and large. Abandon it. If you
+ * would like to test this algorithm (int* fui_bitmap_idx_llist),
+ * Please uncomment the contents below. * 
+ *  
 void free_bmap_idx_branch(bmap_idx_brch *bmap_idx_head) {
     bmap_idx_brch *ptr_current = bmap_idx_head;
     bmap_idx_brch *ptr_next;
@@ -686,17 +692,9 @@ void free_bmap_idx_branch(bmap_idx_brch *bmap_idx_head) {
         free(ptr_current);
         ptr_current = ptr_next;
     }
-}
-void free_dup_idx_list(dup_idx_list *dup_idx_head) {
-    dup_idx_list *ptr_current = dup_idx_head;
-    dup_idx_list *ptr_next;
-    while(ptr_current != NULL){
-        ptr_next = ptr_current->ptr_next;
-        free(ptr_current);
-        ptr_current = ptr_next;
-    }
-}
+} */
 
+/* 
 int insert_idx_branch(bmap_idx_brch **bmap_idx_head, uint_16 byte_idx, uint_8 bit_pos, uint_32 raw_idx) {
     bmap_idx_brch *new_node = (bmap_idx_brch *)calloc(1, sizeof(bmap_idx_brch));
     if(new_node == NULL) {
@@ -713,6 +711,131 @@ int insert_idx_branch(bmap_idx_brch **bmap_idx_head, uint_16 byte_idx, uint_8 bi
     new_node->ptr_next = *bmap_idx_head;
     *bmap_idx_head = new_node;
     return 0;
+}*/
+
+/*
+int get_raw_idx(bmap_idx_brch *bmap_idx_head, uint_16 byte_idx, uint_8 bit_pos, uint_32 *raw_idx) {
+    bmap_idx_brch *ptr_current = bmap_idx_head;
+    *raw_idx = 0;
+    if(ptr_current == NULL) {
+        return -1;
+    }
+    while(ptr_current != NULL) {
+        if(ptr_current->byte_index == byte_idx && ptr_current->bit_position == bit_pos) {
+            *raw_idx = ptr_current->raw_index;
+            return 0;
+        }
+        ptr_current = ptr_current->ptr_next;
+    }
+    return -3;
+} */
+
+/*
+void free_bitmap_idx(bitmap_idx_base *bitmap_head, uint_16 num_elems) {
+    for(uint_32 i = 0; i < num_elems; i++) {
+        if(bitmap_head[i].ptr_bit_branch != NULL) {
+            free(bitmap_head[i].ptr_bit_branch);
+        }
+        if(bitmap_head[i].ptr_idx_branch != NULL) {
+            free_bmap_idx_branch(bitmap_head[i].ptr_idx_branch);
+        }
+    }
+}*/
+
+/*
+int* fui_bitmap_idx_llist(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head) {
+    uint_32 i, j = 0;
+    uint_32 tmp_quotient = 0, tmp_mod = 0, tmp_dup_raw_index;
+    int tmp = 0, *final_output_arr = NULL;
+    bitmap_idx_base *bitmap_head = NULL, *tmp_bitmap_realloc = NULL;
+    uint_16 tmp_byte_index = 0, bitmap_base_size = BITMAP_INIT_LENGTH;
+    uint_8 tmp_bit_position = 0;
+    *err_flag = 0;
+    *num_elems_out = 0;
+    if(*dup_idx_head != NULL) {
+        *err_flag = -9;
+        return NULL;
+    }
+    if (input_arr == NULL) {
+        *err_flag = -5;
+        return NULL;
+    }
+    if (num_elems < 1){
+        *err_flag = -3;
+        return NULL;
+    }
+    dup_idx_list *dup_idx_head_tmp = NULL;
+    bitmap_head = (bitmap_idx_base *)calloc(BITMAP_INIT_LENGTH, sizeof(bitmap_idx_base));
+    if(bitmap_head == NULL) {
+        *err_flag = 5;
+        return NULL;
+    }
+    int *output_arr = (int *)calloc(num_elems, sizeof(int));
+    if (output_arr == NULL) {
+        free(bitmap_head);
+        *err_flag = -1;
+        return NULL;
+    }
+    for(i = 0; i < num_elems; i++) {
+        tmp = input_arr[i];
+        tmp_quotient = abs(tmp / BIT_MOD_DIV_FACTOR);
+        tmp_mod = abs(tmp % BIT_MOD_DIV_FACTOR);
+        tmp_byte_index = (tmp < 0) ? (NEGATIVE_START_POS + (tmp_mod / 8)) : (tmp_mod / 8);
+        tmp_bit_position = tmp_mod % 8;
+        if((tmp_quotient + 1) > bitmap_base_size) {
+            if((tmp_bitmap_realloc = (bitmap_idx_base *)realloc(bitmap_head, (tmp_quotient + 1) * sizeof(bitmap_idx_base))) == NULL) {
+                *err_flag = 7;
+                goto free_memory;
+            }
+            memset(tmp_bitmap_realloc + bitmap_base_size, 0, (tmp_quotient + 1 - bitmap_base_size) * sizeof(bitmap_base));
+            bitmap_head = tmp_bitmap_realloc;
+            bitmap_base_size = (tmp_quotient + 1);
+        }
+        if(bitmap_head[tmp_quotient].ptr_bit_branch == NULL) {
+            if((bitmap_head[tmp_quotient].ptr_bit_branch = (uint_8 *)calloc(BIT_MOD_TABLE_SIZE, sizeof(uint_8))) == NULL) {
+                *err_flag = 1;
+                goto free_memory;
+            }
+        }
+        if(bitmap_head[tmp_quotient].ptr_bit_branch != NULL && check_bit((bitmap_head[tmp_quotient].ptr_bit_branch)[tmp_byte_index], tmp_bit_position)) {
+            if(get_raw_idx(bitmap_head[tmp_quotient].ptr_idx_branch, tmp_byte_index, tmp_bit_position, &tmp_dup_raw_index) != 0) {
+                *err_flag = 9;
+                goto free_memory;
+            }
+            insert_dup_idx_list(&dup_idx_head_tmp, i, tmp_dup_raw_index);
+            continue;
+        }
+        output_arr[j] = tmp;
+        j++;
+        flip_bit((bitmap_head[tmp_quotient].ptr_bit_branch)[tmp_byte_index], tmp_bit_position);
+        insert_idx_branch(&(bitmap_head[tmp_quotient].ptr_idx_branch), tmp_byte_index, tmp_bit_position, i);
+    }
+free_memory:
+    free_bitmap_idx(bitmap_head, bitmap_base_size);
+    free(bitmap_head);
+    if(*err_flag != 0) {
+        free(output_arr);
+        return NULL;
+    }
+    final_output_arr = (int *)realloc(output_arr, j * sizeof(int));
+    if(final_output_arr == NULL) {
+        free(output_arr);
+        *err_flag = 3;
+        return NULL;
+    }
+    *num_elems_out = j;
+    *dup_idx_head = dup_idx_head_tmp;
+    return final_output_arr;
+}*/
+
+void free_dup_idx_list(dup_idx_list *dup_idx_head) {
+    dup_idx_list *ptr_current = dup_idx_head;
+    dup_idx_list *ptr_next;
+    while(ptr_current != NULL){
+        ptr_next = ptr_current->ptr_next;
+        free(ptr_current);
+        ptr_current = ptr_next;
+    }
 }
 
 int insert_dup_idx_list(dup_idx_list **dup_idx_head, uint_32 idx_a, uint_32 idx_b) {
@@ -732,22 +855,6 @@ int insert_dup_idx_list(dup_idx_list **dup_idx_head, uint_32 idx_a, uint_32 idx_
     return 0;
 }
 
-int get_raw_idx(bmap_idx_brch *bmap_idx_head, uint_16 byte_idx, uint_8 bit_pos, uint_32 *raw_idx) {
-    bmap_idx_brch *ptr_current = bmap_idx_head;
-    *raw_idx = 0;
-    if(ptr_current == NULL) {
-        return -1;
-    }
-    while(ptr_current != NULL) {
-        if(ptr_current->byte_index == byte_idx && ptr_current->bit_position == bit_pos) {
-            *raw_idx = ptr_current->raw_index;
-            return 0;
-        }
-        ptr_current = ptr_current->ptr_next;
-    }
-    return -3;
-}
-
 void print_dup_idx_list(dup_idx_list *dup_idx_head, uint_32 max_nodes) {
     dup_idx_list *ptr_current = dup_idx_head;
     printf("\n");
@@ -756,19 +863,35 @@ void print_dup_idx_list(dup_idx_list *dup_idx_head, uint_32 max_nodes) {
         return;
     }
     uint_32 i = 0;
+    printf("\nIndex pairs of duplicate elements:\n");
     while(ptr_current != NULL && i < max_nodes) {
-        printf("{%u, %u} ", ptr_current->index_a, ptr_current->index_b);
+        printf("{%u\t%u}\n", ptr_current->index_a, ptr_current->index_b);
         ptr_current = ptr_current->ptr_next;
         i++;
-        if(i%10 == 0) {
-            printf("\n");
-        }
     }
     if( i == max_nodes) {
         printf("... Remaining elements not printed ...\n");
     }
     else {
-        printf("\n");
+        printf("Print done.\n");
+    }
+}
+
+void print_out_idx(out_idx *output_index, uint_32 num_elems, uint_32 max_elems) {
+    if(output_index == NULL) {
+        printf("NULL OUTPUT AND INDEX!\n");
+        return;
+    }
+    uint_32 i;
+    printf("\nRaw index and duplicate elements:\n");
+    for(i = 0; i < max_elems && i < num_elems; i++) {
+        printf("%u\t%d\n", output_index[i].raw_index, output_index[i].out_elem);
+    }
+    if(max_elems != num_elems && i == max_elems) {
+        printf("... %u remaining elements not printed ...\n", num_elems - max_elems);
+    }
+    else{
+        printf("Print done.\n");
     }
 }
 
@@ -776,17 +899,6 @@ void free_bitmap(bitmap_base *bitmap_head, uint_16 num_elems) {
     for(uint_32 i = 0; i < num_elems; i++) {
         if(bitmap_head[i].ptr_branch != NULL) {
             free(bitmap_head[i].ptr_branch);
-        }
-    }
-}
-
-void free_bitmap_idx(bitmap_idx_base *bitmap_head, uint_16 num_elems) {
-    for(uint_32 i = 0; i < num_elems; i++) {
-        if(bitmap_head[i].ptr_bit_branch != NULL) {
-            free(bitmap_head[i].ptr_bit_branch);
-        }
-        if(bitmap_head[i].ptr_idx_branch != NULL) {
-            free_bmap_idx_branch(bitmap_head[i].ptr_idx_branch);
         }
     }
 }
@@ -978,11 +1090,12 @@ free_memory:
     return final_output_arr;
 }
 
-int* fui_bitmap_dtree_idx(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head) {
+out_idx* fui_bitmap_dtree_idx(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head) {
     uint_32 i, j = 0;
     uint_32 tmp_dup_raw_index;
     uint_16 tmp_quotient = 0, tmp_mod = 0;
-    int tmp = 0, *final_output_arr = NULL;
+    int tmp = 0;
+    out_idx *final_output_arr = NULL;
     bitmap_dtree *bitmap_head = NULL, *tmp_bitmap_head = NULL;
     uint_8 tree_index = 0;
     void *idx_adj_head = NULL, *tmp_idx_adj = NULL;
@@ -1005,7 +1118,7 @@ int* fui_bitmap_dtree_idx(const int *input_arr, const uint_32 num_elems, uint_32
         *err_flag = 5;
         return NULL;
     }
-    int *output_arr = (int *)calloc(num_elems, sizeof(int));
+    out_idx *output_arr = (out_idx *)calloc(num_elems, sizeof(out_idx));
     if (output_arr == NULL) {
         free(bitmap_head);
         *err_flag = -1;
@@ -1127,7 +1240,8 @@ int* fui_bitmap_dtree_idx(const int *input_arr, const uint_32 num_elems, uint_32
             insert_dup_idx_list(&dup_idx_head_tmp, i, tmp_dup_raw_index);
             continue;
         }
-        output_arr[j] = tmp;
+        output_arr[j].out_elem = tmp;
+        output_arr[j].raw_index = i;
         j++;
         flip_bit(((bitmap_head[tmp_quotient].ptr_branch)[tree_index])[tmp_byte_index], tmp_bit_position);
         if(raw_index_range == 32 ) {
@@ -1156,96 +1270,7 @@ free_memory:
         free(output_arr);
         return NULL;
     }
-    final_output_arr = (int *)realloc(output_arr, j * sizeof(int));
-    if(final_output_arr == NULL) {
-        free(output_arr);
-        *err_flag = 3;
-        return NULL;
-    }
-    *num_elems_out = j;
-    *dup_idx_head = dup_idx_head_tmp;
-    return final_output_arr;
-}
-
-
-int* fui_bitmap_idx_llist(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head) {
-    uint_32 i, j = 0;
-    uint_32 tmp_quotient = 0, tmp_mod = 0, tmp_dup_raw_index;
-    int tmp = 0, *final_output_arr = NULL;
-    bitmap_idx_base *bitmap_head = NULL, *tmp_bitmap_realloc = NULL;
-    uint_16 tmp_byte_index = 0, bitmap_base_size = BITMAP_INIT_LENGTH;
-    uint_8 tmp_bit_position = 0;
-    *err_flag = 0;
-    *num_elems_out = 0;
-    if(*dup_idx_head != NULL) {
-        *err_flag = -9;
-        return NULL;
-    }
-    if (input_arr == NULL) {
-        *err_flag = -5;
-        return NULL;
-    }
-    if (num_elems < 1){
-        *err_flag = -3;
-        return NULL;
-    }
-    dup_idx_list *dup_idx_head_tmp = NULL;
-    bitmap_head = (bitmap_idx_base *)calloc(BITMAP_INIT_LENGTH, sizeof(bitmap_idx_base));
-    if(bitmap_head == NULL) {
-        *err_flag = 5;
-        return NULL;
-    }
-    int *output_arr = (int *)calloc(num_elems, sizeof(int));
-    if (output_arr == NULL) {
-        free(bitmap_head);
-        *err_flag = -1;
-        return NULL;
-    }
-    for(i = 0; i < num_elems; i++) {
-        tmp = input_arr[i];
-        tmp_quotient = abs(tmp / BIT_MOD_DIV_FACTOR);
-        tmp_mod = abs(tmp % BIT_MOD_DIV_FACTOR);
-        tmp_byte_index = (tmp < 0) ? (NEGATIVE_START_POS + (tmp_mod / 8)) : (tmp_mod / 8);
-        tmp_bit_position = tmp_mod % 8;
-
-        /* Grow the tree if needed. */
-        if((tmp_quotient + 1) > bitmap_base_size) {
-            if((tmp_bitmap_realloc = (bitmap_idx_base *)realloc(bitmap_head, (tmp_quotient + 1) * sizeof(bitmap_idx_base))) == NULL) {
-                *err_flag = 7;
-                goto free_memory;
-            }
-            memset(tmp_bitmap_realloc + bitmap_base_size, 0, (tmp_quotient + 1 - bitmap_base_size) * sizeof(bitmap_base));
-            bitmap_head = tmp_bitmap_realloc;
-            bitmap_base_size = (tmp_quotient + 1);
-        }
-        if(bitmap_head[tmp_quotient].ptr_bit_branch == NULL) {
-            if((bitmap_head[tmp_quotient].ptr_bit_branch = (uint_8 *)calloc(BIT_MOD_TABLE_SIZE, sizeof(uint_8))) == NULL) {
-                *err_flag = 1;
-                goto free_memory;
-            }
-        }
-        if(bitmap_head[tmp_quotient].ptr_bit_branch != NULL && check_bit((bitmap_head[tmp_quotient].ptr_bit_branch)[tmp_byte_index], tmp_bit_position)) {
-            /* Duplicate item found. Insert an node to dup_idx_head_tmp */
-            if(get_raw_idx(bitmap_head[tmp_quotient].ptr_idx_branch, tmp_byte_index, tmp_bit_position, &tmp_dup_raw_index) != 0) {
-                *err_flag = 9;
-                goto free_memory;
-            }
-            insert_dup_idx_list(&dup_idx_head_tmp, i, tmp_dup_raw_index);
-            continue;
-        }
-        output_arr[j] = tmp;
-        j++;
-        flip_bit((bitmap_head[tmp_quotient].ptr_bit_branch)[tmp_byte_index], tmp_bit_position);
-        insert_idx_branch(&(bitmap_head[tmp_quotient].ptr_idx_branch), tmp_byte_index, tmp_bit_position, i);
-    }
-free_memory:
-    free_bitmap_idx(bitmap_head, bitmap_base_size);
-    free(bitmap_head);
-    if(*err_flag != 0) {
-        free(output_arr);
-        return NULL;
-    }
-    final_output_arr = (int *)realloc(output_arr, j * sizeof(int));
+    final_output_arr = (out_idx *)realloc(output_arr, j * sizeof(out_idx));
     if(final_output_arr == NULL) {
         free(output_arr);
         *err_flag = 3;
@@ -1290,7 +1315,7 @@ int main(int argc, char** argv) {
         return 5;
     }
     int err_flag = 0;
-    uint_32 num_elems_out = 0;
+    uint_32 num_elems_out = 0, num_elems_out_idx = 0;
     clock_t start, end;
 
     int *out_brute_opt = NULL;
@@ -1300,7 +1325,7 @@ int main(int argc, char** argv) {
     int *out_ht_dyn = NULL;
     int *out_bit_dyn = NULL;
     int *out_bit_stc = NULL;
-    int *out_bit_dyn_idx = NULL;
+    out_idx *out_bit_dyn_idx = NULL;
 
 
     generate_random_input_arr(arr_input, num_elems, rand_max);
@@ -1329,9 +1354,9 @@ int main(int argc, char** argv) {
     printf("BITMAP_DYN:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     start = clock();
-    out_bit_dyn_idx = fui_bitmap_dtree_idx(arr_input, num_elems, &num_elems_out, &err_flag, &dup_idx_list1);
+    out_bit_dyn_idx = fui_bitmap_dtree_idx(arr_input, num_elems, &num_elems_out_idx, &err_flag, &dup_idx_list1);
     end = clock();
-    printf("BITMAP_IDX:\t%lf\t%d\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out, err_flag);
+    printf("BITMAP_IDX:\t%lf\t%d\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
 
     start = clock();
     out_bit_stc = fui_bitmap_stc(arr_input, num_elems, &num_elems_out, &err_flag);
@@ -1366,7 +1391,6 @@ int main(int argc, char** argv) {
     }
 
     free(out_bit_dyn);
-    free(out_bit_dyn_idx);
     free(out_bit_stc);
     free(out_ht_dtree);
     free(out_ht_stree);
@@ -1375,8 +1399,10 @@ int main(int argc, char** argv) {
         free(out_brute_opt);
         free(out_brute);
     }
-    print_dup_idx_list(dup_idx_list1, 10);
+    print_dup_idx_list(dup_idx_list1, 3);
+    print_out_idx(out_bit_dyn_idx, num_elems_out_idx, 5);
     free_dup_idx_list(dup_idx_list1);
+    free(out_bit_dyn_idx);
 
     memset(arr_input, 0, num_elems);
     generate_growing_arr(arr_input, num_elems);
@@ -1403,9 +1429,9 @@ int main(int argc, char** argv) {
     printf("BITMAP_DYN:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     start = clock();
-    out_bit_dyn_idx = fui_bitmap_dtree_idx(arr_input, num_elems, &num_elems_out, &err_flag, &dup_idx_list2);
+    out_bit_dyn_idx = fui_bitmap_dtree_idx(arr_input, num_elems, &num_elems_out_idx, &err_flag, &dup_idx_list2);
     end = clock();
-    printf("BITMAP_IDX:\t%lf\t%d\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out, err_flag);
+    printf("BITMAP_IDX:\t%lf\t%d\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
 
     start = clock();
     out_bit_stc = fui_bitmap_stc(arr_input, num_elems, &num_elems_out, &err_flag);
@@ -1444,8 +1470,11 @@ int main(int argc, char** argv) {
     free(out_ht_stree);
     free(out_ht_dyn);
     free(out_brute_opt);
-    print_dup_idx_list(dup_idx_list2, 10);
+
+    print_dup_idx_list(dup_idx_list2, 3);
+    print_out_idx(out_bit_dyn_idx, num_elems_out_idx, 5);
     free_dup_idx_list(dup_idx_list2);
+    free(out_bit_dyn_idx);
     printf("\nBenchmark done.\n\n");
     
     free(arr_input);
