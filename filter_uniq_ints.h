@@ -49,15 +49,6 @@ typedef struct {
     uint_8 *ptr_branch_n;
 } htable_base;
 
-uint_32 convert_string_to_positive_num(const char* string);
-int* filter_unique_elems_naive(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
-int* filter_unique_elems_naive_improved(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
-void free_hash_table(uint_8 *hash_table[], uint_32 num_elems);
-void free_hash_table_new(htable_base hash_table_new[], uint_32 num_elems);
-int* filter_unique_elems_ht(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
-int* filter_unique_elems_ht_new(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
-int* filter_unique_elems_ht_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
-
 /**
  * Auxiliary functions, e.g.
  *  - Print out an array (Caution: when the array is very big, don't use it)
@@ -65,15 +56,26 @@ int* filter_unique_elems_ht_dyn(const int *input_arr, const uint_32 num_elems, u
  *  - Generate a RANDOM input integer array
  *  - Generate a GROWING input integer array
 */
-void print_arr(const int *arr, uint_32 num_elems);
+uint_32 convert_string_to_positive_num(const char* string);
+void print_arr(const int *arr, uint_32 num_elems, uint_32 max_elems);
 int compare_arr(const int *arr_a, const int *arr_b, uint_32 num_elems);
 int generate_random_input_arr(int *arr, uint_32 num_elems, uint_32 rand_max);
 int generate_growing_arr(int *arr, uint_32 num_elems);
 
-/**
- * Testing the bit-based hash table algorithm
- * This algorithm would save 8x memory usage
- */
+
+/* Brute functions. */
+int* fui_brute(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
+int* fui_brute_opt(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
+
+/* Memory-inefficient hash table algorithms */
+void free_hash_table(uint_8 *hash_table[], uint_32 num_elems);
+void free_hash_table_new(htable_base hash_table_new[], uint_32 num_elems);
+int* fui_htable_dtree(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
+int* fui_htable_stree(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
+int* fui_htable_stree_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
+
+
+/* Bitmap based algorithms. */
 
 #define NEGATIVE_START_POS  8192
 #define BIT_MOD_TABLE_SIZE  16384
@@ -81,28 +83,86 @@ int generate_growing_arr(int *arr, uint_32 num_elems);
 #define BITMAP_INIT_LENGTH  128
 #define BITMAP_LENGTH_MAX   32769
 
-/* STATIC BITMAP SIZE */
-#define BITMAP_STATIC_ROW   4096
-#define BITMAP_STATIC_COL   16384
+#define UINT_16_MAX         65536
+#define UINT_8_MAX          256
+#define IDX_ADJ_BRCH_SIZE   65536
+
+struct bmap_idx_tbl_struct {
+    uint_16 byte_index;
+    uint_8 bit_position;
+    uint_32 raw_index;
+    struct bmap_idx_tbl_struct *ptr_next;
+};
+
+struct dup_idx_struct {
+    uint_32 index_a;
+    uint_32 index_b;
+    struct dup_idx_struct *ptr_next;
+};
+
+typedef struct bmap_idx_tbl_struct  bmap_idx_brch;
+typedef struct dup_idx_struct       dup_idx_list;
 
 typedef struct {
-    uint_16 branch_size;
+    int out_elem;
+    uint_32 raw_index;
+} out_idx;
+
+typedef struct {
+    uint_32 branch_size;
     uint_8 *ptr_branch;
 } bitmap_base;
 
 typedef struct {
-    uint_16 branch_size_n;
-    uint_16 branch_size_p;
-    uint_8 *ptr_branch_n;
-    uint_8 *ptr_branch_p;
-} bitmap_dbase;
+    uint_16 branch_size[2];
+    uint_8 *ptr_branch[2];
+} bitmap_dtree;
+
+typedef struct {
+    uint_16 bit_branch_size;
+    uint_8 *ptr_bit_branch;
+    bmap_idx_brch *ptr_idx_branch;
+} bitmap_idx_base;
+
+/* Adjacent index hashtable */
+typedef struct {
+    uint_16 branch_size[2];
+    uint_8 *ptr_branch[2];
+} idx_ht_8;
+
+typedef struct {
+    uint_16 branch_size[2];
+    uint_16 *ptr_branch[2];
+} idx_ht_16;
+
+typedef struct {
+    uint_16 branch_size[2];
+    uint_32 *ptr_branch[2];
+} idx_ht_32;
 
 #define flip_bit(byte_a, bit_position) ((byte_a) |= (0x80 >> (bit_position)))
 #define check_bit(byte_a, bit_position) ((byte_a) & (0x80 >> (bit_position)))
 
+void free_bmap_idx_branch(bmap_idx_brch *bmap_idx_head);
+void free_dup_idx_list(dup_idx_list *dup_idx_head);
+int insert_idx_branch(bmap_idx_brch **bmap_idx_head, uint_16 byte_idx, uint_8 bit_pos, uint_32 raw_idx);
+int insert_dup_idx_list(dup_idx_list **dup_idx_head, uint_32 idx_a, uint_32 idx_b);
+int get_raw_idx(bmap_idx_brch *bmap_idx_head, uint_16 byte_idx, uint_8 bit_pos, uint_32 *raw_idx);
+void print_dup_idx_list(dup_idx_list *dup_idx_head, uint_32 max_nodes);
+
 void free_bitmap(bitmap_base *bitmap_head, uint_16 num_elems);
+void free_bitmap_idx(bitmap_idx_base *bitmap_head, uint_16 num_elems);
+
+void free_bitmap_dtree(bitmap_dtree *bitmap_head, uint_16 num_elems);
+void free_idx_ht_8(idx_ht_8 *idx_ht_head, uint_16 num_elems);
+void free_idx_ht_16(idx_ht_16 *idx_ht_head, uint_16 num_elems);
+void free_idx_ht_32(idx_ht_32 *idx_ht_head, uint_16 num_elems);
+
 int* fui_bitmap_stc(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
-int* fui_bitmap_base_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
+int* fui_bitmap_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
+
+int* fui_bitmap_dtree_idx(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head);
+int* fui_bitmap_idx_llist(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head);
 
 /* To be continued. */
 int* fui_bitmap_full_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);

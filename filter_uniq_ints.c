@@ -54,7 +54,7 @@ uint_32 convert_string_to_positive_num(const char* string) {
  *  NULL if any error happens
  * 
  */
-int* filter_unique_elems_naive(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag){
+int* fui_brute(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag){
     uint_32 i, j = 1, k;
     int tmp = 0;
     int *final_output_arr = NULL;
@@ -114,7 +114,7 @@ int* filter_unique_elems_naive(const int *input_arr, const uint_32 num_elems, ui
  *  NULL if any error happens
  * 
  */
-int* filter_unique_elems_naive_improved(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag){
+int* fui_brute_opt(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag){
     uint_32 i, j = 1, k;
     int max_current, min_current, diff_to_max = 0, diff_to_min = 0, tmp_diff_to_max = 0, tmp_diff_to_min = 0;
     int tmp = 0;
@@ -214,7 +214,7 @@ void free_hash_table(uint_8 *hash_table[], uint_32 num_elems) {
  *  NULL if any error happens
  * 
  */
-int* filter_unique_elems_ht(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag) {
+int* fui_htable_dtree(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag) {
     uint_32 i, j = 0;
     uint_32 tmp_quotient = 0, tmp_mod = 0;
     int tmp = 0;
@@ -317,7 +317,7 @@ void free_hash_table_new(htable_base hash_table_new[], uint_32 num_elems) {
  *  NULL if any error happens
  * 
  */
-int* filter_unique_elems_ht_new(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag) {
+int* fui_htable_stree(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag) {
     uint_32 i, j = 0;
     uint_32 tmp_quotient = 0, tmp_mod = 0;
     int tmp = 0;
@@ -441,7 +441,7 @@ free_memory:
  *  NULL if any error happens
  * 
  */
-int* filter_unique_elems_ht_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag) {
+int* fui_htable_stree_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag) {
     uint_32 i, j = 0;
     uint_32 tmp_quotient = 0, tmp_mod = 0;
     int tmp = 0;
@@ -575,18 +575,22 @@ free_memory:
  *  void
  * 
  */
-void print_arr(const int *arr, uint_32 num_elems) {
+void print_arr(const int *arr, uint_32 num_elems, uint_32 max_elems) {
     if(arr == NULL || num_elems < 1) {
         printf("ERROR: NULL array input.\n");
         return;
     }
-    for(uint_32 i = 0; i < num_elems; i++) {
+    uint_32 i;
+    for(i = 0; i < num_elems && i < max_elems; i++) {
         printf("%d\t", arr[i]);
         if((i+1)%10 == 0) {
             printf("\n");
         }
     }
-    printf("\n\n");
+    if(num_elems != max_elems && i == max_elems) {
+        printf("... Remaining %u elements not printed ...\n", num_elems-max_elems);
+    }
+    printf("\n");
 }
 
 int compare_arr(const int *arr_a, const int *arr_b, uint_32 num_elems) {
@@ -674,10 +678,170 @@ int generate_growing_arr(int *arr, uint_32 num_elems) {
     return 0;
 }
 
+void free_bmap_idx_branch(bmap_idx_brch *bmap_idx_head) {
+    bmap_idx_brch *ptr_current = bmap_idx_head;
+    bmap_idx_brch *ptr_next;
+    while(ptr_current != NULL){
+        ptr_next = ptr_current->ptr_next;
+        free(ptr_current);
+        ptr_current = ptr_next;
+    }
+}
+void free_dup_idx_list(dup_idx_list *dup_idx_head) {
+    dup_idx_list *ptr_current = dup_idx_head;
+    dup_idx_list *ptr_next;
+    while(ptr_current != NULL){
+        ptr_next = ptr_current->ptr_next;
+        free(ptr_current);
+        ptr_current = ptr_next;
+    }
+}
+
+int insert_idx_branch(bmap_idx_brch **bmap_idx_head, uint_16 byte_idx, uint_8 bit_pos, uint_32 raw_idx) {
+    bmap_idx_brch *new_node = (bmap_idx_brch *)calloc(1, sizeof(bmap_idx_brch));
+    if(new_node == NULL) {
+        return -1;
+    }
+    new_node->byte_index = byte_idx;
+    new_node->bit_position = bit_pos;
+    new_node->raw_index = raw_idx;
+    if(*bmap_idx_head == NULL) {
+        *bmap_idx_head = new_node;
+        new_node->ptr_next = NULL;
+        return 0;
+    }
+    new_node->ptr_next = *bmap_idx_head;
+    *bmap_idx_head = new_node;
+    return 0;
+}
+
+int insert_dup_idx_list(dup_idx_list **dup_idx_head, uint_32 idx_a, uint_32 idx_b) {
+    dup_idx_list *new_node = (dup_idx_list *)calloc(1, sizeof(dup_idx_list));
+    if(new_node == NULL) {
+        return -1;
+    }
+    new_node->index_a = idx_a;
+    new_node->index_b = idx_b;
+    if(*dup_idx_head == NULL) {
+        *dup_idx_head = new_node;
+        new_node->ptr_next = NULL;
+        return 0;
+    }
+    new_node->ptr_next = *dup_idx_head;
+    *dup_idx_head = new_node;
+    return 0;
+}
+
+int get_raw_idx(bmap_idx_brch *bmap_idx_head, uint_16 byte_idx, uint_8 bit_pos, uint_32 *raw_idx) {
+    bmap_idx_brch *ptr_current = bmap_idx_head;
+    *raw_idx = 0;
+    if(ptr_current == NULL) {
+        return -1;
+    }
+    while(ptr_current != NULL) {
+        if(ptr_current->byte_index == byte_idx && ptr_current->bit_position == bit_pos) {
+            *raw_idx = ptr_current->raw_index;
+            return 0;
+        }
+        ptr_current = ptr_current->ptr_next;
+    }
+    return -3;
+}
+
+void print_dup_idx_list(dup_idx_list *dup_idx_head, uint_32 max_nodes) {
+    dup_idx_list *ptr_current = dup_idx_head;
+    printf("\n");
+    if(ptr_current == NULL) {
+        printf("NULL LIST!\n");
+        return;
+    }
+    uint_32 i = 0;
+    while(ptr_current != NULL && i < max_nodes) {
+        printf("{%u, %u} ", ptr_current->index_a, ptr_current->index_b);
+        ptr_current = ptr_current->ptr_next;
+        i++;
+        if(i%10 == 0) {
+            printf("\n");
+        }
+    }
+    if( i == max_nodes) {
+        printf("... Remaining elements not printed ...\n");
+    }
+    else {
+        printf("\n");
+    }
+}
+
 void free_bitmap(bitmap_base *bitmap_head, uint_16 num_elems) {
     for(uint_32 i = 0; i < num_elems; i++) {
         if(bitmap_head[i].ptr_branch != NULL) {
             free(bitmap_head[i].ptr_branch);
+        }
+    }
+}
+
+void free_bitmap_idx(bitmap_idx_base *bitmap_head, uint_16 num_elems) {
+    for(uint_32 i = 0; i < num_elems; i++) {
+        if(bitmap_head[i].ptr_bit_branch != NULL) {
+            free(bitmap_head[i].ptr_bit_branch);
+        }
+        if(bitmap_head[i].ptr_idx_branch != NULL) {
+            free_bmap_idx_branch(bitmap_head[i].ptr_idx_branch);
+        }
+    }
+}
+
+void free_bitmap_dtree(bitmap_dtree *bitmap_head, uint_16 num_elems) {
+    if(bitmap_head == NULL) {
+        return;
+    }
+    for(uint_16 i = 0; i < num_elems; i++) {
+        if(bitmap_head[i].ptr_branch[0] != NULL) {
+            free(bitmap_head[i].ptr_branch[0]);
+        }
+        if(bitmap_head[i].ptr_branch[1] != NULL) {
+            free(bitmap_head[i].ptr_branch[1]);
+        }
+    }
+}
+
+void free_idx_ht_8(idx_ht_8 *idx_ht_head, uint_16 num_elems) {
+    if(idx_ht_head == NULL) {
+        return;
+    }
+    for(uint_16 i = 0; i < num_elems; i++) {
+        if(idx_ht_head[i].ptr_branch[0] != NULL) {
+            free(idx_ht_head[i].ptr_branch[0]);
+        }
+        if(idx_ht_head[i].ptr_branch[1] != NULL) {
+            free(idx_ht_head[i].ptr_branch[1]);
+        }
+    }
+}
+void free_idx_ht_16(idx_ht_16 *idx_ht_head, uint_16 num_elems) {
+    if(idx_ht_head == NULL) {
+        return;
+    }
+    for(uint_16 i = 0; i < num_elems; i++) {
+        if(idx_ht_head[i].ptr_branch[0] != NULL) {
+            free(idx_ht_head[i].ptr_branch[0]);
+        }
+        if(idx_ht_head[i].ptr_branch[1] != NULL) {
+            free(idx_ht_head[i].ptr_branch[1]);
+        }
+    }
+}
+
+void free_idx_ht_32(idx_ht_32 *idx_ht_head, uint_16 num_elems) {
+    if(idx_ht_head == NULL) {
+        return;
+    }
+    for(uint_16 i = 0; i < num_elems; i++) {
+        if(idx_ht_head[i].ptr_branch[0] != NULL) {
+            free(idx_ht_head[i].ptr_branch[0]);
+        }
+        if(idx_ht_head[i].ptr_branch[1] != NULL) {
+            free(idx_ht_head[i].ptr_branch[1]);
         }
     }
 }
@@ -739,7 +903,7 @@ free_memory:
     return final_output_arr;
 }
 
-int* fui_bitmap_base_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag) {
+int* fui_bitmap_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag) {
     uint_32 i, j = 0;
     uint_32 tmp_quotient = 0, tmp_mod = 0;
     int tmp = 0, *final_output_arr = NULL;
@@ -814,6 +978,284 @@ free_memory:
     return final_output_arr;
 }
 
+int* fui_bitmap_dtree_idx(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head) {
+    uint_32 i, j = 0;
+    uint_32 tmp_dup_raw_index;
+    uint_16 tmp_quotient = 0, tmp_mod = 0;
+    int tmp = 0, *final_output_arr = NULL;
+    bitmap_dtree *bitmap_head = NULL, *tmp_bitmap_head = NULL;
+    uint_8 tree_index = 0;
+    void *idx_adj_head = NULL, *tmp_idx_adj = NULL;
+    dup_idx_list *dup_idx_head_tmp = NULL;
+    uint_16 tmp_byte_index = 0, bitmap_base_size = BITMAP_INIT_LENGTH;
+    uint_8 tmp_bit_position = 0;
+    uint_8 raw_index_range = 0;
+    *err_flag = 0;
+    *num_elems_out = 0;
+    if(*dup_idx_head != NULL) {
+        *err_flag = -9;
+        return NULL;
+    }
+    if (input_arr == NULL) {
+        *err_flag = -7;
+        return NULL;
+    }
+    bitmap_head = (bitmap_dtree *)calloc(BITMAP_INIT_LENGTH, sizeof(bitmap_dtree));
+    if(bitmap_head == NULL) {
+        *err_flag = 5;
+        return NULL;
+    }
+    int *output_arr = (int *)calloc(num_elems, sizeof(int));
+    if (output_arr == NULL) {
+        free(bitmap_head);
+        *err_flag = -1;
+        return NULL;
+    }
+    if (num_elems < 1){
+        *err_flag = -5;
+    }
+    else if(num_elems > UINT_16_MAX ) {
+        if((idx_adj_head = (idx_ht_32 *)calloc(BITMAP_INIT_LENGTH, sizeof(idx_ht_32))) == NULL) {
+            *err_flag = -3;
+        }
+        else {
+            raw_index_range = 32;
+        }
+    }
+    else if(num_elems > UINT_8_MAX) {
+        if((idx_adj_head = (idx_ht_16 *)calloc(BITMAP_INIT_LENGTH, sizeof(idx_ht_16))) == NULL) {
+            *err_flag = -3;
+        }
+        else {
+            raw_index_range = 16;
+        }
+    }
+    else{
+        if((idx_adj_head = (idx_ht_8 *)calloc(BITMAP_INIT_LENGTH, sizeof(idx_ht_8))) == NULL) {
+            *err_flag = -3;
+        }
+        else {
+            raw_index_range = 8;
+        }
+    }
+    if(*err_flag != 0) {
+        free(bitmap_head);
+        free(output_arr);
+        return NULL;
+    }
+    for(i = 0; i < num_elems; i++) {
+        tmp = input_arr[i];
+        tree_index = (tmp < 0) ? 1 : 0;
+        tmp_quotient = abs(tmp / BIT_MOD_DIV_FACTOR);
+        tmp_mod = abs(tmp % BIT_MOD_DIV_FACTOR);
+        tmp_byte_index = (tmp_mod / 8);
+        tmp_bit_position = tmp_mod % 8;
+        /* Grow the tree if needed. */
+        if((tmp_quotient + 1) > bitmap_base_size) {
+            if((tmp_bitmap_head = (bitmap_dtree *)realloc(bitmap_head, (tmp_quotient + 1) * sizeof(bitmap_dtree))) == NULL) {
+                *err_flag = 7;
+                goto free_memory;
+            }
+            memset(tmp_bitmap_head + bitmap_base_size, 0, (tmp_quotient + 1 - bitmap_base_size) * sizeof(bitmap_dtree));
+            bitmap_head = tmp_bitmap_head;
+            if(raw_index_range == 32 ) {
+                if((tmp_idx_adj = (idx_ht_32 *)realloc((idx_ht_32 *)idx_adj_head, (tmp_quotient + 1) * sizeof(idx_ht_32))) == NULL) {
+                    *err_flag = 7;
+                    goto free_memory;
+                }
+                memset((idx_ht_32 *)tmp_idx_adj + bitmap_base_size, 0, (tmp_quotient + 1 - bitmap_base_size) * sizeof(idx_ht_32));
+                idx_adj_head = (idx_ht_32 *)tmp_idx_adj;
+            }
+            else if(raw_index_range == 16 ) {
+                if((tmp_idx_adj = (idx_ht_16 *)realloc((idx_ht_16 *)idx_adj_head, (tmp_quotient + 1) * sizeof(idx_ht_16))) == NULL) {
+                    *err_flag = 7;
+                    goto free_memory;
+                }
+                memset((idx_ht_16 *)tmp_idx_adj + bitmap_base_size, 0, (tmp_quotient + 1 - bitmap_base_size) * sizeof(idx_ht_16));
+                idx_adj_head = (idx_ht_16 *)tmp_idx_adj;
+            }
+            else{
+                if((tmp_idx_adj = (idx_ht_8 *)realloc((idx_ht_8 *)idx_adj_head, (tmp_quotient + 1) * sizeof(idx_ht_8))) == NULL) {
+                    *err_flag = 7;
+                    goto free_memory;
+                }
+                memset((idx_ht_8 *)tmp_idx_adj + bitmap_base_size, 0, (tmp_quotient + 1 - bitmap_base_size) * sizeof(idx_ht_8));
+                idx_adj_head = (idx_ht_8 *)tmp_idx_adj;
+            }
+            bitmap_base_size = (tmp_quotient + 1);
+        }
+        if((bitmap_head[tmp_quotient].ptr_branch)[tree_index] == NULL) {
+            if(((bitmap_head[tmp_quotient].ptr_branch)[tree_index] = (uint_8 *)calloc(BIT_MOD_TABLE_SIZE, sizeof(uint_8))) == NULL) {
+                *err_flag = 1;
+                goto free_memory;
+            }
+        }
+        if(raw_index_range == 32 ) {
+            if((((idx_ht_32 *)idx_adj_head)[tmp_quotient].ptr_branch)[tree_index] == NULL) {
+                if(((((idx_ht_32 *)idx_adj_head)[tmp_quotient].ptr_branch)[tree_index] = (uint_32 *)calloc(IDX_ADJ_BRCH_SIZE, sizeof(uint_32))) == NULL){
+                    *err_flag = 1;
+                    goto free_memory;
+                }
+            }
+        }
+        else if(raw_index_range == 16 ) {
+            if((((idx_ht_16 *)idx_adj_head)[tmp_quotient].ptr_branch)[tree_index] == NULL) {
+                if((((idx_ht_16 *)idx_adj_head)[tmp_quotient].ptr_branch[tree_index] = (uint_16 *)calloc(IDX_ADJ_BRCH_SIZE, sizeof(uint_16))) == NULL){
+                    *err_flag = 1;
+                    goto free_memory;
+                }
+            }
+        }
+        else{
+            if((((idx_ht_8 *)idx_adj_head)[tmp_quotient].ptr_branch)[tree_index] == NULL) {
+                if(((((idx_ht_8 *)idx_adj_head)[tmp_quotient].ptr_branch)[tree_index] = (uint_8 *)calloc(IDX_ADJ_BRCH_SIZE, sizeof(uint_8))) == NULL){
+                    *err_flag = 1;
+                    goto free_memory;
+                }
+            }
+        }
+        if((bitmap_head[tmp_quotient].ptr_branch)[tree_index] != NULL && check_bit(((bitmap_head[tmp_quotient].ptr_branch)[tree_index])[tmp_byte_index], tmp_bit_position)) {
+            if(raw_index_range == 32 ) {
+                tmp_dup_raw_index = ((((idx_ht_32 *)idx_adj_head)[tmp_quotient].ptr_branch)[tree_index])[tmp_mod];
+            }
+            else if(raw_index_range == 16 ) {
+                tmp_dup_raw_index = ((((idx_ht_16 *)idx_adj_head)[tmp_quotient].ptr_branch)[tree_index])[tmp_mod];
+            }
+            else{
+                tmp_dup_raw_index = ((((idx_ht_8 *)idx_adj_head)[tmp_quotient].ptr_branch)[tree_index])[tmp_mod];
+            }
+            insert_dup_idx_list(&dup_idx_head_tmp, i, tmp_dup_raw_index);
+            continue;
+        }
+        output_arr[j] = tmp;
+        j++;
+        flip_bit(((bitmap_head[tmp_quotient].ptr_branch)[tree_index])[tmp_byte_index], tmp_bit_position);
+        if(raw_index_range == 32 ) {
+            (((idx_ht_32 *)idx_adj_head)[tmp_quotient].ptr_branch[tree_index])[tmp_mod] = i;
+        }
+        else if(raw_index_range == 16 ) {
+            ((idx_ht_16 *)idx_adj_head)[tmp_quotient].ptr_branch[tree_index][tmp_mod] = (uint_16)i;
+        }
+        else{
+            (((idx_ht_8 *)idx_adj_head)[tmp_quotient].ptr_branch[tree_index])[tmp_mod] = (uint_8)i;
+        }
+    }
+free_memory:
+    free_bitmap_dtree(bitmap_head, bitmap_base_size);
+    free(bitmap_head);
+    if(raw_index_range == 32 ) {
+        free_idx_ht_32((idx_ht_32 *)idx_adj_head, bitmap_base_size);
+    }
+    else if(raw_index_range == 16 ) {
+        free_idx_ht_16((idx_ht_16 *)idx_adj_head, bitmap_base_size);
+    }
+    else{
+        free_idx_ht_8((idx_ht_8 *)idx_adj_head, bitmap_base_size);    
+    }
+    if(*err_flag != 0) {
+        free(output_arr);
+        return NULL;
+    }
+    final_output_arr = (int *)realloc(output_arr, j * sizeof(int));
+    if(final_output_arr == NULL) {
+        free(output_arr);
+        *err_flag = 3;
+        return NULL;
+    }
+    *num_elems_out = j;
+    *dup_idx_head = dup_idx_head_tmp;
+    return final_output_arr;
+}
+
+
+int* fui_bitmap_idx_llist(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head) {
+    uint_32 i, j = 0;
+    uint_32 tmp_quotient = 0, tmp_mod = 0, tmp_dup_raw_index;
+    int tmp = 0, *final_output_arr = NULL;
+    bitmap_idx_base *bitmap_head = NULL, *tmp_bitmap_realloc = NULL;
+    uint_16 tmp_byte_index = 0, bitmap_base_size = BITMAP_INIT_LENGTH;
+    uint_8 tmp_bit_position = 0;
+    *err_flag = 0;
+    *num_elems_out = 0;
+    if(*dup_idx_head != NULL) {
+        *err_flag = -9;
+        return NULL;
+    }
+    if (input_arr == NULL) {
+        *err_flag = -5;
+        return NULL;
+    }
+    if (num_elems < 1){
+        *err_flag = -3;
+        return NULL;
+    }
+    dup_idx_list *dup_idx_head_tmp = NULL;
+    bitmap_head = (bitmap_idx_base *)calloc(BITMAP_INIT_LENGTH, sizeof(bitmap_idx_base));
+    if(bitmap_head == NULL) {
+        *err_flag = 5;
+        return NULL;
+    }
+    int *output_arr = (int *)calloc(num_elems, sizeof(int));
+    if (output_arr == NULL) {
+        free(bitmap_head);
+        *err_flag = -1;
+        return NULL;
+    }
+    for(i = 0; i < num_elems; i++) {
+        tmp = input_arr[i];
+        tmp_quotient = abs(tmp / BIT_MOD_DIV_FACTOR);
+        tmp_mod = abs(tmp % BIT_MOD_DIV_FACTOR);
+        tmp_byte_index = (tmp < 0) ? (NEGATIVE_START_POS + (tmp_mod / 8)) : (tmp_mod / 8);
+        tmp_bit_position = tmp_mod % 8;
+
+        /* Grow the tree if needed. */
+        if((tmp_quotient + 1) > bitmap_base_size) {
+            if((tmp_bitmap_realloc = (bitmap_idx_base *)realloc(bitmap_head, (tmp_quotient + 1) * sizeof(bitmap_idx_base))) == NULL) {
+                *err_flag = 7;
+                goto free_memory;
+            }
+            memset(tmp_bitmap_realloc + bitmap_base_size, 0, (tmp_quotient + 1 - bitmap_base_size) * sizeof(bitmap_base));
+            bitmap_head = tmp_bitmap_realloc;
+            bitmap_base_size = (tmp_quotient + 1);
+        }
+        if(bitmap_head[tmp_quotient].ptr_bit_branch == NULL) {
+            if((bitmap_head[tmp_quotient].ptr_bit_branch = (uint_8 *)calloc(BIT_MOD_TABLE_SIZE, sizeof(uint_8))) == NULL) {
+                *err_flag = 1;
+                goto free_memory;
+            }
+        }
+        if(bitmap_head[tmp_quotient].ptr_bit_branch != NULL && check_bit((bitmap_head[tmp_quotient].ptr_bit_branch)[tmp_byte_index], tmp_bit_position)) {
+            /* Duplicate item found. Insert an node to dup_idx_head_tmp */
+            if(get_raw_idx(bitmap_head[tmp_quotient].ptr_idx_branch, tmp_byte_index, tmp_bit_position, &tmp_dup_raw_index) != 0) {
+                *err_flag = 9;
+                goto free_memory;
+            }
+            insert_dup_idx_list(&dup_idx_head_tmp, i, tmp_dup_raw_index);
+            continue;
+        }
+        output_arr[j] = tmp;
+        j++;
+        flip_bit((bitmap_head[tmp_quotient].ptr_bit_branch)[tmp_byte_index], tmp_bit_position);
+        insert_idx_branch(&(bitmap_head[tmp_quotient].ptr_idx_branch), tmp_byte_index, tmp_bit_position, i);
+    }
+free_memory:
+    free_bitmap_idx(bitmap_head, bitmap_base_size);
+    free(bitmap_head);
+    if(*err_flag != 0) {
+        free(output_arr);
+        return NULL;
+    }
+    final_output_arr = (int *)realloc(output_arr, j * sizeof(int));
+    if(final_output_arr == NULL) {
+        free(output_arr);
+        *err_flag = 3;
+        return NULL;
+    }
+    *num_elems_out = j;
+    *dup_idx_head = dup_idx_head_tmp;
+    return final_output_arr;
+}
+
 /**
  * @brief
  *  usage: ./command argv[1] argv[2]
@@ -827,6 +1269,7 @@ free_memory:
  */
 int main(int argc, char** argv) {
     int with_brute = 0;
+    dup_idx_list *dup_idx_list1 = NULL, *dup_idx_list2 = NULL;
     if(argc < 3) {
         printf("ERROR: not enough args. USAGE: ./command argv[1] argv[2] argv[3](Optional: brute).\n");
         return 1;
@@ -835,6 +1278,7 @@ int main(int argc, char** argv) {
         with_brute = 1;
     }
     uint_32 num_elems = convert_string_to_positive_num(argv[1]), rand_max = convert_string_to_positive_num(argv[2]);
+    
     printf("INPUT_ELEMS:\t%u\nRANDOM_MAX:\t%u\n\n",num_elems, rand_max);
     if(num_elems < 0 || rand_max < 0) {
         printf("ERROR: arguments illegal. Make sure they are plain positive numbers.\n");
@@ -848,9 +1292,25 @@ int main(int argc, char** argv) {
     int err_flag = 0;
     uint_32 num_elems_out = 0;
     clock_t start, end;
-    int *out_naive_improved = NULL, *out_naive = NULL, *out_ht = NULL, *out_ht_new = NULL, *out_ht_dyn = NULL, *out_bit = NULL, *out_bit_stc = NULL;
-    generate_random_input_arr(arr_input,num_elems,rand_max);
-    /*FILE* file_p=fopen("random.csv","wb+");
+
+    int *out_brute_opt = NULL;
+    int *out_brute = NULL;
+    int *out_ht_dtree = NULL;
+    int *out_ht_stree = NULL;
+    int *out_ht_dyn = NULL;
+    int *out_bit_dyn = NULL;
+    int *out_bit_stc = NULL;
+    int *out_bit_dyn_idx = NULL;
+
+
+    generate_random_input_arr(arr_input, num_elems, rand_max);
+    //print_arr(arr_input, num_elems, 100);
+    
+  /**
+   * Please uncomment the FILE I/O part if you'd like to write the arr_input
+   * to a file.
+   * 
+    FILE* file_p=fopen("random.csv","wb+");
     if(file_p == NULL){
         free(arr_input);
         return 7;
@@ -858,13 +1318,20 @@ int main(int argc, char** argv) {
     for(uint_32 i = 0; i < num_elems; i++) {
         fprintf(file_p, "%d\n", arr_input[i]);
     }
-    fclose(file_p);*/
+    fclose(file_p);
+   */
     printf("RANDOM ARRAY INPUT:\n");
     printf("ALGO_TYPE\tTIME_IN_SEC\tUNIQUE_INTEGERS\n");
+    
     start = clock();
-    out_bit = fui_bitmap_base_dyn(arr_input, num_elems, &num_elems_out, &err_flag);
+    out_bit_dyn = fui_bitmap_dyn(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("BITMAP_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("BITMAP_DYN:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+    start = clock();
+    out_bit_dyn_idx = fui_bitmap_dtree_idx(arr_input, num_elems, &num_elems_out, &err_flag, &dup_idx_list1);
+    end = clock();
+    printf("BITMAP_IDX:\t%lf\t%d\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out, err_flag);
 
     start = clock();
     out_bit_stc = fui_bitmap_stc(arr_input, num_elems, &num_elems_out, &err_flag);
@@ -872,45 +1339,53 @@ int main(int argc, char** argv) {
     printf("BITMAP_STC:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     start = clock();
-    out_ht = filter_unique_elems_ht(arr_input, num_elems, &num_elems_out, &err_flag);
+    out_ht_dtree = fui_htable_dtree(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("HASH_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("HTBL_DTREE:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     start = clock();
-    out_ht_new = filter_unique_elems_ht_new(arr_input, num_elems, &num_elems_out, &err_flag);
+    out_ht_stree = fui_htable_stree(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("HASH_ALGO_NEW:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("HTBL_STREE:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     start = clock();
-    out_ht_dyn = filter_unique_elems_ht_dyn(arr_input, num_elems, &num_elems_out, &err_flag);
+    out_ht_dyn = fui_htable_stree_dyn(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("HASH_ALGO_DYN:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("HTBL_STREE_DYN:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     if(with_brute == 1) {
         start = clock();
-        out_naive_improved = filter_unique_elems_naive_improved(arr_input, num_elems, &num_elems_out, &err_flag);
+        out_brute_opt = fui_brute_opt(arr_input, num_elems, &num_elems_out, &err_flag);
         end = clock();
-        printf("NAIVE_ALGO_NEW:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("BRUTE_OPT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
     
         start = clock();
-        out_naive = filter_unique_elems_naive(arr_input, num_elems, &num_elems_out, &err_flag);
+        out_brute = fui_brute(arr_input, num_elems, &num_elems_out, &err_flag);
         end = clock();
-        printf("NAIVE_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("BRUTE_ORIG:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
     }
 
-    free(out_ht);
-    free(out_ht_new);
-    free(out_ht_dyn);
-    free(out_bit);
+    free(out_bit_dyn);
+    free(out_bit_dyn_idx);
     free(out_bit_stc);
+    free(out_ht_dtree);
+    free(out_ht_stree);
+    free(out_ht_dyn);
     if(with_brute == 1) {
-        free(out_naive_improved);
-        free(out_naive);
+        free(out_brute_opt);
+        free(out_brute);
     }
-    
+    print_dup_idx_list(dup_idx_list1, 10);
+    free_dup_idx_list(dup_idx_list1);
+
     memset(arr_input, 0, num_elems);
     generate_growing_arr(arr_input, num_elems);
-    /*file_p=fopen("growing.csv","wb+");
+
+  /**
+   * Please uncomment the FILE I/O part if you'd like to write the arr_input
+   * to a file.
+   * 
+    file_p=fopen("growing.csv","wb+");
     if(file_p == NULL){
         free(arr_input);
         return 7;
@@ -918,14 +1393,19 @@ int main(int argc, char** argv) {
     for(uint_32 i = 0; i < num_elems; i++) {
         fprintf(file_p, "%d\n", arr_input[i]);
     }
-    fclose(file_p);*/
+    fclose(file_p);
+   */
     printf("\nGROWING ARRAY INPUT:\n");
     printf("ALGO_TYPE\tTIME_IN_SEC\tUNIQUE_INTEGERS\n");
-    
     start = clock();
-    out_bit = fui_bitmap_base_dyn(arr_input, num_elems, &num_elems_out, &err_flag);
+    out_bit_dyn = fui_bitmap_dyn(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("BITMAP_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("BITMAP_DYN:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+    start = clock();
+    out_bit_dyn_idx = fui_bitmap_dtree_idx(arr_input, num_elems, &num_elems_out, &err_flag, &dup_idx_list2);
+    end = clock();
+    printf("BITMAP_IDX:\t%lf\t%d\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out, err_flag);
 
     start = clock();
     out_bit_stc = fui_bitmap_stc(arr_input, num_elems, &num_elems_out, &err_flag);
@@ -933,38 +1413,41 @@ int main(int argc, char** argv) {
     printf("BITMAP_STC:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     start = clock();
-    out_ht = filter_unique_elems_ht(arr_input, num_elems, &num_elems_out, &err_flag);
+    out_ht_dtree = fui_htable_dtree(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("HASH_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("HTBL_DTREE:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     start = clock();
-    out_ht_new = filter_unique_elems_ht_new(arr_input, num_elems, &num_elems_out, &err_flag);
+    out_ht_stree= fui_htable_stree(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("HASH_ALGO_NEW:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("HTBL_STREE:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     start = clock();
-    out_ht_dyn = filter_unique_elems_ht_dyn(arr_input, num_elems, &num_elems_out, &err_flag);
+    out_ht_dyn = fui_htable_stree_dyn(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("HASH_ALGO_DYN:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("HTBL_STREE_DYN:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     start = clock();
-    out_naive_improved = filter_unique_elems_naive_improved(arr_input, num_elems, &num_elems_out, &err_flag);
+    out_brute_opt = fui_brute_opt(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("NAIVE_ALGO_NEW:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("BRUTE_OPT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
     if(with_brute == 1) {
         start = clock();
-        out_naive = filter_unique_elems_naive(arr_input, num_elems, &num_elems_out, &err_flag);
+        out_brute = fui_brute(arr_input, num_elems, &num_elems_out, &err_flag);
         end = clock();
-        printf("NAIVE_ALGO:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
-        free(out_naive);
+        printf("BRUTE_ORIG:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        free(out_brute);
     }
-    printf("\nBenchmark done.\n\n");
-    free(out_naive_improved);
-    free(out_ht);
-    free(out_ht_new);
-    free(out_ht_dyn);
-    free(out_bit);
+    free(out_bit_dyn);
     free(out_bit_stc);
+    free(out_ht_dtree);
+    free(out_ht_stree);
+    free(out_ht_dyn);
+    free(out_brute_opt);
+    print_dup_idx_list(dup_idx_list2, 10);
+    free_dup_idx_list(dup_idx_list2);
+    printf("\nBenchmark done.\n\n");
+    
     free(arr_input);
     return 0;
 }
