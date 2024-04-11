@@ -625,7 +625,7 @@ int compare_arr(const int *arr_a, const int *arr_b, uint_32 num_elems) {
  * 
  */
 int generate_random_input_arr(int *arr, uint_32 num_elems, uint_32 rand_max) {
-    int sign_flag, rand_num, rand_num_ext;
+    int sign_flag, rand_num;
     if(arr == NULL) {
         return -5;
     }
