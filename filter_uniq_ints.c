@@ -625,7 +625,7 @@ int compare_arr(const int *arr_a, const int *arr_b, uint_32 num_elems) {
  * 
  */
 int generate_random_input_arr(int *arr, uint_32 num_elems, uint_32 rand_max) {
-    int sign_flag, rand_num;
+    int sign_flag, rand_num, rand_num_ext;
     if(arr == NULL) {
         return -5;
     }
@@ -638,7 +638,12 @@ int generate_random_input_arr(int *arr, uint_32 num_elems, uint_32 rand_max) {
     srand(time(0));
     for(uint_32 i = 0; i < num_elems; i++) {
         sign_flag = rand();
-        rand_num = rand()%rand_max;
+        if(RAND_MAX == 0x7fff) {
+            rand_num = (rand()<<16 | rand()) % rand_max;
+        }
+        else{
+            rand_num = rand() % rand_max;
+        }
         if(sign_flag%2 == 0) {
             arr[i] = rand_num;
         }
