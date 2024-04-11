@@ -50,7 +50,6 @@ int main(int argc, char** argv) {
     int *out_bit_stc = NULL;
     out_idx *out_bit_dyn_idx = NULL;
 
-
     generate_random_input_arr(arr_input, num_elems, rand_max);
     //print_arr(arr_input, num_elems, 100);
     

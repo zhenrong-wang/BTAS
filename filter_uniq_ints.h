@@ -183,24 +183,14 @@ out_idx* fui_bitmap_dtree_idx(const int *input_arr, const uint_32 num_elems, uin
 
 
 /**
- * Extending the algo to 64bit or even longer input element.
- * For 128bit input, we need to split them into 2 columns.
- * A 64bit integer e.g. 0 x FF 'FF' FF 'FF' FF 'FF' FF 'FF', we
- * define the quoted bytes as l32 and define the others as h32.
- */
-#define assemble_l32(a) (((a) & (0xFF)) | (((a) >> 8) & (0xFF00)) | (((a) >> 16) & (0xFF0000)) | (((a) >> 24) & (0xFF000000)))
-#define assemble_h32(a) ((((a) >> 8) & (0xFF)) | (((a) >> 16) & (0xFF00)) | (((a) >> 24) & (0xFF0000)) | (((a) >> 32) & (0xFF000000)))
+ * Extending the algo to 64bit or even longer input element. Quite Challanging.
+ * 
+int assemble_h32(int_64bit a);
+int assemble_l32(int_64bit a);
 
 int hash_64_to_32(int_64bit in64);
+int_64bit* transform_32_to_64_arr(const int *arr_input_32, uint_32 num_elems, const char *option);
 out_idx_i64* fui_bitmap_dtree_idx_64(const int_64bit *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head);
-
-
-/* To be continued.
-int* fui_bitmap_full_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
-int* fui_bitmap_dbase(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
-int* fui_bitmap_dbase_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
-int* fui_bitmap_array(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
-int* fui_bitmap_array_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
 */
 
 #endif
