@@ -24,6 +24,11 @@ typedef     long                int_64bit;
 typedef     unsigned long       uint_64bit;
 #endif
 
+typedef struct {
+    uint_64bit h64bit;
+    uint_64bit l64bit;
+} uint_128bit;
+
 /**
  * The maximum 32-bit signed integer is -2^31 - 2^31, 
  * aka, -32768 x 65536 to 32768 x 65536
@@ -101,6 +106,11 @@ typedef struct {
 } out_idx;
 
 typedef struct {
+    int out_elem;
+    uint_32 raw_index;
+} out_idx_i64;
+
+typedef struct {
     uint_32 branch_size;
     uint_8 *ptr_branch;
 } bitmap_base;
@@ -170,6 +180,19 @@ void free_idx_ht_32(idx_ht_32 *idx_ht_head, uint_16 num_elems);
 int* fui_bitmap_stc(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
 int* fui_bitmap_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
 out_idx* fui_bitmap_dtree_idx(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head);
+
+
+/**
+ * Extending the algo to 64bit or even longer input element.
+ * For 128bit input, we need to split them into 2 columns.
+ * A 64bit integer e.g. 0 x FF 'FF' FF 'FF' FF 'FF' FF 'FF', we
+ * define the quoted bytes as l32 and define the others as h32.
+ */
+#define assemble_l32(a) ((a) & 0xFF | ((a) >> 8) & 0xFF00 | ((a) >> 16) & 0xFF0000 | ((a) >> 24) & 0xFF000000)
+#define assemble_h32(a) (((a) >> 8) & 0xFF | ((a) >> 16) & 0xFF00 | ((a) >> 24) & 0xFF0000 | ((a) >> 32) & 0xFF000000)
+
+int hash_64_to_32(int_64bit in64);
+out_idx_i64* fui_bitmap_dtree_idx_64(const int_64bit *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head);
 
 
 /* To be continued.

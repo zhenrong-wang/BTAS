@@ -1285,3 +1285,44 @@ free_memory:
     *dup_idx_head = dup_idx_head_tmp;
     return final_output_arr;
 }
+
+int hash_64_to_32(int_64bit in64) {
+    int h32 = assemble_h32(in64);
+    int l32 = assemble_l32(in64);
+    int folded = h32 ^ l32;
+    int rotated = (folded >> 16) | (folded << 16);
+    return (folded ^ rotated);
+}
+
+out_idx_i64* fui_bitmap_dtree_idx_64(const int_64bit *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head) {
+    *err_flag = 0;
+    *num_elems_out = 0;
+    uint_32 num_elems_out_32 = 0;
+    int err_flag_local = 0;
+    dup_idx_list *dup_idx_list_32 = NULL;
+    uint_32 i = 0;
+    int* input_arr_hash = (int *)calloc(num_elems_out, sizeof(int));
+    if(input_arr_hash == NULL) {
+        *err_flag = -9;
+        return NULL;
+    }
+    for(i = 0; i < num_elems; i++) {
+        input_arr_hash[i] = hash_64_to_32(input_arr[i]);
+    }
+    out_idx *out_32bit = fui_bitmap_dtree_idx(input_arr_hash, num_elems, &num_elems_out_32, &err_flag_local, &dup_idx_list_32);
+    if(out_32bit == NULL) {
+        *err_flag = -7;
+        return NULL;
+    }
+    out_idx_i64 *final_output = (out_idx_i64 *)calloc(num_elems_out_32, sizeof(out_idx_i64));
+    if(final_output == NULL) {
+        free(out_32bit);
+        *err_flag = -5;
+        return NULL;
+    }
+    for(i = 0; i < num_elems_out_32; i++) {
+        final_output->raw_index = out_32bit->raw_index;
+        final_output->out_elem = input_arr[final_output->raw_index];
+    }
+    return final_output;
+}
