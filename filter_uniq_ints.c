@@ -1301,7 +1301,7 @@ out_idx_i64* fui_bitmap_dtree_idx_64(const int_64bit *input_arr, const uint_32 n
     int err_flag_local = 0;
     dup_idx_list *dup_idx_list_32 = NULL;
     uint_32 i = 0;
-    int* input_arr_hash = (int *)calloc(num_elems_out, sizeof(int));
+    int* input_arr_hash = (int *)calloc(num_elems, sizeof(int));
     if(input_arr_hash == NULL) {
         *err_flag = -9;
         return NULL;
@@ -1312,17 +1312,21 @@ out_idx_i64* fui_bitmap_dtree_idx_64(const int_64bit *input_arr, const uint_32 n
     out_idx *out_32bit = fui_bitmap_dtree_idx(input_arr_hash, num_elems, &num_elems_out_32, &err_flag_local, &dup_idx_list_32);
     if(out_32bit == NULL) {
         *err_flag = -7;
+        free(input_arr_hash);
         return NULL;
     }
     out_idx_i64 *final_output = (out_idx_i64 *)calloc(num_elems_out_32, sizeof(out_idx_i64));
     if(final_output == NULL) {
-        free(out_32bit);
         *err_flag = -5;
+        free(out_32bit);
+        free(input_arr_hash);
         return NULL;
     }
     for(i = 0; i < num_elems_out_32; i++) {
         final_output->raw_index = out_32bit->raw_index;
         final_output->out_elem = input_arr[final_output->raw_index];
     }
+    free(out_32bit);
+    free(input_arr_hash);
     return final_output;
 }

@@ -188,8 +188,8 @@ out_idx* fui_bitmap_dtree_idx(const int *input_arr, const uint_32 num_elems, uin
  * A 64bit integer e.g. 0 x FF 'FF' FF 'FF' FF 'FF' FF 'FF', we
  * define the quoted bytes as l32 and define the others as h32.
  */
-#define assemble_l32(a) ((a) & 0xFF | ((a) >> 8) & 0xFF00 | ((a) >> 16) & 0xFF0000 | ((a) >> 24) & 0xFF000000)
-#define assemble_h32(a) (((a) >> 8) & 0xFF | ((a) >> 16) & 0xFF00 | ((a) >> 24) & 0xFF0000 | ((a) >> 32) & 0xFF000000)
+#define assemble_l32(a) (((a) & (0xFF)) | (((a) >> 8) & (0xFF00)) | (((a) >> 16) & (0xFF0000)) | (((a) >> 24) & (0xFF000000)))
+#define assemble_h32(a) ((((a) >> 8) & (0xFF)) | (((a) >> 16) & (0xFF00)) | (((a) >> 24) & (0xFF0000)) | (((a) >> 32) & (0xFF000000)))
 
 int hash_64_to_32(int_64bit in64);
 out_idx_i64* fui_bitmap_dtree_idx_64(const int_64bit *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head);
