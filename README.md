@@ -218,7 +218,7 @@ There is also a **c-branch** which contains only C implementations and doesn't r
 
 **For the c-branch**
 
-3. b. Build with the C compiler: `gcc filter-uniq-ints.c -Ofast -Wall -o YOUR_PROGRAM_NAME`
+1. b. Build with the C compiler: `gcc *.c -Ofast -Wall -o YOUR_PROGRAM_NAME`
 
 ## 3.2 Run
 
