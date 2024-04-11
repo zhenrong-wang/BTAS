@@ -453,3 +453,5 @@ func generateGrowingArr(arr []int, numElems int) int {
 	}
 	return 0
 }
+
+// main
