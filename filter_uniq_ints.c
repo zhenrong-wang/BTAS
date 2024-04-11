@@ -1025,7 +1025,7 @@ int* fui_bitmap_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_
     uint_32 tmp_quotient = 0, tmp_mod = 0;
     int tmp = 0, *final_output_arr = NULL;
     bitmap_base *bitmap_head = NULL, *tmp_bitmap_realloc = NULL;
-    uint_16 tmp_byte_index = 0, bitmap_base_size = BITMAP_INIT_LENGTH;
+    uint_16 tmp_byte_index = 0, bitmap_base_size = BITMAP_INIT_LENGTH, bitmap_base_size_target = 0;
     uint_8 tmp_bit_position = 0;
     *err_flag = 0;
     *num_elems_out = 0;
@@ -1057,13 +1057,14 @@ int* fui_bitmap_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_
 
         /* Grow the tree if needed. */
         if((tmp_quotient + 1) > bitmap_base_size) {
-            if((tmp_bitmap_realloc = (bitmap_base *)realloc(bitmap_head, (tmp_quotient + 1) * sizeof(bitmap_base))) == NULL) {
+            bitmap_base_size_target = (((tmp_quotient + 1) << 1) > BITMAP_LENGTH_MAX) ? BITMAP_LENGTH_MAX : ((tmp_quotient + 1) << 1);
+            if((tmp_bitmap_realloc = (bitmap_base *)realloc(bitmap_head, bitmap_base_size_target * sizeof(bitmap_base))) == NULL) {
                 *err_flag = 7;
                 goto free_memory;
             }
-            memset(tmp_bitmap_realloc + bitmap_base_size, 0, (tmp_quotient + 1 - bitmap_base_size) * sizeof(bitmap_base));
+            memset(tmp_bitmap_realloc + bitmap_base_size, 0, (bitmap_base_size_target - bitmap_base_size) * sizeof(bitmap_base));
             bitmap_head = tmp_bitmap_realloc;
-            bitmap_base_size = (tmp_quotient + 1);
+            bitmap_base_size = bitmap_base_size_target;
         }
         if(bitmap_head[tmp_quotient].ptr_branch == NULL) {
             if((bitmap_head[tmp_quotient].ptr_branch = (uint_8 *)calloc(BIT_MOD_TABLE_SIZE, sizeof(uint_8))) == NULL) {
@@ -1105,7 +1106,7 @@ out_idx* fui_bitmap_dtree_idx(const int *input_arr, const uint_32 num_elems, uin
     uint_8 tree_index = 0;
     void *idx_adj_head = NULL, *tmp_idx_adj = NULL;
     dup_idx_list *dup_idx_head_tmp = NULL;
-    uint_16 tmp_byte_index = 0, bitmap_base_size = BITMAP_INIT_LENGTH;
+    uint_16 tmp_byte_index = 0, bitmap_base_size = BITMAP_INIT_LENGTH, bitmap_base_size_target = 0;
     uint_8 tmp_bit_position = 0;
     uint_8 raw_index_range = 0;
     *err_flag = 0;
@@ -1170,37 +1171,38 @@ out_idx* fui_bitmap_dtree_idx(const int *input_arr, const uint_32 num_elems, uin
         tmp_bit_position = tmp_mod % 8;
         /* Grow the tree if needed. */
         if((tmp_quotient + 1) > bitmap_base_size) {
-            if((tmp_bitmap_head = (bitmap_dtree *)realloc(bitmap_head, (tmp_quotient + 1) * sizeof(bitmap_dtree))) == NULL) {
+            bitmap_base_size_target = (((tmp_quotient + 1) << 1) > BITMAP_LENGTH_MAX) ? BITMAP_LENGTH_MAX : ((tmp_quotient + 1) << 1);
+            if((tmp_bitmap_head = (bitmap_dtree *)realloc(bitmap_head, bitmap_base_size_target * sizeof(bitmap_dtree))) == NULL) {
                 *err_flag = 7;
                 goto free_memory;
             }
-            memset(tmp_bitmap_head + bitmap_base_size, 0, (tmp_quotient + 1 - bitmap_base_size) * sizeof(bitmap_dtree));
+            memset(tmp_bitmap_head + bitmap_base_size, 0, (bitmap_base_size_target - bitmap_base_size) * sizeof(bitmap_dtree));
             bitmap_head = tmp_bitmap_head;
             if(raw_index_range == 32 ) {
-                if((tmp_idx_adj = (idx_ht_32 *)realloc((idx_ht_32 *)idx_adj_head, (tmp_quotient + 1) * sizeof(idx_ht_32))) == NULL) {
+                if((tmp_idx_adj = (idx_ht_32 *)realloc((idx_ht_32 *)idx_adj_head, bitmap_base_size_target * sizeof(idx_ht_32))) == NULL) {
                     *err_flag = 7;
                     goto free_memory;
                 }
-                memset((idx_ht_32 *)tmp_idx_adj + bitmap_base_size, 0, (tmp_quotient + 1 - bitmap_base_size) * sizeof(idx_ht_32));
+                memset((idx_ht_32 *)tmp_idx_adj + bitmap_base_size, 0, (bitmap_base_size_target - bitmap_base_size) * sizeof(idx_ht_32));
                 idx_adj_head = (idx_ht_32 *)tmp_idx_adj;
             }
             else if(raw_index_range == 16 ) {
-                if((tmp_idx_adj = (idx_ht_16 *)realloc((idx_ht_16 *)idx_adj_head, (tmp_quotient + 1) * sizeof(idx_ht_16))) == NULL) {
+                if((tmp_idx_adj = (idx_ht_16 *)realloc((idx_ht_16 *)idx_adj_head, bitmap_base_size_target * sizeof(idx_ht_16))) == NULL) {
                     *err_flag = 7;
                     goto free_memory;
                 }
-                memset((idx_ht_16 *)tmp_idx_adj + bitmap_base_size, 0, (tmp_quotient + 1 - bitmap_base_size) * sizeof(idx_ht_16));
+                memset((idx_ht_16 *)tmp_idx_adj + bitmap_base_size, 0, (bitmap_base_size_target - bitmap_base_size) * sizeof(idx_ht_16));
                 idx_adj_head = (idx_ht_16 *)tmp_idx_adj;
             }
             else{
-                if((tmp_idx_adj = (idx_ht_8 *)realloc((idx_ht_8 *)idx_adj_head, (tmp_quotient + 1) * sizeof(idx_ht_8))) == NULL) {
+                if((tmp_idx_adj = (idx_ht_8 *)realloc((idx_ht_8 *)idx_adj_head, bitmap_base_size_target * sizeof(idx_ht_8))) == NULL) {
                     *err_flag = 7;
                     goto free_memory;
                 }
-                memset((idx_ht_8 *)tmp_idx_adj + bitmap_base_size, 0, (tmp_quotient + 1 - bitmap_base_size) * sizeof(idx_ht_8));
+                memset((idx_ht_8 *)tmp_idx_adj + bitmap_base_size, 0, (bitmap_base_size_target - bitmap_base_size) * sizeof(idx_ht_8));
                 idx_adj_head = (idx_ht_8 *)tmp_idx_adj;
             }
-            bitmap_base_size = (tmp_quotient + 1);
+            bitmap_base_size = bitmap_base_size_target;
         }
         if((bitmap_head[tmp_quotient].ptr_branch)[tree_index] == NULL) {
             if(((bitmap_head[tmp_quotient].ptr_branch)[tree_index] = (uint_8 *)calloc(BIT_MOD_TABLE_SIZE, sizeof(uint_8))) == NULL) {
