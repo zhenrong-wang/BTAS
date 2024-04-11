@@ -85,12 +85,13 @@ int* fui_htable_stree_dyn(const int *input_arr, const uint_32 num_elems, uint_32
 #define NEGATIVE_START_POS  8192
 #define BIT_MOD_TABLE_SIZE  16384
 #define BIT_MOD_DIV_FACTOR  65536
-#define BITMAP_INIT_LENGTH  128
+#define BITMAP_INIT_LENGTH  1024
 #define BITMAP_LENGTH_MAX   32769
 
 #define UINT_16_MAX         65536
 #define UINT_8_MAX          256
 #define IDX_ADJ_BRCH_SIZE   65536
+#define BITMAP_BRCH_DTREE   65536
 
 struct dup_idx_struct {
     uint_32 index_a;
@@ -177,9 +178,11 @@ void free_idx_ht_8(idx_ht_8 *idx_ht_head, uint_16 num_elems);
 void free_idx_ht_16(idx_ht_16 *idx_ht_head, uint_16 num_elems);
 void free_idx_ht_32(idx_ht_32 *idx_ht_head, uint_16 num_elems);
 
-int* fui_bitmap_stc(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
-int* fui_bitmap_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
-out_idx* fui_bitmap_dtree_idx(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head);
+int* fui_bitmap_stc_stree(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
+int* fui_bitmap_dyn_stree(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
+int* fui_bitmap_dyn_dtree(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
+out_idx* fui_bitmap_idx_stree(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head);
+out_idx* fui_bitmap_idx_dtree(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head);
 
 
 /**
