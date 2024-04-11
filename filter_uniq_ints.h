@@ -172,11 +172,12 @@ int* fui_bitmap_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_
 out_idx* fui_bitmap_dtree_idx(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head);
 
 
-/* To be continued. */
+/* To be continued.
 int* fui_bitmap_full_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
 int* fui_bitmap_dbase(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
 int* fui_bitmap_dbase_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
 int* fui_bitmap_array(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
 int* fui_bitmap_array_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag);
+*/
 
 #endif
