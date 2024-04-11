@@ -1,0 +1,238 @@
+Array size: 10
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 20
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 30
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 40
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 50
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 60
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 70
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 80
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 90
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 100
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 200
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 300
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 400
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 500
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 600
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 700
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 800
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 900
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 1000
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 2000
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 3000
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 4000
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 5000
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 6000
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 7000
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 8000
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 9000
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 10000
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 50000
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 100000
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 200000
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 300000
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 400000
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
+Array size: 500000
+Naive algorithm: 1.778µs
+Improved algorithm: 1.03µs
+HashTable algorithm: 3.559µs
+DynamicHashTable algorithm: 978.879µs
+BitHashTable algorithm: 222.43µs
+-----------------------------
