@@ -16,7 +16,7 @@ The algorithm is expected to remove the duplicate elements and filter the unique
 
 `{10, 38895, 775, 77899023, 892}`
 
-The real-world cases are much more complex and with much larger scale. E.g. a group of 100 million 32-bit hash values.
+The real-world cases are much more complex and with much larger scale. **E.g. a group of 100 million 32-bit hash values or timestamps**.
 
 We focus on integer dataset because other types of data can be mapped or hashed to the integer space in many ways. The raw integer data are usually unsorted and chaotic. 
 
