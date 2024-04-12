@@ -1,4 +1,4 @@
-# TR: BitTree - A Dynamic Bitmap Algorithm to Process Large-Scale Dataset Efficiently
+# TR: BTAS - A BitTree Algorithm Set to Process Large-Scale Dataset Efficiently
 
 # 0. Abstract
 
