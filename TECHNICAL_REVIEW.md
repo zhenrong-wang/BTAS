@@ -18,7 +18,7 @@ The algorithm is expected to remove the duplicate elements and filter the unique
 
 The real-world cases are much more complex and with much larger scale. E.g. a group of 100 million 32-bit hash values.
 
-We focus on integer dataset because other types of data can be mapped or hashed to the integer space in many ways (e.g. hashing). The raw integer data are usually unsorted and chaotic. 
+We focus on integer dataset because other types of data can be mapped or hashed to the integer space in many ways. The raw integer data are usually unsorted and chaotic. 
 
 ## 1.2 The Current Methods
 
@@ -182,7 +182,7 @@ The article described the **BitTree Algorithm Set (BTAS)** whose superiority has
 
 The methods and implementations are not the best in terms of memory management. Many works need to be done, including:
 
-- Parallelism: this needs extra work on multi-thread design and threading
-- Multi-layer data structure: Currently there is only stems with branches, it is possible that by adopting a leaf layer the algorithms could be better handling sparse values.
+- **Parallelism:** this needs extra work on multi-thread design and coding
+- **Multi-layer data structure:** Currently there is only stems with branches, it is possible that by adopting a leaf layer the algorithms could be better handling sparse values.
 
 Any review and feedback is highly appreciated and welcomed. Please check the [GitHub repository](https://github.com/zhenrong-wang/filter-uniq-ints) or contact me through X/twitter(@wangzhr4), or email (zhenrongwang@live.com).
