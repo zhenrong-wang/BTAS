@@ -180,9 +180,10 @@ The article described the **BitTree Algorithm Set (BTAS)** whose superiority has
 
 # 5. Future Work
 
-The methods and implementations are not the best in terms of memory management. Many works need to be done, including:
+The methods and implementations are not the best in terms of memory management and datastructure. Many works need to be done, including:
 
 - **Parallelism:** this needs extra work on multi-thread design and coding
 - **Multi-layer data structure:** Currently there is only stems with branches, it is possible that by adopting a leaf layer the algorithms could be better handling sparse values.
+- **Extend to 64bit** 64bit migration is another story but it worths efforts because the widely-used hash algorithms start from 64bit up to 256 or even more. Therefore, extending to 64bit has big technical values.
 
 Any review and feedback is highly appreciated and welcomed. Please check the [GitHub repository](https://github.com/zhenrong-wang/filter-uniq-ints) or contact me through X/twitter(@wangzhr4), or email (zhenrongwang@live.com).
