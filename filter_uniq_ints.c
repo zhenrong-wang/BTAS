@@ -1140,7 +1140,7 @@ int* fui_bitmap_dyn_dtree(const int *input_arr, const uint_32 num_elems, uint_32
                 *err_flag = 7;
                 goto free_memory;
             }
-            memset(tmp_bitmap_realloc + bitmap_base_size, 0, (bitmap_base_size_target - bitmap_base_size) * sizeof(bitmap_base));
+            memset(tmp_bitmap_realloc + bitmap_base_size, 0, (bitmap_base_size_target - bitmap_base_size) * sizeof(bitmap_dtree));
             bitmap_head = tmp_bitmap_realloc;
             bitmap_base_size = bitmap_base_size_target;
         }
