@@ -58,7 +58,7 @@ Meanwhle, it is unnecessary to allocate a full bitmap with 512 MiB. Using a dyna
 
 Therefore, we can use the 2 indexes `a`, `b` to divide the integer space. Take signed integers for an example, if we let `M = 65536`, the absolute range of quotient would be `[0, 32768]`, and the absolute modulus would be `[0, 65535]`. So we can either choose a single-tree with the absolute quotient, or choose a double-tree with one for positive integers or 0 and the other for negative integers. 
 
-- For a single-tree, the maximum length of the modulus branch would be `2*65536 = 131,071 bit = 16KiB` (NOTE: Here we have 1 bit unused).
+- For a single-tree, the maximum length of the modulus branch would be `2*65536 = 131,072 bit = 16KiB` (NOTE: Here we have 1 bit unused).
 - For a double-tree, the maximum length of the modulus branch would be `65536 bit = 8 KiB`. (As mentioned, we also wasted 1 bit).
 
 With the method described above and the dynamic memory management, it is ready to implement in C or other programming languages. 
