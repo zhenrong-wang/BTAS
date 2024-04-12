@@ -8,7 +8,7 @@ This article reviews a dynamic bitmap algorithm set - the **BitTree Algorithm Se
 
 ## 1.1 Problem Description
 
-This algorithm set originated from an engineering problem: removing duplicate elements from a given dataset. This problem is very important for processing or preprocessing various types of raw data. Duplicate elements undermine the data quality, distort the analysis results, and thus mislead technical or business decisions. Here is a simple example to demonstrate the problem:
+This algorithm set originated from an engineering problem: removing duplicate elements from a given dataset. This problem is very important for processing or preprocessing various types of raw data. In many cases, duplicate elements undermine the data quality, distort the analysis results, and thus mislead technical or business decisions. Here is a simple example to demonstrate the problem:
 
 Given an array: `{10, 38895, 775, *10*, *38895*, 77899023, 892, *38895*}`
 
@@ -56,7 +56,7 @@ Meanwhle, it is unnecessary to allocate a full bitmap with 512 MiB. Using a dyna
 
 `(a = N / M, b = N Mod M )`
 
-Therefore, we can use the 2 indexes `a`, `b` to divide the integer space. For signed integers for an example, if we let `M = 65536`, the absolute range of quotient would be `[0, 32768]`, and the absolute modulus would be `[0, 65535]`. So we can either choose a single-tree with the absolute quotient, or choose a double-tree with one for positive integers or 0 and the other for negative integers. 
+Therefore, we can use the 2 indexes `a`, `b` to divide the integer space. Take signed integers for an example, if we let `M = 65536`, the absolute range of quotient would be `[0, 32768]`, and the absolute modulus would be `[0, 65535]`. So we can either choose a single-tree with the absolute quotient, or choose a double-tree with one for positive integers or 0 and the other for negative integers. 
 
 - For a single-tree, the maximum length of the modulus branch would be `2*65536 = 131,071 bit = 16KiB` (NOTE: Here we have 1 bit unused).
 - For a double-tree, the maximum length of the modulus branch would be `65536 bit = 8 KiB`. (As mentioned, we also wasted 1 bit).
