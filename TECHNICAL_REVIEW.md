@@ -56,10 +56,10 @@ Meanwhle, it is unnecessary to allocate a full bitmap with 512 MiB. Using a dyna
 
 `(a = N / M, b = N Mod M )`
 
-Therefore, we can use the 2 indexes `a`, `b` to divide the integer space. For signed integers for an example, if we let `M = 65536`, the absolute range of quotient would be `[0, 32768]`, and the absolute modulus would be `[0, 65535]`. So we can either choose a single tree with the absolute quotient, or choose a double tree with one for positive integers or 0 and the other for negative integers. 
+Therefore, we can use the 2 indexes `a`, `b` to divide the integer space. For signed integers for an example, if we let `M = 65536`, the absolute range of quotient would be `[0, 32768]`, and the absolute modulus would be `[0, 65535]`. So we can either choose a single-tree with the absolute quotient, or choose a double-tree with one for positive integers or 0 and the other for negative integers. 
 
-- For a single tree, the maximum length of the modulus branch would be `2*65536 = 131,071 bit = 16KiB` (NOTE: Here we have 1 bit unused bit).
-- For a double tree, the maximum length of the modulus branch would be `65536 bit = 8 KiB`. (As mentioned, we also wasted 1 bit).
+- For a single-tree, the maximum length of the modulus branch would be `2*65536 = 131,071 bit = 16KiB` (NOTE: Here we have 1 bit unused).
+- For a double-tree, the maximum length of the modulus branch would be `65536 bit = 8 KiB`. (As mentioned, we also wasted 1 bit).
 
 With the method described above and the dynamic memory management, it is ready to implement in C or other programming languages. 
 
@@ -81,14 +81,14 @@ In order to resolve this issue, we need an Adjacent Index Hashmap to record the 
 
 Currently, we implemented 4 algorithms that combined as the **BitTree Algorithm Set (BTAS)**, they are:
 
-- BitTree with single tree (BTS)
+- BitTree with single-tree (BTS)
 - BitTree with double-tree (BTD)
 - BitTree with single-tree and an Adjacent Index Hashmap (BTSAIH)
 - BitTree with double-tree and an Adjacent Index Hashmap (BTDAIH)
 
 In order to save memory, the Adjacent Index Hashmap uses a double-tree architecture and it is also self-adjustable according to the size of the original array.
 
-The diagram below shows the architecture of a single tree BitTree:
+The diagram below shows the architecture of a single-tree BitTree:
 
 ```
 Quotient: Stem[0] - Stem[1] - Stem[2] - Stem[3] - ... - Stem[32768]
@@ -169,8 +169,8 @@ Round GROWING (time in second):
 
 We also ran **mariaDB** {Ver 15.1 Distrib 10.1.48-MariaDB, for debian-linux-gnu (x86_64) using readline 5.2} to process the same datasets against the **BTAS**.
 
-- For an input array `{1M, 10k}`, **BTAS** cost only `0.0035` sec while **mariaDB** cost `0.81 sec`. The **BTAS** was 231 times faster.
-- For an input array `{10M, 100M}`, **BTAS** cost `0.57 sec` while **mariaDB** cost `7 min 34.48sec`. The **BTAS** was 1000 times faster.
+- For an input array `{1M, 10k}`, **BTAS** cost only `0.0035` sec while **mariaDB** cost `0.81 sec`. The **BTAS** was **231** times faster.
+- For an input array `{10M, 100M}`, **BTAS** cost `0.57 sec` while **mariaDB** cost `7 min 34.48sec`. The **BTAS** was **1000** times faster.
 
 The superiority got proved by the benchmarks above.
 
