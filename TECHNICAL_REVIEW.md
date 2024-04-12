@@ -34,7 +34,7 @@ Direct removal/filter is feasible with a **brute method** (BRUTE).
 
 It is obvious that by using a nested-loop, one can find out all the duplicate elements and remove/skip them during processing. The outer loop reads the raw elements one-by-one, while the inner loop checks whether the current raw element has occured (been recorded) or not. If yes, skip the element and go ahead to the next one; if no, save it to the target output array. 
 
-The main drawback is the time complexity - O(n^2) - which makes it acceptable when the raw data scales up.
+The main drawback is the time complexity - O(n^2) - which makes it unacceptable when the raw data scales up.
 
 The introduced **BitTree Algorithm Set (BTAS)** aims to solve this problem with O(n) time complexity and lower/fixed space complexity. And the following contents would prove both the feasibility and superiority.
 
