@@ -94,11 +94,16 @@ The diagram below shows the architecture of a single-tree BitTree:
 Quotient: Stem[0] - Stem[1] - Stem[2] - Stem[3] - ... - Stem[32768]
                |         |         |         |                 |               
 Modulus:      [1]       [1]       [1]       [1]               [1]
-               |         |         |         |                 |
+  Positive     |         |         |         |                 |
               [2]       [2]       [2]       [2]               [2]
               ...       ...       ...       ...               ...
             [65535]   [65535]   [65535]   [65535]           [65535]
-
+----------     +         +         +         +                 +
+Modulus:      [1]       [1]       [1]       [1]               [1]
+  Negative     |         |         |         |                 |
+              [2]       [2]       [2]       [2]               [2]
+              ...       ...       ...       ...               ...
+            [65535]   [65535]   [65535]   [65535]           [65535]
 ```
 
 The growth stratety is also important for performance. Frequent memory (re)allocation would undermine the performance significantly. 
