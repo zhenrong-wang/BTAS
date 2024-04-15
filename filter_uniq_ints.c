@@ -22,7 +22,7 @@
  *   1 if overflow occurred
  *   0 if succeeded
  */
-int string_to_positive_num(const char* string, uint_32 *positive_num) {
+int string_to_u32_num(const char* string, uint_32 *positive_num) {
     *positive_num = 0;
     if(string == NULL) {
         return -1;

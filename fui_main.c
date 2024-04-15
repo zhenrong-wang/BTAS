@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
     }
     uint_32 num_elems, rand_max;
     
-    if(string_to_positive_num(argv[1], &num_elems) != 0 || string_to_positive_num(argv[2], &rand_max) != 0) {
+    if(string_to_u32_num(argv[1], &num_elems) != 0 || string_to_u32_num(argv[2], &rand_max) != 0) {
         printf("ERROR: arguments illegal. Make sure they are plain positive numbers and < 4,294,967,296.\n");
         return 3;
     }
