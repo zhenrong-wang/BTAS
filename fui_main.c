@@ -25,13 +25,13 @@ int main(int argc, char** argv) {
     if(argc > 3 && strcmp(argv[3], "brute") == 0) {
         with_brute = 1;
     }
-    uint_32 num_elems = convert_string_to_positive_num(argv[1]), rand_max = convert_string_to_positive_num(argv[2]);
+    uint_32 num_elems, rand_max;
     
-    printf("INPUT_ELEMS:\t%u\nRANDOM_MAX:\t%u\n\n",num_elems, rand_max);
-    if(num_elems < 0 || rand_max < 0) {
-        printf("ERROR: arguments illegal. Make sure they are plain positive numbers.\n");
+    if(string_to_positive_num(argv[1], &num_elems) != 0 || string_to_positive_num(argv[2], &rand_max) != 0) {
+        printf("ERROR: arguments illegal. Make sure they are plain positive numbers and < 4,294,967,296.\n");
         return 3;
     }
+    printf("INPUT_ELEMS:\t%u\nRANDOM_MAX:\t%u\n\n",num_elems, rand_max);
     int *arr_input = (int *)malloc(sizeof(int) * num_elems);
     if(arr_input == NULL) {
         printf("ERROR: Failed to allocate memory for input array.\n");

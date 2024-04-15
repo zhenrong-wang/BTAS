@@ -21,19 +21,27 @@
  *  -1 if illegal chars found or NULL pointer
  *  A positive number if succeeded
  */
-uint_32 convert_string_to_positive_num(const char* string) {
+int string_to_positive_num(const char* string, uint_32 *positive_num) {
+    *positive_num = 0;
     if(string == NULL) {
         return -1;
     }
     size_t str_length = strlen(string);
-    int result = 0;
+    size_t result = 0;
     for(size_t i = 0; i < str_length; i++) {
         if(string[i] < 48 || string[i] > 57) {
             return -1;
         }
         result = result * 10 + (string[i] - 48);
     }
-    return result;
+    if(result > 0xFFFFFFFF) {
+        *positive_num = 0xFFFFFFFF;
+        return 1; /* Overflow occurred. Set the output to UINT32_MAX */
+    }
+    else {
+        *positive_num = result & 0xFFFFFFFF;
+        return 0;
+    }
 }
 
 /**
