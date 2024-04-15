@@ -159,9 +159,8 @@ Round RANDOM (time in second):
  *UNIQUE*      97533        9766427       97624372
 ```
 
-```
 Round GROWING (time in second):
-
+```
             |  EnvSet B  |          EnvSet A        |
 | Algorithm | {100k, 2M} | {10M, 200M} | {100M, 4B} |
 | BTS       |  0.000545  |  0.076000   |  0.439000  |
