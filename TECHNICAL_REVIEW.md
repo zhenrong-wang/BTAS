@@ -1,5 +1,7 @@
 # TR: BTAS - A BitTree Algorithm Set to Process Large-Scale Dataset Efficiently
 
+[Author: Zhenrong WANG](https://github.com/zhenrong-wang)
+
 # 0. Abstract
 
 This article reviewed a dynamic bitmap algorithm set - the **BitTree Algorithm Set (BTAS)** proposed and implemented in the C Programming Language by [Zhenrong WANG](https://github.com/zhenrong-wang). This article described its background, introduced the algorithm set in detail, and demonstrated the implementation and benchmark results. 
