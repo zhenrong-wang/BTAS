@@ -36,9 +36,9 @@ It is obvious that by using a nested-loop, one can find out all the duplicate el
 
 The main drawback is the time complexity - O(n^2) - which makes it unacceptable when the raw data scales up.
 
-The introduced **BitTree Algorithm Set (BTAS)** aims to solve this problem with O(n) time complexity and lower/fixed space complexity. And the following contents would prove both the feasibility and superiority.
-
 # 2. Algorithm Description
+
+The introduced **BitTree Algorithm Set (BTAS)** aims to solve this problem with O(n) time complexity, lower/fixed space complexity, and without sorting. The following contents would prove both the feasibility and superiority.
 
 In order to record whether an element occurred or not previously, it is natural to design a seperate data structure, e.g. a Hash Table that transforms every raw element (in the integer case, is the whole integer space with 2^32 possibilities) to an index table so that the inner loop described above would be avoided.
 
