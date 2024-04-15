@@ -34,15 +34,13 @@ int string_to_positive_num(const char* string, uint_32 *positive_num) {
             return -1;
         }
         result = result * 10 + (string[i] - 48);
+        if(result > 0xFFFFFFFF) {
+            *positive_num = 0xFFFFFFFF;
+            return 1; /* Overflow occurred. Set the output to UINT32_MAX */
+        }
     }
-    if(result > 0xFFFFFFFF) {
-        *positive_num = 0xFFFFFFFF;
-        return 1; /* Overflow occurred. Set the output to UINT32_MAX */
-    }
-    else {
-        *positive_num = result & 0xFFFFFFFF;
-        return 0;
-    }
+    *positive_num = result & 0xFFFFFFFF;
+    return 0;
 }
 
 /**
