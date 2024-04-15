@@ -14,12 +14,13 @@
 #include "filter_uniq_ints.h"
 
 /**
- * @brief Convert a string to a posivie number
+ * @brief Convert a string to a UINT32 posivie number
  *  The string cannot contain characters other than 0~9
  * 
  * @returns
  *  -1 if illegal chars found or NULL pointer
- *  A positive number if succeeded
+ *   1 if overflow occurred
+ *   0 if succeeded
  */
 int string_to_positive_num(const char* string, uint_32 *positive_num) {
     *positive_num = 0;
