@@ -28,7 +28,7 @@ uint_32 convert_string_to_positive_num(const char* string) {
     size_t str_length = strlen(string);
     int result = 0;
     for(size_t i = 0; i < str_length; i++) {
-        if(string[i] < 48 || string[i] > 56) {
+        if(string[i] < 48 || string[i] > 57) {
             return -1;
         }
         result = result * 10 + (string[i] - 48);
