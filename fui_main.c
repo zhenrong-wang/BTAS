@@ -74,27 +74,27 @@ int main(int argc, char** argv) {
     start = clock();
     out_bit_dyn = fui_bitmap_dyn_stree(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("BITMAP_DYN_S:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("BTAS_STREE:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     start = clock();
     out_bit_dyn = fui_bitmap_dyn_dtree(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("BITMAP_DYN_D:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("BTAS_DTREE:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     start = clock();
     out_bit_dyn_idx = fui_bitmap_idx_stree(arr_input, num_elems, &num_elems_out_idx, &err_flag, &dup_idx_list1_1);
     end = clock();
-    printf("BITMAP_IDX_S:\t%lf\t%d\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
+    printf("BTAS_SAIH:\t%lf\t%d\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
 
     start = clock();
     out_bit_dyn_idx = fui_bitmap_idx_dtree(arr_input, num_elems, &num_elems_out_idx, &err_flag, &dup_idx_list1_2);
     end = clock();
-    printf("BITMAP_IDX_D:\t%lf\t%d\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
+    printf("BTAS_DAIH:\t%lf\t%d\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
 
     start = clock();
     out_bit_stc = fui_bitmap_stc_stree(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("BITMAP_STC:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("BTAS_STC:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     start = clock();
     out_ht_dtree = fui_htable_dtree(arr_input, num_elems, &num_elems_out, &err_flag);
@@ -162,27 +162,27 @@ int main(int argc, char** argv) {
     start = clock();
     out_bit_dyn = fui_bitmap_dyn_stree(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("BITMAP_DYN_S:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("BTAS_STREE:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     start = clock();
     out_bit_dyn = fui_bitmap_dyn_dtree(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("BITMAP_DYN_D:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("BTAS_DTREE:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     start = clock();
     out_bit_dyn_idx = fui_bitmap_idx_stree(arr_input, num_elems, &num_elems_out_idx, &err_flag, &dup_idx_list2_1);
     end = clock();
-    printf("BITMAP_IDX_S:\t%lf\t%d\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
+    printf("BTAS_SAIH:\t%lf\t%d\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
 
     start = clock();
     out_bit_dyn_idx = fui_bitmap_idx_dtree(arr_input, num_elems, &num_elems_out_idx, &err_flag, &dup_idx_list2_2);
     end = clock();
-    printf("BITMAP_IDX_D:\t%lf\t%d\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
+    printf("BTAS_DAIH:\t%lf\t%d\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
 
     start = clock();
     out_bit_stc = fui_bitmap_stc_stree(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
-    printf("BITMAP_STC:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    printf("BTAS_STC:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     start = clock();
     out_ht_dtree = fui_htable_dtree(arr_input, num_elems, &num_elems_out, &err_flag);
