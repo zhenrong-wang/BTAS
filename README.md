@@ -20,9 +20,7 @@ We strongly suggest you to read the [Technical Review](./TECHNICAL_REVIEW.md).
 
 ### 3.1.1 Prerequisites
 
-You need a C and Cpp compiler to build this project along with [CMake](https://cmake.org/) > **3.20** to build the **main branch**.
-
-There is also a **c-branch** which contains only C implementations and doesn't require [CMake](https://cmake.org/). Those C implementations updates are syncronized to the **main branch**.
+You need a C compiler to build the `c-branch`. For the `cpp-branch`, you also need [CMake](https://cmake.org/) > **3.20**.
 
 - For Microsoft Windows users, [mingw-w64](https://sourceforge.net/projects/mingw-w64/) is recommended
 - For GNU/Linux Distro or other *nix users, the [GNU Compiler Collections](https://gcc.gnu.org/), known as gcc, is a perfect one
@@ -35,16 +33,16 @@ There is also a **c-branch** which contains only C implementations and doesn't r
 1. Use git to clone this code: `git clone https://github.com/zhenrong-wang/filter-uniq-ints.git`
 2. Change your directory: `cd filter-uniq-ints`
 
-**For the main branch:**
-
-3. a. Configure CMake: `cmake -B cmake-build-release -DCMAKE_BUILD_TYPE=Release`
-4. a. Build command example: `cmake --build cmake-build-release --config Release --target all`
-5. a. Change your directory: `cd cmake-build-release`
-6. a. Build with make: `make`
-
 **For the c-branch**
 
-1. b. Build with the C compiler: `gcc *.c -Ofast -Wall -o YOUR_PROGRAM_NAME`
+3. a. Build with the C compiler: `gcc *.c -Ofast -Wall -o YOUR_PROGRAM_NAME`
+
+**For the cpp-branch:**
+
+3. b. Configure CMake: `cmake -B cmake-build-release -DCMAKE_BUILD_TYPE=Release`
+4. b. Build command example: `cmake --build cmake-build-release --config Release --target all`
+5. b. Change your directory: `cd cmake-build-release`
+6. b. Build with make: `make`
 
 ## 3.2 Run
 
