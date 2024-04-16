@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "string.h": "c",
-        "random": "c"
+        "random": "c",
+        "stdint.h": "c",
+        "filter_uniq_ints.h": "c"
     }
 }

@@ -11,35 +11,58 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <stdint.h>
 #include "filter_uniq_ints.h"
 
 /**
- * @brief Convert a string to a UINT32 posivie number
+ * @brief Convert a *unsigned* string ('\0' terminated!) 
+ *  to a UINT32 posivie number or 0
  *  The string cannot contain characters other than 0~9
+ *  E.g. 12345678
+ * 
+ * @param 
+ *  [in] const char* string: a '\0'-terminated string. An 
+ *   array without '\0' would cause undefined behaviors. Please
+ *   make sure to preprocess the string with snprintf or strncpy
+ *   or other functions to construct the string. A constant
+ *   string such as "100909" is good to go.
+ * 
+ *  [out] *unsigned_num: an address to an unsigned 32bit integer.
+ *    Make sure the type is correct.
  * 
  * @returns
- *  -1 if illegal chars found or NULL pointer
- *   1 if overflow occurred
- *   0 if succeeded
+ *  -3 if the string is a null pointer
+ *  -1 if invalid chars found
+ *   1 if overflow occurred (the *unsigned_num would be set to UINT32_MAX)
+ *   0 if succeeded and the result is in the range of 0 ~ UINT32_MAX
  */
-int string_to_u32_num(const char* string, uint_32 *positive_num) {
-    *positive_num = 0;
+int string_to_u32_num(const char* string, uint32_t *unsigned_num) {
+    *unsigned_num = 0; /* Set the output to 0. */
     if(string == NULL) {
-        return -1;
+        /* If the string pointer is null, reject to proceed
+           because strlen(null) would cause stack overflow. */
+        return -3; 
     }
     size_t str_length = strlen(string);
-    size_t result = 0;
+    uint64_t result = 0; /* Define a 64bit unsigned integer as a larger buffer. */
     for(size_t i = 0; i < str_length; i++) {
-        if(string[i] < 48 || string[i] > 57) {
-            return -1;
+        /* Use chars '0' or '9' to guarantee the portability. */
+        if(string[i] < '0' || string[i] > '9') {
+            return -1; /* Illegal chars found. Reject to proceed. */
         }
-        result = result * 10 + (string[i] - 48);
+        result = result * 10 + (string[i] - '0');
         if(result > 0xFFFFFFFF) {
-            *positive_num = 0xFFFFFFFF;
-            return 1; /* Overflow occurred. Set the output to UINT32_MAX */
+            /* Overflow occurred. Set the output to UINT32_MAX and return,
+               Users can decide to use the UINT32_MAX but it is clear that
+               overflow has ocurred indicated by the return value 1. */
+            *unsigned_num = 0xFFFFFFFF;
+            return 1; 
         }
     }
-    *positive_num = result & 0xFFFFFFFF;
+    /* Everything is good, return the lower-32 bit of the 64bit result. 
+       Or, just directly use *unsigned_num = (uint32_t)result to cast it.
+       Let's avoid cast and use bitwise operation to manually cast. */
+    *unsigned_num = result & 0xFFFFFFFF;
     return 0;
 }
 
@@ -61,8 +84,8 @@ int string_to_u32_num(const char* string, uint_32 *positive_num) {
  *  NULL if any error happens
  * 
  */
-int* fui_brute(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag){
-    uint_32 i, j = 1, k;
+int* fui_brute(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag){
+    uint32_t i, j = 1, k;
     int tmp = 0;
     int *final_output_arr = NULL;
     *err_flag = 0;
@@ -121,8 +144,8 @@ int* fui_brute(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems
  *  NULL if any error happens
  * 
  */
-int* fui_brute_opt(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag){
-    uint_32 i, j = 1, k;
+int* fui_brute_opt(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag){
+    uint32_t i, j = 1, k;
     int max_current, min_current, diff_to_max = 0, diff_to_min = 0, tmp_diff_to_max = 0, tmp_diff_to_min = 0;
     int tmp = 0;
     int *final_output_arr = NULL;
@@ -195,8 +218,8 @@ int* fui_brute_opt(const int *input_arr, const uint_32 num_elems, uint_32 *num_e
     return final_output_arr;
 }
 
-void free_hash_table(uint_8 *hash_table[], uint_32 num_elems) {
-    for(uint_32 i = 0; i < num_elems; i++) {
+void free_hash_table(uint8_t *hash_table[], uint32_t num_elems) {
+    for(uint32_t i = 0; i < num_elems; i++) {
         if(hash_table[i] != NULL) {
             free(hash_table[i]);
         }
@@ -221,13 +244,13 @@ void free_hash_table(uint_8 *hash_table[], uint_32 num_elems) {
  *  NULL if any error happens
  * 
  */
-int* fui_htable_dtree(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag) {
-    uint_32 i, j = 0;
-    uint_32 tmp_quotient = 0, tmp_mod = 0;
+int* fui_htable_dtree(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag) {
+    uint32_t i, j = 0;
+    uint32_t tmp_quotient = 0, tmp_mod = 0;
     int tmp = 0;
     int *final_output_arr = NULL;
-    uint_8 *hash_table_base_p[HASH_TABLE_SIZE] = {NULL,};
-    uint_8 *hash_table_base_n[HASH_TABLE_SIZE] = {NULL,};
+    uint8_t *hash_table_base_p[HASH_TABLE_SIZE] = {NULL,};
+    uint8_t *hash_table_base_n[HASH_TABLE_SIZE] = {NULL,};
     *err_flag = 0;
     *num_elems_out = 0;
     if (input_arr == NULL) {
@@ -249,7 +272,7 @@ int* fui_htable_dtree(const int *input_arr, const uint_32 num_elems, uint_32 *nu
         tmp_mod = abs(tmp % MOD_TABLE_SIZE);
         if(tmp > 0) {
             if(hash_table_base_p[tmp_quotient] == NULL) {
-                if((hash_table_base_p[tmp_quotient] = (uint_8 *)calloc(MOD_TABLE_SIZE, sizeof(uint_8))) == NULL) {
+                if((hash_table_base_p[tmp_quotient] = (uint8_t *)calloc(MOD_TABLE_SIZE, sizeof(uint8_t))) == NULL) {
                     *err_flag = 1;
                     goto free_memory;
                 }
@@ -260,7 +283,7 @@ int* fui_htable_dtree(const int *input_arr, const uint_32 num_elems, uint_32 *nu
         }
         else {
             if(hash_table_base_n[tmp_quotient] == NULL) {
-                if((hash_table_base_n[tmp_quotient] = (uint_8 *)calloc(MOD_TABLE_SIZE, sizeof(uint_8))) == NULL) {
+                if((hash_table_base_n[tmp_quotient] = (uint8_t *)calloc(MOD_TABLE_SIZE, sizeof(uint8_t))) == NULL) {
                     *err_flag = 1;
                     goto free_memory;
                 }
@@ -295,8 +318,8 @@ free_memory:
     return final_output_arr;
 }
 
-void free_hash_table_new(htable_base hash_table_new[], uint_32 num_elems) {
-    for(uint_32 i = 0; i < num_elems; i++) {
+void free_hash_table_new(htable_base hash_table_new[], uint32_t num_elems) {
+    for(uint32_t i = 0; i < num_elems; i++) {
         if(hash_table_new[i].ptr_branch_p != NULL) {
             free(hash_table_new[i].ptr_branch_p);
         }
@@ -324,12 +347,12 @@ void free_hash_table_new(htable_base hash_table_new[], uint_32 num_elems) {
  *  NULL if any error happens
  * 
  */
-int* fui_htable_stree(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag) {
-    uint_32 i, j = 0;
-    uint_32 tmp_quotient = 0, tmp_mod = 0;
+int* fui_htable_stree(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag) {
+    uint32_t i, j = 0;
+    uint32_t tmp_quotient = 0, tmp_mod = 0;
     int tmp = 0;
     int *final_output_arr = NULL;
-    uint_8 *tmp_realloc_ptr = NULL;
+    uint8_t *tmp_realloc_ptr = NULL;
     htable_base hash_table_base[HASH_TABLE_SIZE] = {{0, 0, NULL, NULL},};
     *err_flag = 0;
     *num_elems_out = 0;
@@ -352,7 +375,7 @@ int* fui_htable_stree(const int *input_arr, const uint_32 num_elems, uint_32 *nu
         tmp_mod = abs(tmp % MOD_TABLE_SIZE);
         if(tmp > 0) {
             if(hash_table_base[tmp_quotient].ptr_branch_p == NULL) {
-                if((hash_table_base[tmp_quotient].ptr_branch_p = (uint_8 *)calloc(tmp_mod + 1, sizeof(uint_8))) == NULL) {
+                if((hash_table_base[tmp_quotient].ptr_branch_p = (uint8_t *)calloc(tmp_mod + 1, sizeof(uint8_t))) == NULL) {
                     *err_flag = 1;
                     goto free_memory;
                 }
@@ -362,13 +385,13 @@ int* fui_htable_stree(const int *input_arr, const uint_32 num_elems, uint_32 *nu
             }
             else {
                 if(hash_table_base[tmp_quotient].branch_size_p < (tmp_mod + 1)){
-                    if((tmp_realloc_ptr = (uint_8 *)realloc(hash_table_base[tmp_quotient].ptr_branch_p, (tmp_mod + 1)*sizeof(uint_8))) == NULL) {
+                    if((tmp_realloc_ptr = (uint8_t *)realloc(hash_table_base[tmp_quotient].ptr_branch_p, (tmp_mod + 1)*sizeof(uint8_t))) == NULL) {
                         *err_flag = 1;
                         goto free_memory;
                     }
                     else {
                         hash_table_base[tmp_quotient].ptr_branch_p = tmp_realloc_ptr;
-                        memset(tmp_realloc_ptr + hash_table_base[tmp_quotient].branch_size_p, 0, sizeof(uint_8) * (tmp_mod + 1 - hash_table_base[tmp_quotient].branch_size_p));
+                        memset(tmp_realloc_ptr + hash_table_base[tmp_quotient].branch_size_p, 0, sizeof(uint8_t) * (tmp_mod + 1 - hash_table_base[tmp_quotient].branch_size_p));
                         hash_table_base[tmp_quotient].branch_size_p = tmp_mod + 1;
                     }
                 }
@@ -379,7 +402,7 @@ int* fui_htable_stree(const int *input_arr, const uint_32 num_elems, uint_32 *nu
         }
         else {
             if(hash_table_base[tmp_quotient].ptr_branch_n == NULL) {
-                if((hash_table_base[tmp_quotient].ptr_branch_n = (uint_8 *)calloc(tmp_mod + 1, sizeof(uint_8))) == NULL) {
+                if((hash_table_base[tmp_quotient].ptr_branch_n = (uint8_t *)calloc(tmp_mod + 1, sizeof(uint8_t))) == NULL) {
                     *err_flag = 1;
                     goto free_memory;
                 }
@@ -389,13 +412,13 @@ int* fui_htable_stree(const int *input_arr, const uint_32 num_elems, uint_32 *nu
             }
             else {
                 if(hash_table_base[tmp_quotient].branch_size_n < (tmp_mod + 1)){
-                    if((tmp_realloc_ptr = (uint_8 *)realloc(hash_table_base[tmp_quotient].ptr_branch_n, (tmp_mod + 1) * sizeof(uint_8))) == NULL) {
+                    if((tmp_realloc_ptr = (uint8_t *)realloc(hash_table_base[tmp_quotient].ptr_branch_n, (tmp_mod + 1) * sizeof(uint8_t))) == NULL) {
                         *err_flag = 1;
                         goto free_memory;
                     }
                     else {
                         hash_table_base[tmp_quotient].ptr_branch_n = tmp_realloc_ptr;
-                        memset(tmp_realloc_ptr + hash_table_base[tmp_quotient].branch_size_n , 0, sizeof(uint_8) * (tmp_mod + 1 - hash_table_base[tmp_quotient].branch_size_n));
+                        memset(tmp_realloc_ptr + hash_table_base[tmp_quotient].branch_size_n , 0, sizeof(uint8_t) * (tmp_mod + 1 - hash_table_base[tmp_quotient].branch_size_n));
                         hash_table_base[tmp_quotient].branch_size_n = tmp_mod + 1;
                     }
                 }
@@ -448,14 +471,14 @@ free_memory:
  *  NULL if any error happens
  * 
  */
-int* fui_htable_stree_dyn(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag) {
-    uint_32 i, j = 0;
-    uint_32 tmp_quotient = 0, tmp_mod = 0;
+int* fui_htable_stree_dyn(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag) {
+    uint32_t i, j = 0;
+    uint32_t tmp_quotient = 0, tmp_mod = 0;
     int tmp = 0;
     int *final_output_arr = NULL;
-    uint_8 *tmp_realloc_ptr = NULL;
+    uint8_t *tmp_realloc_ptr = NULL;
     htable_base *hash_table_base = NULL, *tmp_ht_realloc_ptr = NULL;
-    uint_32 ht_base_length = HT_DYN_INI_SIZE;
+    uint32_t ht_base_length = HT_DYN_INI_SIZE;
     *err_flag = 0;
     *num_elems_out = 0;
     if (input_arr == NULL) {
@@ -493,7 +516,7 @@ int* fui_htable_stree_dyn(const int *input_arr, const uint_32 num_elems, uint_32
         }
         if(tmp > 0) {
             if(hash_table_base[tmp_quotient].ptr_branch_p == NULL) {
-                if((hash_table_base[tmp_quotient].ptr_branch_p = (uint_8 *)calloc(tmp_mod + 1, sizeof(uint_8))) == NULL) {
+                if((hash_table_base[tmp_quotient].ptr_branch_p = (uint8_t *)calloc(tmp_mod + 1, sizeof(uint8_t))) == NULL) {
                     *err_flag = 1;
                     goto free_memory;
                 }
@@ -503,13 +526,13 @@ int* fui_htable_stree_dyn(const int *input_arr, const uint_32 num_elems, uint_32
             }
             else {
                 if(hash_table_base[tmp_quotient].branch_size_p < (tmp_mod + 1)){
-                    if((tmp_realloc_ptr = (uint_8 *)realloc(hash_table_base[tmp_quotient].ptr_branch_p, (tmp_mod + 1) * sizeof(uint_8))) == NULL) {
+                    if((tmp_realloc_ptr = (uint8_t *)realloc(hash_table_base[tmp_quotient].ptr_branch_p, (tmp_mod + 1) * sizeof(uint8_t))) == NULL) {
                         *err_flag = 1;
                         goto free_memory;
                     }
                     else {
                         hash_table_base[tmp_quotient].ptr_branch_p = tmp_realloc_ptr;
-                        memset(tmp_realloc_ptr + hash_table_base[tmp_quotient].branch_size_p, 0, sizeof(uint_8) * (tmp_mod + 1 - hash_table_base[tmp_quotient].branch_size_p));
+                        memset(tmp_realloc_ptr + hash_table_base[tmp_quotient].branch_size_p, 0, sizeof(uint8_t) * (tmp_mod + 1 - hash_table_base[tmp_quotient].branch_size_p));
                         hash_table_base[tmp_quotient].branch_size_p = tmp_mod + 1;
                     }
                 }
@@ -520,7 +543,7 @@ int* fui_htable_stree_dyn(const int *input_arr, const uint_32 num_elems, uint_32
         }
         else {
             if(hash_table_base[tmp_quotient].ptr_branch_n == NULL) {
-                if((hash_table_base[tmp_quotient].ptr_branch_n = (uint_8 *)calloc(tmp_mod + 1, sizeof(uint_8))) == NULL) {
+                if((hash_table_base[tmp_quotient].ptr_branch_n = (uint8_t *)calloc(tmp_mod + 1, sizeof(uint8_t))) == NULL) {
                     *err_flag = 1;
                     goto free_memory;
                 }
@@ -530,13 +553,13 @@ int* fui_htable_stree_dyn(const int *input_arr, const uint_32 num_elems, uint_32
             }
             else {
                 if(hash_table_base[tmp_quotient].branch_size_n < (tmp_mod + 1)){
-                    if((tmp_realloc_ptr = (uint_8 *)realloc(hash_table_base[tmp_quotient].ptr_branch_n, (tmp_mod + 1)*sizeof(uint_8))) == NULL) {
+                    if((tmp_realloc_ptr = (uint8_t *)realloc(hash_table_base[tmp_quotient].ptr_branch_n, (tmp_mod + 1)*sizeof(uint8_t))) == NULL) {
                         *err_flag = 1;
                         goto free_memory;
                     }
                     else {
                         hash_table_base[tmp_quotient].ptr_branch_n = tmp_realloc_ptr;
-                        memset(tmp_realloc_ptr + hash_table_base[tmp_quotient].branch_size_n , 0, sizeof(uint_8) * (tmp_mod + 1 - hash_table_base[tmp_quotient].branch_size_n));
+                        memset(tmp_realloc_ptr + hash_table_base[tmp_quotient].branch_size_n , 0, sizeof(uint8_t) * (tmp_mod + 1 - hash_table_base[tmp_quotient].branch_size_n));
                         hash_table_base[tmp_quotient].branch_size_n = tmp_mod + 1;
                     }
                 }
@@ -582,12 +605,12 @@ free_memory:
  *  void
  * 
  */
-void print_arr(const int *arr, uint_32 num_elems, uint_32 max_elems) {
+void print_arr(const int *arr, uint32_t num_elems, uint32_t max_elems) {
     if(arr == NULL || num_elems < 1) {
         printf("ERROR: NULL array input.\n");
         return;
     }
-    uint_32 i;
+    uint32_t i;
     for(i = 0; i < num_elems && i < max_elems; i++) {
         printf("%d\t", arr[i]);
         if((i+1)%10 == 0) {
@@ -600,14 +623,14 @@ void print_arr(const int *arr, uint_32 num_elems, uint_32 max_elems) {
     printf("\n");
 }
 
-int compare_arr(const int *arr_a, const int *arr_b, uint_32 num_elems) {
+int compare_arr(const int *arr_a, const int *arr_b, uint32_t num_elems) {
     if(arr_a == NULL || arr_b == NULL) {
         return -3;
     }
     if(num_elems < 1) {
         return -1;
     }
-    for(uint_32 i = 0; i < num_elems; i++) {
+    for(uint32_t i = 0; i < num_elems; i++) {
         if(arr_a[i] != arr_b[i]) {
             return 1;
         }
@@ -631,7 +654,7 @@ int compare_arr(const int *arr_a, const int *arr_b, uint_32 num_elems) {
  *  -1 if the rand_max is 0
  * 
  */
-int generate_random_input_arr(int *arr, uint_32 num_elems, uint_32 rand_max) {
+int generate_random_input_arr(int *arr, uint32_t num_elems, uint32_t rand_max) {
     int sign_flag, rand_num;
     if(arr == NULL) {
         return -5;
@@ -643,7 +666,7 @@ int generate_random_input_arr(int *arr, uint_32 num_elems, uint_32 rand_max) {
         return -1;
     }
     srand(time(0));
-    for(uint_32 i = 0; i < num_elems; i++) {
+    for(uint32_t i = 0; i < num_elems; i++) {
         sign_flag = rand();
         if(RAND_MAX == 0x7fff) {
             rand_num = (rand()<<16 | rand()) % rand_max;
@@ -677,14 +700,14 @@ int generate_random_input_arr(int *arr, uint_32 num_elems, uint_32 rand_max) {
  *  -3 if the num_elems is 0
  * 
  */
-int generate_growing_arr(int *arr, uint_32 num_elems) {
+int generate_growing_arr(int *arr, uint32_t num_elems) {
     if(arr == NULL) {
         return -5;
     }
     if(num_elems < 1) {
         return -3;
     }
-    for(uint_32 i = 0; i < num_elems; i++) {
+    for(uint32_t i = 0; i < num_elems; i++) {
         arr[i] = i;
     }
     return 0;
@@ -707,7 +730,7 @@ void free_bmap_idx_branch(bmap_idx_brch *bmap_idx_head) {
 } */
 
 /* 
-int insert_idx_branch(bmap_idx_brch **bmap_idx_head, uint_16 byte_idx, uint_8 bit_pos, uint_32 raw_idx) {
+int insert_idx_branch(bmap_idx_brch **bmap_idx_head, uint16_t byte_idx, uint8_t bit_pos, uint32_t raw_idx) {
     bmap_idx_brch *new_node = (bmap_idx_brch *)calloc(1, sizeof(bmap_idx_brch));
     if(new_node == NULL) {
         return -1;
@@ -726,7 +749,7 @@ int insert_idx_branch(bmap_idx_brch **bmap_idx_head, uint_16 byte_idx, uint_8 bi
 }*/
 
 /*
-int get_raw_idx(bmap_idx_brch *bmap_idx_head, uint_16 byte_idx, uint_8 bit_pos, uint_32 *raw_idx) {
+int get_raw_idx(bmap_idx_brch *bmap_idx_head, uint16_t byte_idx, uint8_t bit_pos, uint32_t *raw_idx) {
     bmap_idx_brch *ptr_current = bmap_idx_head;
     *raw_idx = 0;
     if(ptr_current == NULL) {
@@ -743,8 +766,8 @@ int get_raw_idx(bmap_idx_brch *bmap_idx_head, uint_16 byte_idx, uint_8 bit_pos, 
 } */
 
 /*
-void free_bitmap_idx(bitmap_idx_base *bitmap_head, uint_16 num_elems) {
-    for(uint_32 i = 0; i < num_elems; i++) {
+void free_bitmap_idx(bitmap_idx_base *bitmap_head, uint16_t num_elems) {
+    for(uint32_t i = 0; i < num_elems; i++) {
         if(bitmap_head[i].ptr_bit_branch != NULL) {
             free(bitmap_head[i].ptr_bit_branch);
         }
@@ -755,13 +778,13 @@ void free_bitmap_idx(bitmap_idx_base *bitmap_head, uint_16 num_elems) {
 }*/
 
 /*
-int* fui_bitmap_idx_llist(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head) {
-    uint_32 i, j = 0;
-    uint_32 tmp_quotient = 0, tmp_mod = 0, tmp_dup_raw_index;
+int* fui_bitmap_idx_llist(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head) {
+    uint32_t i, j = 0;
+    uint32_t tmp_quotient = 0, tmp_mod = 0, tmp_dup_raw_index;
     int tmp = 0, *final_output_arr = NULL;
     bitmap_idx_base *bitmap_head = NULL, *tmp_bitmap_realloc = NULL;
-    uint_16 tmp_byte_index = 0, bitmap_base_size = BITMAP_INIT_LENGTH;
-    uint_8 tmp_bit_position = 0;
+    uint16_t tmp_byte_index = 0, bitmap_base_size = BITMAP_INIT_LENGTH;
+    uint8_t tmp_bit_position = 0;
     *err_flag = 0;
     *num_elems_out = 0;
     if(*dup_idx_head != NULL) {
@@ -804,7 +827,7 @@ int* fui_bitmap_idx_llist(const int *input_arr, const uint_32 num_elems, uint_32
             bitmap_base_size = (tmp_quotient + 1);
         }
         if(bitmap_head[tmp_quotient].ptr_bit_branch == NULL) {
-            if((bitmap_head[tmp_quotient].ptr_bit_branch = (uint_8 *)calloc(BIT_MOD_TABLE_SIZE, sizeof(uint_8))) == NULL) {
+            if((bitmap_head[tmp_quotient].ptr_bit_branch = (uint8_t *)calloc(BIT_MOD_TABLE_SIZE, sizeof(uint8_t))) == NULL) {
                 *err_flag = 1;
                 goto free_memory;
             }
@@ -850,7 +873,7 @@ void free_dup_idx_list(dup_idx_list *dup_idx_head) {
     }
 }
 
-int insert_dup_idx_list(dup_idx_list **dup_idx_head, uint_32 idx_a, uint_32 idx_b) {
+int insert_dup_idx_list(dup_idx_list **dup_idx_head, uint32_t idx_a, uint32_t idx_b) {
     dup_idx_list *new_node = (dup_idx_list *)calloc(1, sizeof(dup_idx_list));
     if(new_node == NULL) {
         return -1;
@@ -867,14 +890,14 @@ int insert_dup_idx_list(dup_idx_list **dup_idx_head, uint_32 idx_a, uint_32 idx_
     return 0;
 }
 
-void print_dup_idx_list(dup_idx_list *dup_idx_head, uint_32 max_nodes) {
+void print_dup_idx_list(dup_idx_list *dup_idx_head, uint32_t max_nodes) {
     dup_idx_list *ptr_current = dup_idx_head;
     printf("\n");
     if(ptr_current == NULL) {
         printf("NULL LIST!\n");
         return;
     }
-    uint_32 i = 0;
+    uint32_t i = 0;
     printf("\nIndex pairs of duplicate elements:\n");
     while(ptr_current != NULL && i < max_nodes) {
         printf("{%u\t%u}\n", ptr_current->index_a, ptr_current->index_b);
@@ -889,12 +912,12 @@ void print_dup_idx_list(dup_idx_list *dup_idx_head, uint_32 max_nodes) {
     }
 }
 
-void print_out_idx(out_idx *output_index, uint_32 num_elems, uint_32 max_elems) {
+void print_out_idx(out_idx *output_index, uint32_t num_elems, uint32_t max_elems) {
     if(output_index == NULL) {
         printf("NULL OUTPUT AND INDEX!\n");
         return;
     }
-    uint_32 i;
+    uint32_t i;
     printf("\nRaw index and duplicate elements:\n");
     for(i = 0; i < max_elems && i < num_elems; i++) {
         printf("%u\t%d\n", output_index[i].raw_index, output_index[i].out_elem);
@@ -907,19 +930,19 @@ void print_out_idx(out_idx *output_index, uint_32 num_elems, uint_32 max_elems) 
     }
 }
 
-void free_bitmap(bitmap_base *bitmap_head, uint_16 num_elems) {
-    for(uint_32 i = 0; i < num_elems; i++) {
+void free_bitmap(bitmap_base *bitmap_head, uint16_t num_elems) {
+    for(uint32_t i = 0; i < num_elems; i++) {
         if(bitmap_head[i].ptr_branch != NULL) {
             free(bitmap_head[i].ptr_branch);
         }
     }
 }
 
-void free_bitmap_dtree(bitmap_dtree *bitmap_head, uint_16 num_elems) {
+void free_bitmap_dtree(bitmap_dtree *bitmap_head, uint16_t num_elems) {
     if(bitmap_head == NULL) {
         return;
     }
-    for(uint_16 i = 0; i < num_elems; i++) {
+    for(uint16_t i = 0; i < num_elems; i++) {
         if(bitmap_head[i].ptr_branch[0] != NULL) {
             free(bitmap_head[i].ptr_branch[0]);
         }
@@ -929,11 +952,11 @@ void free_bitmap_dtree(bitmap_dtree *bitmap_head, uint_16 num_elems) {
     }
 }
 
-void free_idx_ht_8(idx_ht_8 *idx_ht_head, uint_16 num_elems) {
+void free_idx_ht_8(idx_ht_8 *idx_ht_head, uint16_t num_elems) {
     if(idx_ht_head == NULL) {
         return;
     }
-    for(uint_16 i = 0; i < num_elems; i++) {
+    for(uint16_t i = 0; i < num_elems; i++) {
         if(idx_ht_head[i].ptr_branch[0] != NULL) {
             free(idx_ht_head[i].ptr_branch[0]);
         }
@@ -942,25 +965,11 @@ void free_idx_ht_8(idx_ht_8 *idx_ht_head, uint_16 num_elems) {
         }
     }
 }
-void free_idx_ht_16(idx_ht_16 *idx_ht_head, uint_16 num_elems) {
+void free_idx_ht_16(idx_ht_16 *idx_ht_head, uint16_t num_elems) {
     if(idx_ht_head == NULL) {
         return;
     }
-    for(uint_16 i = 0; i < num_elems; i++) {
-        if(idx_ht_head[i].ptr_branch[0] != NULL) {
-            free(idx_ht_head[i].ptr_branch[0]);
-        }
-        if(idx_ht_head[i].ptr_branch[1] != NULL) {
-            free(idx_ht_head[i].ptr_branch[1]);
-        }
-    }
-}
-
-void free_idx_ht_32(idx_ht_32 *idx_ht_head, uint_16 num_elems) {
-    if(idx_ht_head == NULL) {
-        return;
-    }
-    for(uint_16 i = 0; i < num_elems; i++) {
+    for(uint16_t i = 0; i < num_elems; i++) {
         if(idx_ht_head[i].ptr_branch[0] != NULL) {
             free(idx_ht_head[i].ptr_branch[0]);
         }
@@ -970,13 +979,27 @@ void free_idx_ht_32(idx_ht_32 *idx_ht_head, uint_16 num_elems) {
     }
 }
 
-int* fui_bitmap_stc_stree(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag) {
-    uint_32 i, j = 0;
-    uint_32 tmp_quotient = 0, tmp_mod = 0;
+void free_idx_ht_32(idx_ht_32 *idx_ht_head, uint16_t num_elems) {
+    if(idx_ht_head == NULL) {
+        return;
+    }
+    for(uint16_t i = 0; i < num_elems; i++) {
+        if(idx_ht_head[i].ptr_branch[0] != NULL) {
+            free(idx_ht_head[i].ptr_branch[0]);
+        }
+        if(idx_ht_head[i].ptr_branch[1] != NULL) {
+            free(idx_ht_head[i].ptr_branch[1]);
+        }
+    }
+}
+
+int* fui_bitmap_stc_stree(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag) {
+    uint32_t i, j = 0;
+    uint32_t tmp_quotient = 0, tmp_mod = 0;
     int tmp = 0, *final_output_arr = NULL;
     bitmap_base bitmap_head[BITMAP_LENGTH_MAX] = {{0, NULL},};
-    uint_16 tmp_byte_index = 0;
-    uint_8 tmp_bit_position = 0;
+    uint16_t tmp_byte_index = 0;
+    uint8_t tmp_bit_position = 0;
     *err_flag = 0;
     *num_elems_out = 0;
     if (input_arr == NULL) {
@@ -999,7 +1022,7 @@ int* fui_bitmap_stc_stree(const int *input_arr, const uint_32 num_elems, uint_32
         tmp_byte_index = (tmp < 0) ? (NEGATIVE_START_POS + (tmp_mod / 8)) : (tmp_mod / 8);
         tmp_bit_position = tmp_mod % 8;
         if(bitmap_head[tmp_quotient].ptr_branch == NULL) {
-            if((bitmap_head[tmp_quotient].ptr_branch = (uint_8 *)calloc(BIT_MOD_TABLE_SIZE, sizeof(uint_8))) == NULL) {
+            if((bitmap_head[tmp_quotient].ptr_branch = (uint8_t *)calloc(BIT_MOD_TABLE_SIZE, sizeof(uint8_t))) == NULL) {
                 *err_flag = 1;
                 goto free_memory;
             }
@@ -1027,13 +1050,13 @@ free_memory:
     return final_output_arr;
 }
 
-int* fui_bitmap_dyn_stree(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag) {
-    uint_32 i, j = 0;
-    uint_32 tmp_quotient = 0, tmp_mod = 0;
+int* fui_bitmap_dyn_stree(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag) {
+    uint32_t i, j = 0;
+    uint32_t tmp_quotient = 0, tmp_mod = 0;
     int tmp = 0, *final_output_arr = NULL;
     bitmap_base *bitmap_head = NULL, *tmp_bitmap_realloc = NULL;
-    uint_16 tmp_byte_index = 0, bitmap_base_size = BITMAP_INIT_LENGTH, bitmap_base_size_target = 0;
-    uint_8 tmp_bit_position = 0;
+    uint16_t tmp_byte_index = 0, bitmap_base_size = BITMAP_INIT_LENGTH, bitmap_base_size_target = 0;
+    uint8_t tmp_bit_position = 0;
     *err_flag = 0;
     *num_elems_out = 0;
     if (input_arr == NULL) {
@@ -1074,7 +1097,7 @@ int* fui_bitmap_dyn_stree(const int *input_arr, const uint_32 num_elems, uint_32
             bitmap_base_size = bitmap_base_size_target;
         }
         if(bitmap_head[tmp_quotient].ptr_branch == NULL) {
-            if((bitmap_head[tmp_quotient].ptr_branch = (uint_8 *)calloc(BIT_MOD_TABLE_SIZE, sizeof(uint_8))) == NULL) {
+            if((bitmap_head[tmp_quotient].ptr_branch = (uint8_t *)calloc(BIT_MOD_TABLE_SIZE, sizeof(uint8_t))) == NULL) {
                 *err_flag = 1;
                 goto free_memory;
             }
@@ -1103,14 +1126,14 @@ free_memory:
     return final_output_arr;
 }
 
-int* fui_bitmap_dyn_dtree(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag) {
-    uint_32 i, j = 0;
-    uint_16 tmp_quotient = 0, tmp_mod = 0;
+int* fui_bitmap_dyn_dtree(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag) {
+    uint32_t i, j = 0;
+    uint16_t tmp_quotient = 0, tmp_mod = 0;
     int tmp = 0, *final_output_arr = NULL;
     bitmap_dtree *bitmap_head = NULL, *tmp_bitmap_realloc = NULL;
-    uint_16 tmp_byte_index = 0, bitmap_base_size = BITMAP_INIT_LENGTH, bitmap_base_size_target = 0;
-    uint_8 tmp_bit_position = 0;
-    uint_8 tree_index = 0;
+    uint16_t tmp_byte_index = 0, bitmap_base_size = BITMAP_INIT_LENGTH, bitmap_base_size_target = 0;
+    uint8_t tmp_bit_position = 0;
+    uint8_t tree_index = 0;
     *err_flag = 0;
     *num_elems_out = 0;
     if (input_arr == NULL) {
@@ -1152,7 +1175,7 @@ int* fui_bitmap_dyn_dtree(const int *input_arr, const uint_32 num_elems, uint_32
             bitmap_base_size = bitmap_base_size_target;
         }
         if(bitmap_head[tmp_quotient].ptr_branch[tree_index] == NULL) {
-            if((bitmap_head[tmp_quotient].ptr_branch[tree_index] = (uint_8 *)calloc(BITMAP_BRCH_DTREE, sizeof(uint_8))) == NULL) {
+            if((bitmap_head[tmp_quotient].ptr_branch[tree_index] = (uint8_t *)calloc(BITMAP_BRCH_DTREE, sizeof(uint8_t))) == NULL) {
                 *err_flag = 1;
                 goto free_memory;
             }
@@ -1180,19 +1203,19 @@ free_memory:
     *num_elems_out = j;
     return final_output_arr;
 }
-out_idx* fui_bitmap_idx_stree(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head) {
-    uint_32 i, j = 0;
-    uint_32 tmp_dup_raw_index;
-    uint_16 tmp_quotient = 0, tmp_mod = 0;
+out_idx* fui_bitmap_idx_stree(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head) {
+    uint32_t i, j = 0;
+    uint32_t tmp_dup_raw_index;
+    uint16_t tmp_quotient = 0, tmp_mod = 0;
     int tmp = 0;
     out_idx *final_output_arr = NULL;
     bitmap_base *bitmap_head = NULL, *tmp_bitmap_head = NULL;
-    uint_8 tree_index_idx = 0;
+    uint8_t tree_index_idx = 0;
     void *idx_adj_head = NULL, *tmp_idx_adj = NULL;
     dup_idx_list *dup_idx_head_tmp = NULL;
-    uint_16 tmp_byte = 0, bitmap_base_size = BITMAP_INIT_LENGTH, bitmap_base_size_target = 0;
-    uint_8 tmp_bit_position = 0;
-    uint_8 raw_index_range = 0;
+    uint16_t tmp_byte = 0, bitmap_base_size = BITMAP_INIT_LENGTH, bitmap_base_size_target = 0;
+    uint8_t tmp_bit_position = 0;
+    uint8_t raw_index_range = 0;
     *err_flag = 0;
     *num_elems_out = 0;
     if(*dup_idx_head != NULL) {
@@ -1289,14 +1312,14 @@ out_idx* fui_bitmap_idx_stree(const int *input_arr, const uint_32 num_elems, uin
             bitmap_base_size = bitmap_base_size_target;
         }
         if(bitmap_head[tmp_quotient].ptr_branch == NULL) {
-            if(((bitmap_head[tmp_quotient].ptr_branch) = (uint_8 *)calloc(BIT_MOD_TABLE_SIZE, sizeof(uint_8))) == NULL) {
+            if(((bitmap_head[tmp_quotient].ptr_branch) = (uint8_t *)calloc(BIT_MOD_TABLE_SIZE, sizeof(uint8_t))) == NULL) {
                 *err_flag = 1;
                 goto free_memory;
             }
         }
         if(raw_index_range == 32 ) {
             if((((idx_ht_32 *)idx_adj_head)[tmp_quotient].ptr_branch)[tree_index_idx] == NULL) {
-                if(((((idx_ht_32 *)idx_adj_head)[tmp_quotient].ptr_branch)[tree_index_idx] = (uint_32 *)calloc(IDX_ADJ_BRCH_SIZE, sizeof(uint_32))) == NULL){
+                if(((((idx_ht_32 *)idx_adj_head)[tmp_quotient].ptr_branch)[tree_index_idx] = (uint32_t *)calloc(IDX_ADJ_BRCH_SIZE, sizeof(uint32_t))) == NULL){
                     *err_flag = 1;
                     goto free_memory;
                 }
@@ -1304,7 +1327,7 @@ out_idx* fui_bitmap_idx_stree(const int *input_arr, const uint_32 num_elems, uin
         }
         else if(raw_index_range == 16 ) {
             if((((idx_ht_16 *)idx_adj_head)[tmp_quotient].ptr_branch)[tree_index_idx] == NULL) {
-                if((((idx_ht_16 *)idx_adj_head)[tmp_quotient].ptr_branch[tree_index_idx] = (uint_16 *)calloc(IDX_ADJ_BRCH_SIZE, sizeof(uint_16))) == NULL){
+                if((((idx_ht_16 *)idx_adj_head)[tmp_quotient].ptr_branch[tree_index_idx] = (uint16_t *)calloc(IDX_ADJ_BRCH_SIZE, sizeof(uint16_t))) == NULL){
                     *err_flag = 1;
                     goto free_memory;
                 }
@@ -1312,7 +1335,7 @@ out_idx* fui_bitmap_idx_stree(const int *input_arr, const uint_32 num_elems, uin
         }
         else{
             if((((idx_ht_8 *)idx_adj_head)[tmp_quotient].ptr_branch)[tree_index_idx] == NULL) {
-                if(((((idx_ht_8 *)idx_adj_head)[tmp_quotient].ptr_branch)[tree_index_idx] = (uint_8 *)calloc(IDX_ADJ_BRCH_SIZE, sizeof(uint_8))) == NULL){
+                if(((((idx_ht_8 *)idx_adj_head)[tmp_quotient].ptr_branch)[tree_index_idx] = (uint8_t *)calloc(IDX_ADJ_BRCH_SIZE, sizeof(uint8_t))) == NULL){
                     *err_flag = 1;
                     goto free_memory;
                 }
@@ -1339,10 +1362,10 @@ out_idx* fui_bitmap_idx_stree(const int *input_arr, const uint_32 num_elems, uin
             (((idx_ht_32 *)idx_adj_head)[tmp_quotient].ptr_branch[tree_index_idx])[tmp_mod] = i;
         }
         else if(raw_index_range == 16 ) {
-            ((idx_ht_16 *)idx_adj_head)[tmp_quotient].ptr_branch[tree_index_idx][tmp_mod] = (uint_16)i;
+            ((idx_ht_16 *)idx_adj_head)[tmp_quotient].ptr_branch[tree_index_idx][tmp_mod] = (uint16_t)i;
         }
         else{
-            (((idx_ht_8 *)idx_adj_head)[tmp_quotient].ptr_branch[tree_index_idx])[tmp_mod] = (uint_8)i;
+            (((idx_ht_8 *)idx_adj_head)[tmp_quotient].ptr_branch[tree_index_idx])[tmp_mod] = (uint8_t)i;
         }
     }
 free_memory:
@@ -1372,19 +1395,19 @@ free_memory:
     return final_output_arr;
 }
 
-out_idx* fui_bitmap_idx_dtree(const int *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head) {
-    uint_32 i, j = 0;
-    uint_32 tmp_dup_raw_index;
-    uint_16 tmp_quotient = 0, tmp_mod = 0;
+out_idx* fui_bitmap_idx_dtree(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head) {
+    uint32_t i, j = 0;
+    uint32_t tmp_dup_raw_index;
+    uint16_t tmp_quotient = 0, tmp_mod = 0;
     int tmp = 0;
     out_idx *final_output_arr = NULL;
     bitmap_dtree *bitmap_head = NULL, *tmp_bitmap_head = NULL;
-    uint_8 tree_index = 0;
+    uint8_t tree_index = 0;
     void *idx_adj_head = NULL, *tmp_idx_adj = NULL;
     dup_idx_list *dup_idx_head_tmp = NULL;
-    uint_16 tmp_byte_index = 0, bitmap_base_size = BITMAP_INIT_LENGTH, bitmap_base_size_target = 0;
-    uint_8 tmp_bit_position = 0;
-    uint_8 raw_index_range = 0;
+    uint16_t tmp_byte_index = 0, bitmap_base_size = BITMAP_INIT_LENGTH, bitmap_base_size_target = 0;
+    uint8_t tmp_bit_position = 0;
+    uint8_t raw_index_range = 0;
     *err_flag = 0;
     *num_elems_out = 0;
     if(*dup_idx_head != NULL) {
@@ -1481,14 +1504,14 @@ out_idx* fui_bitmap_idx_dtree(const int *input_arr, const uint_32 num_elems, uin
             bitmap_base_size = bitmap_base_size_target;
         }
         if((bitmap_head[tmp_quotient].ptr_branch)[tree_index] == NULL) {
-            if(((bitmap_head[tmp_quotient].ptr_branch)[tree_index] = (uint_8 *)calloc(BITMAP_BRCH_DTREE, sizeof(uint_8))) == NULL) {
+            if(((bitmap_head[tmp_quotient].ptr_branch)[tree_index] = (uint8_t *)calloc(BITMAP_BRCH_DTREE, sizeof(uint8_t))) == NULL) {
                 *err_flag = 1;
                 goto free_memory;
             }
         }
         if(raw_index_range == 32 ) {
             if((((idx_ht_32 *)idx_adj_head)[tmp_quotient].ptr_branch)[tree_index] == NULL) {
-                if(((((idx_ht_32 *)idx_adj_head)[tmp_quotient].ptr_branch)[tree_index] = (uint_32 *)calloc(IDX_ADJ_BRCH_SIZE, sizeof(uint_32))) == NULL){
+                if(((((idx_ht_32 *)idx_adj_head)[tmp_quotient].ptr_branch)[tree_index] = (uint32_t *)calloc(IDX_ADJ_BRCH_SIZE, sizeof(uint32_t))) == NULL){
                     *err_flag = 1;
                     goto free_memory;
                 }
@@ -1496,7 +1519,7 @@ out_idx* fui_bitmap_idx_dtree(const int *input_arr, const uint_32 num_elems, uin
         }
         else if(raw_index_range == 16 ) {
             if((((idx_ht_16 *)idx_adj_head)[tmp_quotient].ptr_branch)[tree_index] == NULL) {
-                if((((idx_ht_16 *)idx_adj_head)[tmp_quotient].ptr_branch[tree_index] = (uint_16 *)calloc(IDX_ADJ_BRCH_SIZE, sizeof(uint_16))) == NULL){
+                if((((idx_ht_16 *)idx_adj_head)[tmp_quotient].ptr_branch[tree_index] = (uint16_t *)calloc(IDX_ADJ_BRCH_SIZE, sizeof(uint16_t))) == NULL){
                     *err_flag = 1;
                     goto free_memory;
                 }
@@ -1504,7 +1527,7 @@ out_idx* fui_bitmap_idx_dtree(const int *input_arr, const uint_32 num_elems, uin
         }
         else{
             if((((idx_ht_8 *)idx_adj_head)[tmp_quotient].ptr_branch)[tree_index] == NULL) {
-                if(((((idx_ht_8 *)idx_adj_head)[tmp_quotient].ptr_branch)[tree_index] = (uint_8 *)calloc(IDX_ADJ_BRCH_SIZE, sizeof(uint_8))) == NULL){
+                if(((((idx_ht_8 *)idx_adj_head)[tmp_quotient].ptr_branch)[tree_index] = (uint8_t *)calloc(IDX_ADJ_BRCH_SIZE, sizeof(uint8_t))) == NULL){
                     *err_flag = 1;
                     goto free_memory;
                 }
@@ -1531,10 +1554,10 @@ out_idx* fui_bitmap_idx_dtree(const int *input_arr, const uint_32 num_elems, uin
             (((idx_ht_32 *)idx_adj_head)[tmp_quotient].ptr_branch[tree_index])[tmp_mod] = i;
         }
         else if(raw_index_range == 16 ) {
-            ((idx_ht_16 *)idx_adj_head)[tmp_quotient].ptr_branch[tree_index][tmp_mod] = (uint_16)i;
+            ((idx_ht_16 *)idx_adj_head)[tmp_quotient].ptr_branch[tree_index][tmp_mod] = (uint16_t)i;
         }
         else{
-            (((idx_ht_8 *)idx_adj_head)[tmp_quotient].ptr_branch[tree_index])[tmp_mod] = (uint_8)i;
+            (((idx_ht_8 *)idx_adj_head)[tmp_quotient].ptr_branch[tree_index])[tmp_mod] = (uint8_t)i;
         }
     }
 free_memory:
@@ -1581,7 +1604,7 @@ int hash_64_to_32(int_64bit in64) {
     return (folded ^ rotated);
 }
 
-int_64bit* transform_32_to_64_arr(const int *arr_input_32, uint_32 num_elems, const char *option) {
+int_64bit* transform_32_to_64_arr(const int *arr_input_32, uint32_t num_elems, const char *option) {
     if(arr_input_32 == NULL) {
         return NULL;
     }
@@ -1590,7 +1613,7 @@ int_64bit* transform_32_to_64_arr(const int *arr_input_32, uint_32 num_elems, co
         return NULL;
     }
     srand(time(0));
-    for(uint_32 i = 0; i < num_elems; i++) {
+    for(uint32_t i = 0; i < num_elems; i++) {
         if(option == NULL || strlen(option) == 0) {
             arr_64[i] = (int_64bit)(arr_input_32[i]);
         }
@@ -1607,13 +1630,13 @@ int_64bit* transform_32_to_64_arr(const int *arr_input_32, uint_32 num_elems, co
     return arr_64;
 }
 
-out_idx_i64* fui_bitmap_dtree_idx_64(const int_64bit *input_arr, const uint_32 num_elems, uint_32 *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head) {
+out_idx_i64* fui_bitmap_dtree_idx_64(const int_64bit *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head) {
     *err_flag = 0;
     *num_elems_out = 0;
-    uint_32 num_elems_out_32 = 0;
+    uint32_t num_elems_out_32 = 0;
     int err_flag_local = 0;
     dup_idx_list *dup_idx_list_32 = NULL;
-    uint_32 i = 0;
+    uint32_t i = 0;
     int* input_arr_hash = (int *)calloc(num_elems, sizeof(int));
     if(input_arr_hash == NULL) {
         *err_flag = -9;

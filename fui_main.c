@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <stdint.h>
 #include "filter_uniq_ints.h"
 
 /**
@@ -25,7 +26,7 @@ int main(int argc, char** argv) {
     if(argc > 3 && strcmp(argv[3], "brute") == 0) {
         with_brute = 1;
     }
-    uint_32 num_elems, rand_max;
+    uint32_t num_elems, rand_max;
     
     if(string_to_u32_num(argv[1], &num_elems) != 0 || string_to_u32_num(argv[2], &rand_max) != 0) {
         printf("ERROR: arguments illegal. Make sure they are plain positive numbers and < 4,294,967,296.\n");
@@ -38,7 +39,7 @@ int main(int argc, char** argv) {
         return 5;
     }
     int err_flag = 0;
-    uint_32 num_elems_out = 0, num_elems_out_idx = 0;
+    uint32_t num_elems_out = 0, num_elems_out_idx = 0;
     clock_t start, end;
 
     int *out_brute_opt = NULL;
@@ -62,7 +63,7 @@ int main(int argc, char** argv) {
         free(arr_input);
         return 7;
     }
-    for(uint_32 i = 0; i < num_elems; i++) {
+    for(uint32_t i = 0; i < num_elems; i++) {
         fprintf(file_p, "%d\n", arr_input[i]);
     }
     fclose(file_p);
@@ -150,7 +151,7 @@ int main(int argc, char** argv) {
         free(arr_input);
         return 7;
     }
-    for(uint_32 i = 0; i < num_elems; i++) {
+    for(uint32_t i = 0; i < num_elems; i++) {
         fprintf(file_p, "%d\n", arr_input[i]);
     }
     fclose(file_p);
