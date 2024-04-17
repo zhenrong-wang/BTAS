@@ -12,7 +12,9 @@ This article reviewed a dynamic bitmap algorithm set - the **BitTree Algorithm S
 
 This algorithm set originated from an engineering problem: removing duplicate elements from a given dataset. This problem is very important for processing or preprocessing various types of raw data. In many cases, duplicate elements undermine the data quality, distort the analysis results, and thus mislead technical or business decisions. Here is a simple example to demonstrate the problem:
 
-Given an array: `{10, 38895, 775, *10*, *38895*, 77899023, 892, *38895*}`
+Given an array: 
+
+`{10, 38895, 775, *10*, *38895*, 77899023, 892, *38895*}`
 
 The algorithm is expected to remove the duplicate elements and filter the unique elements out to:
 
@@ -148,9 +150,12 @@ There are 3 sets of benchmark environment:
 - **Operating System:** Ubuntu 22.04 LTS
 - **Compiler:** gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0
 
-- EnvSet A is for larger dataset benchmark because it has more hardware resource available;
-- EnvSet B is for small dataset benchmark;
-- EnvSet C is for benchmarking against database engines.
+
+EnvSet A is for larger dataset benchmark because it has more hardware resource available;
+
+EnvSet B is for small dataset benchmark;
+
+EnvSet C is for benchmarking against database engines.
 
 **GCC Compiling options:** `-Ofast`
 
@@ -233,7 +238,6 @@ Round GROWING (time in second):
 **Performance Comparison Summary**
 ```
 DB engine time elapsed / BTS time elapsed:
-
                | MariaDB/ | Postgres/ |  Redis/ |  
 | {1M,  200k}  |  110     |  75       |  1732   |
 | {10M, 20M}   |  188     |  55       |  1562   |
@@ -241,6 +245,7 @@ DB engine time elapsed / BTS time elapsed:
 | {100M, 200M} |  78      |  47       |  N/A    |
 
 ```
+
 The superiority got proved by the benchmarks above.
 
 # 4. Summary
