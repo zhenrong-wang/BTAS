@@ -194,8 +194,9 @@ Round GROWING (time in second):
 
 **Steps:**
 
-- Run BTAS executable and generate the `random.csv`
-- Run command `cp -r random.csv /tmp`
+- Build the BTAS executable: `gcc -Wall -Ofast *.c -o btas.run`
+- Run BTAS executable with the 2 args and generate the `random.csv`: E.g(*NOTE*). `./btas.run 1000000 1000000`
+- Run command `cp -r random.csv /tmp/` to copy the dataset to /tmp/
 - For **Postgres**:
   - Enter local postgres: `sudo -u postgres psql` to enter local postgresql
   - Create a table: `CREATE TABLE table_name (col INT);`
@@ -211,6 +212,14 @@ Round GROWING (time in second):
 - For **Redis**:
   - Make sure the redis-python has installed: `pip3 install redis`
   - Run `python3 redis_benchmark.py`
+
+*NOTE*: There are 4 groups, the command line args are:
+```
+{1M, 200k}: ./btas.run 1000000 100000
+{10M, 20M}: ./btas.run 10000000 10000000
+{100M, 20M}: ./btas.run 100000000 10000000
+{100M, 200M}: ./btas.run 100000000 100000000
+```
 
 **Round RANDOM (time in second):**
 ```

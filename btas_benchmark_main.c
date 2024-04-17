@@ -53,10 +53,7 @@ int main(int argc, char** argv) {
     generate_random_input_arr(arr_input, num_elems, rand_max);
     //print_arr(arr_input, num_elems, 100);
     
-  /**
-   * Please uncomment the FILE I/O part if you'd like to write the arr_input
-   * to a file.
-   * 
+    printf("WRITING DATASET TO random.csv ...\n");
     FILE* file_p=fopen("random.csv","wb+");
     if(file_p == NULL){
         free(arr_input);
@@ -66,7 +63,7 @@ int main(int argc, char** argv) {
         fprintf(file_p, "%d\n", arr_input[i]);
     }
     fclose(file_p);
-   */
+
     printf("RANDOM ARRAY INPUT:\n");
     printf("ALGO_TYPE\tTIME_IN_SEC\tUNIQUE_INTEGERS\n");
     
