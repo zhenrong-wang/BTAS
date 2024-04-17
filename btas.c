@@ -83,10 +83,10 @@ int string_to_u32_num(const char* string, uint32_t *unsigned_num) {
  *  NULL if any error happens
  * 
  */
-int* fui_brute(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag){
+int32_t* fui_brute(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag){
     uint32_t i, j = 1, k;
-    int tmp = 0;
-    int *final_output_arr = NULL;
+    int32_t tmp = 0;
+    int32_t *final_output_arr = NULL;
     *err_flag = 0;
     *num_elems_out = 0;
     if (input_arr == NULL) {
@@ -97,7 +97,7 @@ int* fui_brute(const int *input_arr, const uint32_t num_elems, uint32_t *num_ele
         *err_flag = -3;
         return NULL;
     }
-    int *output_arr = (int *)calloc(num_elems, sizeof(int));
+    int32_t *output_arr = (int32_t *)calloc(num_elems, sizeof(int32_t));
     if (output_arr == NULL) {
         *err_flag = -1;
         return NULL;
@@ -115,7 +115,7 @@ int* fui_brute(const int *input_arr, const uint32_t num_elems, uint32_t *num_ele
             j++;
         }
     }
-    final_output_arr = (int *)realloc(output_arr, j*sizeof(int));
+    final_output_arr = (int32_t *)realloc(output_arr, j*sizeof(int32_t));
     if(final_output_arr == NULL) {
         free(output_arr);
         *err_flag = 1;
@@ -143,11 +143,11 @@ int* fui_brute(const int *input_arr, const uint32_t num_elems, uint32_t *num_ele
  *  NULL if any error happens
  * 
  */
-int* fui_brute_opt(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag){
+int32_t* fui_brute_opt(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag){
     uint32_t i, j = 1, k;
-    int max_current, min_current, diff_to_max = 0, diff_to_min = 0, tmp_diff_to_max = 0, tmp_diff_to_min = 0;
-    int tmp = 0;
-    int *final_output_arr = NULL;
+    int32_t max_current, min_current, diff_to_max = 0, diff_to_min = 0, tmp_diff_to_max = 0, tmp_diff_to_min = 0;
+    int32_t tmp = 0;
+    int32_t *final_output_arr = NULL;
     *err_flag = 0;
     *num_elems_out = 0;
     if (input_arr == NULL) {
@@ -158,7 +158,7 @@ int* fui_brute_opt(const int *input_arr, const uint32_t num_elems, uint32_t *num
         *err_flag = -3;
         return NULL;
     }
-    int *output_arr = (int *)calloc(num_elems, sizeof(int));
+    int32_t *output_arr = (int32_t *)calloc(num_elems, sizeof(int32_t));
     if (output_arr == NULL) {
         *err_flag = -1;
         return NULL;
@@ -207,7 +207,7 @@ int* fui_brute_opt(const int *input_arr, const uint32_t num_elems, uint32_t *num
             j++;
         }
     }
-    final_output_arr = (int *)realloc(output_arr, j*sizeof(int));
+    final_output_arr = (int32_t *)realloc(output_arr, j*sizeof(int32_t));
     if(final_output_arr == NULL) {
         free(output_arr);
         *err_flag = 1;
@@ -243,11 +243,11 @@ void free_hash_table(uint8_t *hash_table[], uint32_t num_elems) {
  *  NULL if any error happens
  * 
  */
-int* fui_htable_dtree(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag) {
+int32_t* fui_htable_dtree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag) {
     uint32_t i, j = 0;
     uint32_t tmp_quotient = 0, tmp_mod = 0;
-    int tmp = 0;
-    int *final_output_arr = NULL;
+    int32_t tmp = 0;
+    int32_t *final_output_arr = NULL;
     uint8_t *hash_table_base_p[HASH_TABLE_SIZE] = {NULL,};
     uint8_t *hash_table_base_n[HASH_TABLE_SIZE] = {NULL,};
     *err_flag = 0;
@@ -260,7 +260,7 @@ int* fui_htable_dtree(const int *input_arr, const uint32_t num_elems, uint32_t *
         *err_flag = -3;
         return NULL;
     }
-    int *output_arr = (int *)calloc(num_elems, sizeof(int));
+    int32_t *output_arr = (int32_t *)calloc(num_elems, sizeof(int32_t));
     if (output_arr == NULL) {
         *err_flag = -1;
         return NULL;
@@ -307,7 +307,7 @@ free_memory:
         free(output_arr);
         return NULL;
     }
-    final_output_arr = (int *)realloc(output_arr, j*sizeof(int));
+    final_output_arr = (int32_t *)realloc(output_arr, j*sizeof(int32_t));
     if(final_output_arr == NULL) {
         free(output_arr);
         *err_flag = 3;
@@ -346,11 +346,11 @@ void free_hash_table_new(htable_base hash_table_new[], uint32_t num_elems) {
  *  NULL if any error happens
  * 
  */
-int* fui_htable_stree(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag) {
+int32_t* fui_htable_stree(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag) {
     uint32_t i, j = 0;
     uint32_t tmp_quotient = 0, tmp_mod = 0;
-    int tmp = 0;
-    int *final_output_arr = NULL;
+    int32_t tmp = 0;
+    int32_t *final_output_arr = NULL;
     uint8_t *tmp_realloc_ptr = NULL;
     htable_base hash_table_base[HASH_TABLE_SIZE] = {{0, 0, NULL, NULL},};
     *err_flag = 0;
@@ -363,7 +363,7 @@ int* fui_htable_stree(const int *input_arr, const uint32_t num_elems, uint32_t *
         *err_flag = -3;
         return NULL;
     }
-    int *output_arr = (int *)calloc(num_elems, sizeof(int));
+    int32_t *output_arr = (int32_t *)calloc(num_elems, sizeof(int32_t));
     if (output_arr == NULL) {
         *err_flag = -1;
         return NULL;
@@ -441,7 +441,7 @@ free_memory:
         free(output_arr);
         return NULL;
     }
-    final_output_arr = (int *)realloc(output_arr, j*sizeof(int));
+    final_output_arr = (int32_t *)realloc(output_arr, j*sizeof(int32_t));
     if(final_output_arr == NULL) {
         free(output_arr);
         *err_flag = 3;
@@ -470,11 +470,11 @@ free_memory:
  *  NULL if any error happens
  * 
  */
-int* fui_htable_stree_dyn(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag) {
+int32_t* fui_htable_stree_dyn(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag) {
     uint32_t i, j = 0;
     uint32_t tmp_quotient = 0, tmp_mod = 0;
-    int tmp = 0;
-    int *final_output_arr = NULL;
+    int32_t tmp = 0;
+    int32_t *final_output_arr = NULL;
     uint8_t *tmp_realloc_ptr = NULL;
     htable_base *hash_table_base = NULL, *tmp_ht_realloc_ptr = NULL;
     uint32_t ht_base_length = HT_DYN_INI_SIZE;
@@ -493,7 +493,7 @@ int* fui_htable_stree_dyn(const int *input_arr, const uint32_t num_elems, uint32
         *err_flag = 5;
         return NULL;
     }
-    int *output_arr = (int *)calloc(num_elems, sizeof(int));
+    int32_t *output_arr = (int32_t *)calloc(num_elems, sizeof(int32_t));
     if (output_arr == NULL) {
         free(hash_table_base);
         *err_flag = -1;
@@ -582,7 +582,7 @@ free_memory:
         free(output_arr);
         return NULL;
     }
-    final_output_arr = (int *)realloc(output_arr, j*sizeof(int));
+    final_output_arr = (int32_t *)realloc(output_arr, j*sizeof(int32_t));
     if(final_output_arr == NULL) {
         free(output_arr);
         *err_flag = 3;
@@ -604,7 +604,7 @@ free_memory:
  *  void
  * 
  */
-void print_arr(const int *arr, uint32_t num_elems, uint32_t max_elems) {
+void print_arr(const int32_t *arr, uint32_t num_elems, uint32_t max_elems) {
     if(arr == NULL || num_elems < 1) {
         printf("ERROR: NULL array input.\n");
         return;
@@ -622,7 +622,7 @@ void print_arr(const int *arr, uint32_t num_elems, uint32_t max_elems) {
     printf("\n");
 }
 
-int compare_arr(const int *arr_a, const int *arr_b, uint32_t num_elems) {
+int compare_arr(const int32_t *arr_a, const int32_t *arr_b, uint32_t num_elems) {
     if(arr_a == NULL || arr_b == NULL) {
         return -3;
     }
@@ -653,8 +653,8 @@ int compare_arr(const int *arr_a, const int *arr_b, uint32_t num_elems) {
  *  -1 if the rand_max is 0
  * 
  */
-int generate_random_input_arr(int *arr, uint32_t num_elems, uint32_t rand_max) {
-    int sign_flag, rand_num;
+int generate_random_input_arr(int32_t *arr, uint32_t num_elems, uint32_t rand_max) {
+    int32_t sign_flag, rand_num;
     if(arr == NULL) {
         return -5;
     }
@@ -699,7 +699,7 @@ int generate_random_input_arr(int *arr, uint32_t num_elems, uint32_t rand_max) {
  *  -3 if the num_elems is 0
  * 
  */
-int generate_growing_arr(int *arr, uint32_t num_elems) {
+int generate_growing_arr(int32_t *arr, uint32_t num_elems) {
     if(arr == NULL) {
         return -5;
     }
@@ -992,10 +992,10 @@ void free_idx_ht_32(idx_ht_32 *idx_ht_head, uint16_t num_elems) {
     }
 }
 
-int* fui_bitmap_stc_stree(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag) {
+int32_t* fui_bitmap_stc_stree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag) {
     uint32_t i, j = 0;
     uint32_t tmp_quotient = 0, tmp_mod = 0;
-    int tmp = 0, *final_output_arr = NULL;
+    int32_t tmp = 0, *final_output_arr = NULL;
     bitmap_base bitmap_head[BITMAP_LENGTH_MAX] = {{0, NULL},};
     uint16_t tmp_byte_index = 0;
     uint8_t tmp_bit_position = 0;
@@ -1009,7 +1009,7 @@ int* fui_bitmap_stc_stree(const int *input_arr, const uint32_t num_elems, uint32
         *err_flag = -3;
         return NULL;
     }
-    int *output_arr = (int *)calloc(num_elems, sizeof(int));
+    int32_t *output_arr = (int32_t *)calloc(num_elems, sizeof(int32_t));
     if (output_arr == NULL) {
         *err_flag = -1;
         return NULL;
@@ -1039,7 +1039,7 @@ free_memory:
         free(output_arr);
         return NULL;
     }
-    final_output_arr = (int *)realloc(output_arr, j * sizeof(int));
+    final_output_arr = (int32_t *)realloc(output_arr, j * sizeof(int32_t));
     if(final_output_arr == NULL) {
         free(output_arr);
         *err_flag = 3;
@@ -1049,10 +1049,10 @@ free_memory:
     return final_output_arr;
 }
 
-int* fui_bitmap_dyn_stree(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag) {
+int32_t* fui_bitmap_dyn_stree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag) {
     uint32_t i, j = 0;
     uint32_t tmp_quotient = 0, tmp_mod = 0;
-    int tmp = 0, *final_output_arr = NULL;
+    int32_t tmp = 0, *final_output_arr = NULL;
     bitmap_base *bitmap_head = NULL, *tmp_bitmap_realloc = NULL;
     uint16_t tmp_byte_index = 0, bitmap_base_size = BITMAP_INIT_LENGTH, bitmap_base_size_target = 0;
     uint8_t tmp_bit_position = 0;
@@ -1071,7 +1071,7 @@ int* fui_bitmap_dyn_stree(const int *input_arr, const uint32_t num_elems, uint32
         *err_flag = 5;
         return NULL;
     }
-    int *output_arr = (int *)calloc(num_elems, sizeof(int));
+    int32_t *output_arr = (int32_t *)calloc(num_elems, sizeof(int32_t));
     if (output_arr == NULL) {
         free(bitmap_head);
         *err_flag = -1;
@@ -1115,7 +1115,7 @@ free_memory:
         free(output_arr);
         return NULL;
     }
-    final_output_arr = (int *)realloc(output_arr, j * sizeof(int));
+    final_output_arr = (int32_t *)realloc(output_arr, j * sizeof(int32_t));
     if(final_output_arr == NULL) {
         free(output_arr);
         *err_flag = 3;
@@ -1125,10 +1125,10 @@ free_memory:
     return final_output_arr;
 }
 
-int* fui_bitmap_dyn_dtree(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag) {
+int32_t* fui_bitmap_dyn_dtree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag) {
     uint32_t i, j = 0;
     uint16_t tmp_quotient = 0, tmp_mod = 0;
-    int tmp = 0, *final_output_arr = NULL;
+    int32_t tmp = 0, *final_output_arr = NULL;
     bitmap_dtree *bitmap_head = NULL, *tmp_bitmap_realloc = NULL;
     uint16_t tmp_byte_index = 0, bitmap_base_size = BITMAP_INIT_LENGTH, bitmap_base_size_target = 0;
     uint8_t tmp_bit_position = 0;
@@ -1148,7 +1148,7 @@ int* fui_bitmap_dyn_dtree(const int *input_arr, const uint32_t num_elems, uint32
         *err_flag = 5;
         return NULL;
     }
-    int *output_arr = (int *)calloc(num_elems, sizeof(int));
+    int32_t *output_arr = (int32_t *)calloc(num_elems, sizeof(int32_t));
     if (output_arr == NULL) {
         free(bitmap_head);
         *err_flag = -1;
@@ -1193,7 +1193,7 @@ free_memory:
         free(output_arr);
         return NULL;
     }
-    final_output_arr = (int *)realloc(output_arr, j * sizeof(int));
+    final_output_arr = (int32_t *)realloc(output_arr, j * sizeof(int32_t));
     if(final_output_arr == NULL) {
         free(output_arr);
         *err_flag = 3;
@@ -1202,11 +1202,12 @@ free_memory:
     *num_elems_out = j;
     return final_output_arr;
 }
-out_idx* fui_bitmap_idx_stree(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head) {
+
+out_idx* fui_bitmap_idx_stree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head) {
     uint32_t i, j = 0;
     uint32_t tmp_dup_raw_index;
     uint16_t tmp_quotient = 0, tmp_mod = 0;
-    int tmp = 0;
+    int32_t tmp = 0;
     out_idx *final_output_arr = NULL;
     bitmap_base *bitmap_head = NULL, *tmp_bitmap_head = NULL;
     uint8_t tree_index_idx = 0;
@@ -1394,11 +1395,11 @@ free_memory:
     return final_output_arr;
 }
 
-out_idx* fui_bitmap_idx_dtree(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head) {
+out_idx* fui_bitmap_idx_dtree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head) {
     uint32_t i, j = 0;
     uint32_t tmp_dup_raw_index;
     uint16_t tmp_quotient = 0, tmp_mod = 0;
-    int tmp = 0;
+    int32_t tmp = 0;
     out_idx *final_output_arr = NULL;
     bitmap_dtree *bitmap_head = NULL, *tmp_bitmap_head = NULL;
     uint8_t tree_index = 0;

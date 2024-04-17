@@ -13,6 +13,27 @@
 #include <stdint.h> /* C99 is required. */
 
 /**
+ * If the header failed to get included. Define the types by typedefs.
+ * 
+ * PORTABILITY WARNING: we assert the widths below, meaning that the portability
+ * is not fully-guaranteed! 
+ * PLEASE DO CHECK THE WIDTH AND MODIFY THE typedefs ACCORDINGLY!
+ */
+#ifndef _STDINT_H
+typedef unsigned long long  uint64_t
+typedef signed long long    int64_t
+
+typedef unsigned int        uint32_t
+typedef signed int          int32_t
+
+typedef unsigned short      uint16_t
+typedef signed short        int16_t
+
+typedef unsigned char       uint8_t
+typedef signed char         int8_t
+#endif
+
+/**
  * Section A. Auxiliary functions:
  *  - Convert a string to an unsigned 32bit number
  *  - Print out an array
@@ -21,16 +42,16 @@
  *  - Generate a GROWING input signed integer array
  */
 int string_to_u32_num(const char* string, uint32_t *unsigned_num);
-void print_arr(const int *arr, uint32_t num_elems, uint32_t max_elems);
-int compare_arr(const int *arr_a, const int *arr_b, uint32_t num_elems);
-int generate_random_input_arr(int *arr, uint32_t num_elems, uint32_t rand_max);
-int generate_growing_arr(int *arr, uint32_t num_elems);
+void print_arr(const int32_t *arr, uint32_t num_elems, uint32_t max_elems);
+int compare_arr(const int32_t *arr_a, const int32_t *arr_b, uint32_t num_elems);
+int generate_random_input_arr(int32_t *arr, uint32_t num_elems, uint32_t rand_max);
+int generate_growing_arr(int32_t *arr, uint32_t num_elems);
 
 /**
  * Section B. Brute and Brute-Opt algorithms
  */
-int* fui_brute(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
-int* fui_brute_opt(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
+int32_t* fui_brute(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
+int32_t* fui_brute_opt(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
 
 /**
  * Section C. HASH_TABLE algorithms. 
@@ -52,9 +73,9 @@ typedef struct {
 
 void free_hash_table(uint8_t *hash_table[], uint32_t num_elems);
 void free_hash_table_new(htable_base hash_table_new[], uint32_t num_elems);
-int* fui_htable_dtree(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
-int* fui_htable_stree(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
-int* fui_htable_stree_dyn(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
+int32_t* fui_htable_dtree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
+int32_t* fui_htable_stree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
+int32_t* fui_htable_stree_dyn(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
 
 /**
  * Section D. BitTree Algorithms.
@@ -83,7 +104,7 @@ struct dup_idx_struct {
 typedef struct dup_idx_struct       dup_idx_list;
 
 typedef struct {
-    int out_elem;
+    int32_t out_elem;
     uint32_t raw_index;
 } out_idx;
 
@@ -127,11 +148,11 @@ void free_idx_ht_8(idx_ht_8 *idx_ht_head, uint16_t num_elems);
 void free_idx_ht_16(idx_ht_16 *idx_ht_head, uint16_t num_elems);
 void free_idx_ht_32(idx_ht_32 *idx_ht_head, uint16_t num_elems);
 
-int* fui_bitmap_stc_stree(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
-int* fui_bitmap_dyn_stree(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
-int* fui_bitmap_dyn_dtree(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
-out_idx* fui_bitmap_idx_stree(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head);
-out_idx* fui_bitmap_idx_dtree(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head);
+int32_t* fui_bitmap_stc_stree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
+int32_t* fui_bitmap_dyn_stree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
+int32_t* fui_bitmap_dyn_dtree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
+out_idx* fui_bitmap_idx_stree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head);
+out_idx* fui_bitmap_idx_dtree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head);
 
 
 /**

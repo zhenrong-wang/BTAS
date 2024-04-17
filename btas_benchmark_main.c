@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <stdint.h>
 #include "btas.h"
 
 /**
@@ -33,7 +32,7 @@ int main(int argc, char** argv) {
         return 3;
     }
     printf("INPUT_ELEMS:\t%u\nRANDOM_MAX:\t%u\n\n",num_elems, rand_max);
-    int *arr_input = (int *)malloc(sizeof(int) * num_elems);
+    int32_t *arr_input = (int32_t *)malloc(sizeof(int32_t) * num_elems);
     if(arr_input == NULL) {
         printf("ERROR: Failed to allocate memory for input array.\n");
         return 5;
@@ -42,13 +41,13 @@ int main(int argc, char** argv) {
     uint32_t num_elems_out = 0, num_elems_out_idx = 0;
     clock_t start, end;
 
-    int *out_brute_opt = NULL;
-    int *out_brute = NULL;
-    int *out_ht_dtree = NULL;
-    int *out_ht_stree = NULL;
-    int *out_ht_dyn = NULL;
-    int *out_bit_dyn = NULL;
-    int *out_bit_stc = NULL;
+    int32_t *out_brute_opt = NULL;
+    int32_t *out_brute = NULL;
+    int32_t *out_ht_dtree = NULL;
+    int32_t *out_ht_stree = NULL;
+    int32_t *out_ht_dyn = NULL;
+    int32_t *out_bit_dyn = NULL;
+    int32_t *out_bit_stc = NULL;
     out_idx *out_bit_dyn_idx = NULL;
 
     generate_random_input_arr(arr_input, num_elems, rand_max);
