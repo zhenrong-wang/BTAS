@@ -20,17 +20,28 @@
  * PLEASE DO CHECK THE WIDTH AND MODIFY THE typedefs ACCORDINGLY!
  */
 #ifndef _STDINT_H
-typedef unsigned long long  uint64_t
-typedef signed long long    int64_t
-
-typedef unsigned int        uint32_t
-typedef signed int          int32_t
-
-typedef unsigned short      uint16_t
-typedef signed short        int16_t
-
-typedef unsigned char       uint8_t
-typedef signed char         int8_t
+typedef unsigned long long  uint64_t;
+typedef signed long long    int64_t;
+typedef unsigned char       uint8_t;
+typedef signed char         int8_t;
+    #if defined(__GNUC__) || defined(__clang__)
+        #if __SIZEOF_INT__ < 4
+        typedef unsigned long       uint32_t;
+        typedef signed long         int32_t;
+        typedef unsigned int        uint16_t;
+        typedef signed int          int16_t;
+        #else
+        typedef unsigned int        uint32_t;
+        typedef signed int          int32_t;
+        typedef unsigned short      uint16_t;
+        typedef signed short        int16_t;
+        #endif
+    #else
+    typedef unsigned int        uint32_t;
+    typedef signed int          int32_t;
+    typedef unsigned short      uint16_t;
+    typedef signed short        int16_t;
+    #endif
 #endif
 
 /**
