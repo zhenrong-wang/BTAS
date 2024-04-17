@@ -125,7 +125,7 @@ We did benchmark with 2 rounds:
 - **RANDOM  round:** an array with randomly-generated signed integers.
 - **GROWING round:** an perfectly sorted array {0, 1, 2, 3,...}.
 
-There are 2 sets of benchmark environment:
+There are 3 sets of benchmark environment:
 
 **EnvSet A - Physical Machine:**
 
@@ -134,18 +134,27 @@ There are 2 sets of benchmark environment:
 - **Operating System:** Windows 11 - 23H2
 - **Compiler:** gcc (x86_64-posix-seh-rev0, Built by MinGW-W64 project) 8.1.0
 
-**EnvSet B: - Virtual Machine**
+**EnvSet B: - Virtual Machine1**
 
 - **CPU:** AMD Ryzen 7 PRO 6850HS with Radeon Graphics, 3.20 GHz, 2 vCPUs
 - **Memory:** Allocated 4 GB
 - **Operating System:** Ubuntu 18.04 LTS
 - **Compiler:** gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0
 
-Set A is for larger dataset benchmark because it has more hardware resource available; Set B is for small dataset benchmark.
+**EnvSet C: - Virtual Machine2**
+
+- **CPU:** AMD Ryzen 7 PRO 6850HS with Radeon Graphics, 3.20 GHz, 2 vCPUs
+- **Memory:** Allocated 8 GB
+- **Operating System:** Ubuntu 22.04 LTS
+- **Compiler:** gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0
+
+- EnvSet A is for larger dataset benchmark because it has more hardware resource available;
+- EnvSet B is for small dataset benchmark;
+- EnvSet C is for benchmarking against database engines.
 
 **GCC Compiling options:** `-Ofast`
 
-### 3.2 Results
+### 3.2 Benchmark Among Algorithms
 
 Preliminery results is summarized as below. Each pair {A, B}, A is the size of the raw/original/input array. B is the space of randomness.
 
@@ -173,11 +182,56 @@ Round GROWING (time in second):
  *UNIQUE*        ALL           ALL           ALL
 ```
 
-We also ran **mariaDB** {Ver 15.1 Distrib 10.1.48-MariaDB, for debian-linux-gnu (x86_64) using readline 5.2} to process the same datasets against the **BTAS**.
+## 3.3 Benchmark Against Database Engines
 
-- For an input array `{1M, 10k}`, **BTAS** cost only `0.0035` sec while **mariaDB** cost `0.81 sec`. The **BTAS** was **231** times faster.
-- For an input array `{10M, 100M}`, **BTAS** cost `0.57 sec` while **mariaDB** cost `7 min 34.48sec`. The **BTAS** was **1000** times faster.
+**EnvSet C** was used to benchmark against DB Engines. Only RANDOM Round executed.
 
+**Versions**:
+
+- **Postgres**: psql (PostgreSQL) 14.11 (Ubuntu 14.11-0ubuntu0.22.04.1)
+- **mariaDB**: mariadb  Ver 15.1 Distrib 10.6.16-MariaDB, for debian-linux-gnu (x86_64) using  EditLine wrapper
+- **Redis**: Redis server v=6.0.16 sha=00000000:0 malloc=jemalloc-5.2.1 bits=64 build=a3fdef44459b3ad6
+
+**Steps:**
+
+- Run BTAS executable and generate the `random.csv`
+- Run command `cp -r random.csv /tmp`
+- For **Postgres**:
+  - Enter local postgres: `sudo -u postgres psql` to enter local postgresql
+  - Create a table: `CREATE TABLE table_name (col INT);`
+  - Copy data from /tmp/random.csv: `\COPY table_name (col) FROM '/tmp/random.csv' WITH CSV;`
+  - Validate the result: `SELECT COUNT(DISTINCT col) FROM TABLE_NAME;`
+  - Get the time elapsed: `EXPLAIN ANALYZE SELECT COUNT(DISTINCT col) FROM TABLE_NAME;`
+- For **mariaDB**:
+  - Enter local mariaDB: `sudo mysql -uroot -pxxxxxxxxxx`
+  - Change the database: `use mysql;`
+  - Create a table: `CREATE TABLE table_name (col INT);`
+  - Load data from /tmp/random.csv: `LOAD DATA LOCAL INFILE '/tmp/random.csv' INTO TABLE table_name;`
+  - Get the result and time elapsed: `SELECT COUNT(DISTINCT col) FROM TABLE_NAME;`
+- For **Redis**:
+  - Make sure the redis-python has installed: `pip3 install redis`
+  - Run `python3 redis_benchmark.py`
+
+**Round RANDOM (time in second):**
+```
+               | MariaDB | Postgres |  Redis  |   BTS    | *UNIQUE* |
+| {1M,  200k}  |  0.571  |  0.3874  |  8.98   | 0.005185 | 198658   |
+| {10M, 20M}   |  14.863 |  4.3673  |  123.70 | 0.079195 | 7869066  |
+| {100M, 20M}  |  172.51 |  85.042  |  OOM    | 0.763641 | 19865391 |
+| {100M, 200M} |  193.10 |  117.289 |  OOM    | 2.480953 | 78686830 |
+```
+
+**Performance Comparison Summary**
+```
+DB engine time elapsed / BTS time elapsed:
+
+               | MariaDB/ | Postgres/ |  Redis/ |  
+| {1M,  200k}  |  110     |  75       |  1732   |
+| {10M, 20M}   |  188     |  55       |  1562   |
+| {100M, 20M}  |  226     |  111      |  N/A    |
+| {100M, 200M} |  78      |  47       |  N/A    |
+
+```
 The superiority got proved by the benchmarks above.
 
 # 4. Summary
