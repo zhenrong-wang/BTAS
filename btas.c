@@ -11,8 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <stdint.h>
-#include "filter_uniq_ints.h"
+#include "btas.h"
 
 /**
  * @brief Convert a *unsigned* string ('\0' terminated!) 
