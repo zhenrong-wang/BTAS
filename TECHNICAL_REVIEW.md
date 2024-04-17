@@ -203,20 +203,20 @@ Round GROWING (time in second):
 - Run BTAS executable with the 2 args and generate the `random.csv`: E.g(*NOTE*). `./btas.run 1000000 1000000`
 - Run command `cp -r random.csv /tmp/` to copy the dataset to /tmp/
 - For **Postgres**:
-  - Enter local postgres: `sudo -u postgres psql` to enter local postgresql
-  - Create a table: `CREATE TABLE table_name (col INT);`
-  - Copy data from /tmp/random.csv: `\COPY table_name (col) FROM '/tmp/random.csv' WITH CSV;`
-  - Validate the result: `SELECT COUNT(DISTINCT col) FROM TABLE_NAME;`
-  - Get the time elapsed: `EXPLAIN ANALYZE SELECT COUNT(DISTINCT col) FROM TABLE_NAME;`
+    - Enter local postgres: `sudo -u postgres psql` to enter local postgresql
+    - Create a table: `CREATE TABLE table_name (col INT);`
+    - Copy data from /tmp/random.csv: `\COPY table_name (col) FROM '/tmp/random.csv' WITH CSV;`
+    - Validate the result: `SELECT COUNT(DISTINCT col) FROM TABLE_NAME;`
+    - Get the time elapsed: `EXPLAIN ANALYZE SELECT COUNT(DISTINCT col) FROM TABLE_NAME;`
 - For **mariaDB**:
-  - Enter local mariaDB: `sudo mysql -uroot -pxxxxxxxxxx`
-  - Change the database: `use mysql;`
-  - Create a table: `CREATE TABLE table_name (col INT);`
-  - Load data from /tmp/random.csv: `LOAD DATA LOCAL INFILE '/tmp/random.csv' INTO TABLE table_name;`
-  - Get the result and time elapsed: `SELECT COUNT(DISTINCT col) FROM TABLE_NAME;`
+    - Enter local mariaDB: `sudo mysql -uroot -pxxxxxxxxxx`
+    - Change the database: `use mysql;`
+    - Create a table: `CREATE TABLE table_name (col INT);`
+    - Load data from /tmp/random.csv: `LOAD DATA LOCAL INFILE '/tmp/random.csv' INTO TABLE table_name;`
+    - Get the result and time elapsed: `SELECT COUNT(DISTINCT col) FROM TABLE_NAME;`
 - For **Redis**:
-  - Make sure the redis-python has installed: `pip3 install redis`
-  - Run `python3 redis_benchmark.py`
+    - Make sure the redis-python has installed: `pip3 install redis`
+    - Run `python3 redis_benchmark.py`
 
 *NOTE*: There are 4 groups, the command line args are:
 ```
