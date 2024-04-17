@@ -32,7 +32,6 @@ int generate_growing_arr(int *arr, uint32_t num_elems);
 int* fui_brute(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
 int* fui_brute_opt(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
 
-
 /**
  * Section C. HASH_TABLE algorithms. 
  * 
