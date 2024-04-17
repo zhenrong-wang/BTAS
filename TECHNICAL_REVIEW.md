@@ -200,9 +200,11 @@ Round GROWING (time in second):
 **Steps:**
 
 **1. Build the BTAS executable**: `gcc -Wall -Ofast *.c -o btas.run`
-**2. Run BTAS executable and generate the `random.csv`**: E.g(*NOTE*). `./btas.run 1000000 1000000`
+
+**2. Run BTAS executable and generate the `random.csv`**: E.g(See *NOTE*). `./btas.run 1000000 1000000`
+
 **3. Run command**: `cp -r random.csv /tmp/` to copy the dataset to `/tmp/`
- 
+
 **4A. For Postgres**:
   - **Enter local postgres**: `sudo -u postgres psql` 
   - **Create a table**: `CREATE TABLE table_name (col INT);`
