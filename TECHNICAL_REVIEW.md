@@ -207,21 +207,32 @@ Round GROWING (time in second):
 
 **4A. For Postgres**:
 
-- **Enter local postgres**: `sudo -u postgres psql` 
+- **Enter local postgres**: `sudo -u postgres psql`
+  
 - **Create a table**: `CREATE TABLE table_name (col INT);`
+  
 - **Copy data from /tmp/random.csv**: `\COPY table_name (col) FROM '/tmp/random.csv' WITH CSV;`
+  
 - **Validate the result**: `SELECT COUNT(DISTINCT col) FROM TABLE_NAME;`
+  
 - **Get the time elapsed**: `EXPLAIN ANALYZE SELECT COUNT(DISTINCT col) FROM table_name;`
   
 **4B. For mariaDB**:
+
 - **Enter local mariaDB**: `sudo mysql -uroot -pxxxxxxxxxx`
+  
 - **Change the database**: `use mysql;`
+  
 - **Create a table**: `CREATE TABLE table_name (col INT);`
+  
 - **Load data from /tmp/random.csv**: `LOAD DATA LOCAL INFILE '/tmp/random.csv' INTO TABLE table_name;`
+  
 - **Get the result and time elapsed**: `SELECT COUNT(DISTINCT col) FROM table_name;`
   
 **4C. For Redis**:
+
 - **Make sure the redis-python has installed**: `pip3 install redis`
+  
 - **Run**: `python3 redis_benchmark.py`
 
 *NOTE*: There are 4 groups, the command line args are:
