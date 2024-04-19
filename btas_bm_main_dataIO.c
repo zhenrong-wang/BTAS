@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include "btas.h"
+#include "data_io.h"
 
 /**
  * @brief
@@ -32,15 +33,16 @@ int main(int argc, char** argv) {
         return 3;
     }
     printf("INPUT_ELEMS:\t%u\nRANDOM_MAX:\t%u\n\n",num_elems, rand_max);
-    int32_t *arr_input = (int32_t *)malloc(sizeof(int32_t) * num_elems);
-    if(arr_input == NULL) {
+    
+    int32_t *arr_gen = (int32_t *)malloc(sizeof(int32_t) * num_elems);
+    int32_t *arr_input = NULL;
+    if(arr_gen == NULL) {
         printf("ERROR: Failed to allocate memory for input array.\n");
         return 5;
     }
     int err_flag = 0;
     uint32_t num_elems_out = 0, num_elems_out_idx = 0;
     clock_t start, end;
-
     int32_t *out_brute_opt = NULL;
     int32_t *out_brute = NULL;
     int32_t *out_ht_dtree = NULL;
@@ -50,49 +52,61 @@ int main(int argc, char** argv) {
     int32_t *out_bit_stc = NULL;
     out_idx *out_bit_dyn_idx = NULL;
 
-    generate_random_input_arr(arr_input, num_elems, rand_max);
-    //print_arr(arr_input, num_elems, 100);
-    
-    printf("WRITING DATASET TO random.csv ...\n");
-    FILE* file_p=fopen("random.csv","wb+");
-    if(file_p == NULL){
-        free(arr_input);
+    generate_random_input_arr(arr_gen, num_elems, rand_max);
+    if(export_1d_i32("random.bin", "", arr_gen, num_elems) != 0) {
+        printf("ERROR: Failed to export the data to 'random.bin'.\n");
+        free(arr_gen);
         return 7;
     }
-    for(uint32_t i = 0; i < num_elems; i++) {
-        fprintf(file_p, "%d\n", arr_input[i]);
+    if(export_1d_i32("random.csv", "csv", arr_gen, num_elems) != 0) {
+        printf("ERROR: Failed to export the data to 'random.csv'.\n");
+        free(arr_gen);
+        return 9;
     }
-    fclose(file_p);
+    free(arr_gen);
 
     printf("RANDOM ARRAY INPUT:\n");
     printf("ALGO_TYPE\tTIME_IN_SEC\tUNIQUE_INTEGERS\n");
     
     start = clock();
+    arr_input = import_1d_i32("random.bin", "", &num_elems_out, &err_flag);
     out_bit_dyn = fui_bitmap_dyn_stree(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
     printf("BTAS_STREE:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    free(arr_input);
+    free(out_bit_dyn);
 
     start = clock();
+    arr_input = import_1d_i32("random.bin", "", &num_elems_out, &err_flag);
     out_bit_dyn = fui_bitmap_dyn_dtree(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
     printf("BTAS_DTREE:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    free(arr_input);
+    free(out_bit_dyn);
 
     start = clock();
+    arr_input = import_1d_i32("random.bin", "", &num_elems_out, &err_flag);
     out_bit_dyn_idx = fui_bitmap_idx_stree(arr_input, num_elems, &num_elems_out_idx, &err_flag, &dup_idx_list1_1);
     end = clock();
     printf("BTAS_SAIH:\t%lf\t%d\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
+    free(arr_input);
 
     start = clock();
+    arr_input = import_1d_i32("random.bin", "", &num_elems_out, &err_flag);
     out_bit_dyn_idx = fui_bitmap_idx_dtree(arr_input, num_elems, &num_elems_out_idx, &err_flag, &dup_idx_list1_2);
     end = clock();
     printf("BTAS_DAIH:\t%lf\t%d\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
+    free(arr_input);
 
     start = clock();
+    arr_input = import_1d_i32("random.bin", "", &num_elems_out, &err_flag);
     out_bit_stc = fui_bitmap_stc_stree(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
     printf("BTAS_STC:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    free(arr_input);
+    free(out_bit_stc);
 
-    start = clock();
+    /*start = clock();
     out_ht_dtree = fui_htable_dtree(arr_input, num_elems, &num_elems_out, &err_flag);
     end = clock();
     printf("HTBL_DTREE:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
@@ -117,41 +131,40 @@ int main(int argc, char** argv) {
         out_brute = fui_brute(arr_input, num_elems, &num_elems_out, &err_flag);
         end = clock();
         printf("BRUTE_ORIG:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
-    }
-
-    free(out_bit_dyn);
-    free(out_bit_stc);
-    free(out_ht_dtree);
+    }*/
+    
+    /*free(out_ht_dtree);
     free(out_ht_stree);
     free(out_ht_dyn);
     if(with_brute == 1) {
         free(out_brute_opt);
         free(out_brute);
-    }
+    }*/
     print_dup_idx_list(dup_idx_list1_1, 3);
     print_dup_idx_list(dup_idx_list1_2, 3);
     print_out_idx(out_bit_dyn_idx, num_elems_out_idx, 5);
     free_dup_idx_list(dup_idx_list1_1);
     free_dup_idx_list(dup_idx_list1_2);
-    free(out_bit_dyn_idx);
-
-    memset(arr_input, 0, num_elems);
-    generate_growing_arr(arr_input, num_elems);
-
-  /**
-   * Please uncomment the FILE I/O part if you'd like to write the arr_input
-   * to a file.
-   * 
-    file_p=fopen("growing.csv","wb+");
-    if(file_p == NULL){
-        free(arr_input);
+    return 0;
+    
+    arr_gen = (int32_t *)malloc(sizeof(int32_t) * num_elems);
+    if(arr_gen == NULL) {
+        printf("ERROR: Failed to allocate memory for input array.\n");
+        return 5;
+    }
+    generate_growing_arr(arr_gen, num_elems);
+    if(export_1d_i32("growing.bin", "", arr_gen, num_elems) != 0) {
+        printf("ERROR: Failed to export the data to 'growing.bin'.\n");
+        free(arr_gen);
         return 7;
     }
-    for(uint32_t i = 0; i < num_elems; i++) {
-        fprintf(file_p, "%d\n", arr_input[i]);
+    if(export_1d_i32("growing.csv", "csv", arr_gen, num_elems) != 0) {
+        printf("ERROR: Failed to export the data to 'growing.csv'.\n");
+        free(arr_gen);
+        return 9;
     }
-    fclose(file_p);
-   */
+    free(arr_gen);
+    
     printf("\nGROWING ARRAY INPUT:\n");
     printf("ALGO_TYPE\tTIME_IN_SEC\tUNIQUE_INTEGERS\n");
     
@@ -221,6 +234,5 @@ int main(int argc, char** argv) {
     free(out_bit_dyn_idx);
     printf("\nBenchmark done.\n\n");
     
-    free(arr_input);
     return 0;
 }
