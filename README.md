@@ -1,8 +1,8 @@
-# Filter-Uniq-Ints: Ultra-fast Algorithms for Removing Duplicate Integers/Filtering Unique Integers
+# BTAS - A BitTree Algorithm Set to Process Large-Scale Dataset Efficiently
 
-*Up-to 1000x faster than the performance of industrial standard databases, able to handle 100 million data items with randomness of 4,294,967,296!*
+*Up-to 1000x faster than the performance of industrial standard databases, able to handle 1 billion elements with randomness of 4,294,967,296!*
 
-# 1. Technical Review: Backgrounds, Algorithms, and Benchmarks
+# 1. Technical Review
 
 We strongly suggest you to read the [Technical Review](./TECHNICAL_REVIEW.md).
 
