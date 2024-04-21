@@ -67,6 +67,155 @@ int string_to_u32_num(const char* string, uint32_t *unsigned_num) {
 
 /**
  * 
+ * @brief Print out an integer array for debugging
+ * 
+ * @param [in]
+ *  *arr is the given array pointer
+ *  num_elems is the number of the integer elems in the given array
+ * 
+ * @returns
+ *  void
+ * 
+ */
+void print_arr(const int32_t *arr, uint32_t num_elems, uint32_t max_elems) {
+    if(arr == NULL || num_elems < 1) {
+        printf("ERROR: NULL array input.\n");
+        return;
+    }
+    uint32_t i;
+    for(i = 0; i < num_elems && i < max_elems; i++) {
+        printf("%d\t", arr[i]);
+        if((i+1)%10 == 0) {
+            printf("\n");
+        }
+    }
+    if(num_elems != max_elems && i == max_elems) {
+        printf("... Remaining %u elements not printed ...\n", num_elems-max_elems);
+    }
+    printf("\n");
+}
+
+int compare_arr(const int32_t *arr_a, const int32_t *arr_b, uint32_t num_elems) {
+    if(arr_a == NULL || arr_b == NULL) {
+        return -3;
+    }
+    if(num_elems < 1) {
+        return -1;
+    }
+    for(uint32_t i = 0; i < num_elems; i++) {
+        if(arr_a[i] != arr_b[i]) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+/**
+ * 
+ * @brief Generate random integers and put them into an given array
+ * 
+ * @param [in]
+ *  *arr is the array pointer
+ *  num_elems is the size of the given integer array
+ *  rand_max is the MAXIMUM of the generated random number
+ * 
+ * @returns
+ *  0 if succeeded
+ *  -5 if the arr pointer is null
+ *  -3 if the num_elems is 0
+ *  -1 if the rand_max is 0
+ * 
+ */
+int generate_random_input_arr(int32_t *arr, uint32_t num_elems, uint32_t rand_max) {
+    int32_t sign_flag, rand_num;
+    if(arr == NULL) {
+        return -5;
+    }
+    if(num_elems < 1) {
+        return -3;
+    }
+    if(rand_max < 1) {
+        return -1;
+    }
+    srand(time(0));
+    for(uint32_t i = 0; i < num_elems; i++) {
+        sign_flag = rand();
+        if(RAND_MAX == 0x7fff) {
+            rand_num = (rand()<<16 | rand()) % rand_max;
+        }
+        else{
+            rand_num = rand() % rand_max;
+        }
+        if(sign_flag%2 == 0) {
+            arr[i] = rand_num;
+        }
+        else {
+            arr[i] = 0 - rand_num;
+        }
+    }
+    //print_arr(arr, num_elems);
+    return 0;
+}
+
+/**
+ * 
+ * @brief Generate a single-direction growing integer array
+ *  This is the best case for the new algorighm
+ * 
+ * @param [in]
+ *  *arr is the array pointer
+ *  num_elems is the size of the given integer array
+ * 
+ * @returns
+ *  0 if succeeded
+ *  -5 if the arr pointer is null
+ *  -3 if the num_elems is 0
+ * 
+ */
+int generate_growing_arr(int32_t *arr, uint32_t num_elems) {
+    if(arr == NULL) {
+        return -5;
+    }
+    if(num_elems < 1) {
+        return -3;
+    }
+    for(uint32_t i = 0; i < num_elems; i++) {
+        arr[i] = i;
+    }
+    return 0;
+}
+
+/**
+ * @brief Parse the command arguments and check whether the given
+ *   flag (e.g. --force) is specified by one argument
+ * 
+ * @param [in]
+ *   argc, **argv should come directly from the main();
+ *   *cmd_flag is a given string (e.g. --force)
+ * 
+ * @returns
+ *   -3: cmd_flag is NULL
+ *   -1: argv or *argv is NULL
+ *    1: not specified
+ *    0: specified 
+ */
+int cmd_flag_parser(int argc, char **argv, const char *cmd_flag) {
+    if(cmd_flag == NULL) {
+        return -3;
+    }
+    if(argv == NULL || *argv == NULL) {
+        return -1;
+    }
+    for(int i = 1; i < argc; i++) {
+        if(strcmp(cmd_flag, argv[i]) == 0) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+/**
+ * 
  * @brief Filter out the unique integers from a given array in the 
  *  brute/naive way
  * 
@@ -590,126 +739,6 @@ free_memory:
     }
     *num_elems_out = j;
     return final_output_arr;
-}
-
-/**
- * 
- * @brief Print out an integer array for debugging
- * 
- * @param [in]
- *  *arr is the given array pointer
- *  num_elems is the number of the integer elems in the given array
- * 
- * @returns
- *  void
- * 
- */
-void print_arr(const int32_t *arr, uint32_t num_elems, uint32_t max_elems) {
-    if(arr == NULL || num_elems < 1) {
-        printf("ERROR: NULL array input.\n");
-        return;
-    }
-    uint32_t i;
-    for(i = 0; i < num_elems && i < max_elems; i++) {
-        printf("%d\t", arr[i]);
-        if((i+1)%10 == 0) {
-            printf("\n");
-        }
-    }
-    if(num_elems != max_elems && i == max_elems) {
-        printf("... Remaining %u elements not printed ...\n", num_elems-max_elems);
-    }
-    printf("\n");
-}
-
-int compare_arr(const int32_t *arr_a, const int32_t *arr_b, uint32_t num_elems) {
-    if(arr_a == NULL || arr_b == NULL) {
-        return -3;
-    }
-    if(num_elems < 1) {
-        return -1;
-    }
-    for(uint32_t i = 0; i < num_elems; i++) {
-        if(arr_a[i] != arr_b[i]) {
-            return 1;
-        }
-    }
-    return 0;
-}
-
-/**
- * 
- * @brief Generate random integers and put them into an given array
- * 
- * @param [in]
- *  *arr is the array pointer
- *  num_elems is the size of the given integer array
- *  rand_max is the MAXIMUM of the generated random number
- * 
- * @returns
- *  0 if succeeded
- *  -5 if the arr pointer is null
- *  -3 if the num_elems is 0
- *  -1 if the rand_max is 0
- * 
- */
-int generate_random_input_arr(int32_t *arr, uint32_t num_elems, uint32_t rand_max) {
-    int32_t sign_flag, rand_num;
-    if(arr == NULL) {
-        return -5;
-    }
-    if(num_elems < 1) {
-        return -3;
-    }
-    if(rand_max < 1) {
-        return -1;
-    }
-    srand(time(0));
-    for(uint32_t i = 0; i < num_elems; i++) {
-        sign_flag = rand();
-        if(RAND_MAX == 0x7fff) {
-            rand_num = (rand()<<16 | rand()) % rand_max;
-        }
-        else{
-            rand_num = rand() % rand_max;
-        }
-        if(sign_flag%2 == 0) {
-            arr[i] = rand_num;
-        }
-        else {
-            arr[i] = 0 - rand_num;
-        }
-    }
-    //print_arr(arr, num_elems);
-    return 0;
-}
-
-/**
- * 
- * @brief Generate a single-direction growing integer array
- *  This is the best case for the new algorighm
- * 
- * @param [in]
- *  *arr is the array pointer
- *  num_elems is the size of the given integer array
- * 
- * @returns
- *  0 if succeeded
- *  -5 if the arr pointer is null
- *  -3 if the num_elems is 0
- * 
- */
-int generate_growing_arr(int32_t *arr, uint32_t num_elems) {
-    if(arr == NULL) {
-        return -5;
-    }
-    if(num_elems < 1) {
-        return -3;
-    }
-    for(uint32_t i = 0; i < num_elems; i++) {
-        arr[i] = i;
-    }
-    return 0;
 }
 
 /**

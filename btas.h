@@ -57,6 +57,7 @@ void print_arr(const int32_t *arr, uint32_t num_elems, uint32_t max_elems);
 int compare_arr(const int32_t *arr_a, const int32_t *arr_b, uint32_t num_elems);
 int generate_random_input_arr(int32_t *arr, uint32_t num_elems, uint32_t rand_max);
 int generate_growing_arr(int32_t *arr, uint32_t num_elems);
+int cmd_flag_parser(int argc, char **argv, const char *cmd_flag);
 
 /**
  * Section B. Brute and Brute-Opt algorithms
