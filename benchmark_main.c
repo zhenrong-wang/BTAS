@@ -31,13 +31,13 @@
  */
 int main(int argc, char** argv) {
     
-    int with_brute = 0, with_fio = 0;
+    int with_brute = 0, with_fio = 0, with_count = 0;
     uint32_t num_elems, rand_max;
     dup_idx_list *dup_idx_list1_1 = NULL, *dup_idx_list1_2 = NULL;
     dup_idx_list *dup_idx_list2_1 = NULL, *dup_idx_list2_2 = NULL;
     char data_file_bin[512] = "", data_file_csv[512] = "";
     int err_flag = 0;
-    uint32_t num_elems_out = 0, num_elems_out_idx = 0;
+    uint32_t num_elems_out = 0, num_elems_read = 0, num_elems_out_idx = 0, uniq_count = 0;
     clock_t start, end;
     int32_t *out_brute_opt = NULL;
     int32_t *out_brute = NULL;
@@ -64,7 +64,9 @@ int main(int argc, char** argv) {
             with_fio = 2;
         }
     }
-    
+    if(cmd_flag_parser(argc, argv, "--count") == 0) {
+        with_count = 1;
+    }
     if(string_to_u32_num(argv[1], &num_elems) != 0 || string_to_u32_num(argv[2], &rand_max) != 0) {
         printf("ERROR: arguments illegal. Make sure they are plain positive numbers and < 4,294,967,296.\n");
         return 3;
@@ -98,218 +100,414 @@ int main(int argc, char** argv) {
     }
 
     printf("RANDOM ARRAY INPUT:\n");
-    printf("ALGO_TYPE\tTIME_IN_SEC\tUNIQUE_INTEGERS\n");
+    printf("ALGO_TYPE\t\tTIME_IN_SEC\tUNIQUE_INTEGERS\n");
 
     if(with_fio == 0) {
         start = clock();
         out_bit_dyn = fui_bitmap_dyn_stree(arr_gen, num_elems, &num_elems_out, &err_flag);
         end = clock();
+        free(out_bit_dyn);
+        printf("BTAS_STREE_NOF_EXPORT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+        if(with_count == 1) {
+            start = clock();
+            uniq_count = fui_bitmap_dyn_stree_count(arr_gen, num_elems, &err_flag);
+            end = clock();
+            printf("BTAS_STREE_NOF_COUNT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+        }
     }
     else {
         if(with_fio == 1) {
             start = clock();
-            arr_input = import_1d_i32(data_file_bin, "", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
         }
         else {
             start = clock();
-            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
         }
-        out_bit_dyn = fui_bitmap_dyn_stree(arr_input, num_elems, &num_elems_out, &err_flag);
+        out_bit_dyn = fui_bitmap_dyn_stree(arr_input, num_elems_read, &num_elems_out, &err_flag);
         end = clock();
         free(arr_input);
-    }
-    free(out_bit_dyn);
-    printf("BTAS_STREE:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        free(out_bit_dyn);
+        printf("BTAS_STREE_FIO_EXPORT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
+        if(with_count == 1) {
+            if(with_fio == 1) {
+                start = clock();
+                arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
+            }
+            else {
+                start = clock();
+                arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
+            }
+            uniq_count = fui_bitmap_dyn_stree_count(arr_input, num_elems_read, &err_flag);
+            end = clock();
+            free(arr_input);
+            printf("BTAS_STREE_FIO_COUNT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+        }
+    }
+    
     if(with_fio == 0) {
         start = clock();
         out_bit_dyn = fui_bitmap_dyn_dtree(arr_gen, num_elems, &num_elems_out, &err_flag);
         end = clock();
+        free(out_bit_dyn);
+        printf("BTAS_DTREE_NOF_EXPORT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+        if(with_count == 1) {
+            start = clock();
+            uniq_count = fui_bitmap_dyn_dtree_count(arr_gen, num_elems, &err_flag);
+            end = clock();
+            printf("BTAS_DTREE_NOF_COUNT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+        }
     }
     else {
         if(with_fio == 1) {
             start = clock();
-            arr_input = import_1d_i32(data_file_bin, "", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
         }
         else {
             start = clock();
-            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
         }
-        out_bit_dyn = fui_bitmap_dyn_dtree(arr_input, num_elems, &num_elems_out, &err_flag);
+        out_bit_dyn = fui_bitmap_dyn_dtree(arr_input, num_elems_read, &num_elems_out, &err_flag);
         end = clock();
         free(arr_input);
+        free(out_bit_dyn);
+        printf("BTAS_DTREE_FIO_EXPORT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+        if(with_count == 1) {
+            if(with_fio == 1) {
+                start = clock();
+                arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
+            }
+            else {
+                start = clock();
+                arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
+            }
+            uniq_count = fui_bitmap_dyn_dtree_count(arr_input, num_elems_read, &err_flag);
+            end = clock();
+            free(arr_input);
+            printf("BTAS_DTREE_FIO_COUNT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+        }
     }
-    free(out_bit_dyn);
-    printf("BTAS_DTREE:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
     
     if(with_fio == 0) {
         start = clock();
         out_bit_dyn_idx = fui_bitmap_idx_stree(arr_gen, num_elems, &num_elems_out_idx, &err_flag, &dup_idx_list1_1);
         end = clock();
+        free(out_bit_dyn_idx);
+        printf("BTAS_SAIH_NOF_EXPORT:\t%lf\t%d\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
     }
     else {
         if(with_fio == 1) {
             start = clock();
-            arr_input = import_1d_i32(data_file_bin, "", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
         }
         else {
             start = clock();
-            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
         }
-        out_bit_dyn_idx = fui_bitmap_idx_stree(arr_input, num_elems, &num_elems_out_idx, &err_flag, &dup_idx_list1_1);
+        out_bit_dyn_idx = fui_bitmap_idx_stree(arr_input, num_elems_read, &num_elems_out_idx, &err_flag, &dup_idx_list1_1);
         end = clock();
         free(arr_input);
+        free(out_bit_dyn_idx);
+        printf("BTAS_SAIH_FIO_EXPORT:\t%lf\t%d\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
     }
-    free(out_bit_dyn_idx);
-    printf("BTAS_SAIH:\t%lf\t%d\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
 
     if(with_fio == 0) {
         start = clock();
         out_bit_dyn_idx = fui_bitmap_idx_dtree(arr_gen, num_elems, &num_elems_out_idx, &err_flag, &dup_idx_list1_2);
         end = clock();
+        printf("BTAS_DAIH_NOF_EXPORT:\t%lf\t%d\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
     }
     else {
         if(with_fio == 1) {
             start = clock();
-            arr_input = import_1d_i32(data_file_bin, "", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
         }
         else {
             start = clock();
-            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
         }
-        out_bit_dyn_idx = fui_bitmap_idx_dtree(arr_input, num_elems, &num_elems_out_idx, &err_flag, &dup_idx_list1_2);
+        out_bit_dyn_idx = fui_bitmap_idx_dtree(arr_input, num_elems_read, &num_elems_out_idx, &err_flag, &dup_idx_list1_2);
         end = clock();
         free(arr_input);
+        printf("BTAS_DAIH_FIO_EXPORT:\t%lf\t%d\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
     }
     //free(out_bit_dyn_idx);
-    printf("BTAS_DAIH:\t%lf\t%d\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
 
     if(with_fio == 0) {
         start = clock();
         out_bit_stc = fui_bitmap_stc_stree(arr_gen, num_elems, &num_elems_out, &err_flag);
         end = clock();
+        free(out_bit_stc);
+        printf("BTAS_STC_NOF_EXPORT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+        if(with_count == 1) {
+            start = clock();
+            uniq_count = fui_bitmap_stc_stree_count(arr_gen, num_elems, &err_flag);
+            end = clock();
+            printf("BTAS_STC_NOF_COUNT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+        }
     }
     else {
         if(with_fio == 1) {
             start = clock();
-            arr_input = import_1d_i32(data_file_bin, "", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
         }
         else {
             start = clock();
-            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
         }
-        out_bit_stc = fui_bitmap_stc_stree(arr_input, num_elems, &num_elems_out, &err_flag);
+        out_bit_stc = fui_bitmap_stc_stree(arr_input, num_elems_read, &num_elems_out, &err_flag);
         end = clock();
         free(arr_input);
-    }
-    free(out_bit_stc);
-    printf("BTAS_STC:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        free(out_bit_stc);
+        printf("BTAS_STC_FIO_EXPORT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
+        if(with_count == 1) {
+            if(with_fio == 1) {
+                start = clock();
+                arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
+            }
+            else {
+                start = clock();
+                arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
+            }
+            uniq_count = fui_bitmap_stc_stree_count(arr_input, num_elems_read, &err_flag);
+            end = clock();
+            free(arr_input);
+            printf("BTAS_STC_FIO_COUNT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+        }
+    }
+    
     if(with_fio == 0) {
         start = clock();
         out_ht_dtree = fui_htable_dtree(arr_gen, num_elems, &num_elems_out, &err_flag);
         end = clock();
+        free(out_ht_dtree);
+        printf("HTBL_DTREE_NOF_EXPORT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+        if(with_count == 1) {
+            start = clock();
+            uniq_count = fui_htable_dtree_count(arr_gen, num_elems, &err_flag);
+            end = clock();
+            printf("HTBL_DTREE_NOF_COUNT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+        }
     }
     else {
         if(with_fio == 1) {
             start = clock();
-            arr_input = import_1d_i32(data_file_bin, "", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
         }
         else {
             start = clock();
-            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
         }
-        out_ht_dtree = fui_htable_dtree(arr_input, num_elems, &num_elems_out, &err_flag);
+        out_ht_dtree = fui_htable_dtree(arr_input, num_elems_read, &num_elems_out, &err_flag);
         end = clock();
         free(arr_input);
+        free(out_ht_dtree);
+        printf("HTBL_DTREE_FIO_EXPORT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+        if(with_count == 1) {
+            if(with_fio == 1) {
+                start = clock();
+                arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
+            }
+            else {
+                start = clock();
+                arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
+            }
+            uniq_count = fui_htable_dtree_count(arr_input, num_elems_read, &err_flag);
+            end = clock();
+            free(arr_input);
+            printf("HTBL_DTREE_FIO_COUNT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+        }
     }
-    free(out_ht_dtree);
-    printf("HTBL_DTREE:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     if(with_fio == 0) {
         start = clock();
         out_ht_stree = fui_htable_stree(arr_gen, num_elems, &num_elems_out, &err_flag);
         end = clock();
+        free(out_ht_stree);
+        printf("HTBL_STREE_NOF_EXPORT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+        if(with_count == 1) {
+            start = clock();
+            uniq_count = fui_htable_stree_count(arr_gen, num_elems, &err_flag);
+            end = clock();
+            printf("HTBL_STREE_NOF_COUNT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+        }
     }
     else {
         if(with_fio == 1) {
             start = clock();
-            arr_input = import_1d_i32(data_file_bin, "", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
         }
         else {
             start = clock();
-            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
         }
-        out_ht_stree = fui_htable_stree(arr_input, num_elems, &num_elems_out, &err_flag);
+        out_ht_stree = fui_htable_stree(arr_input, num_elems_read, &num_elems_out, &err_flag);
         end = clock();
         free(arr_input);
+        free(out_ht_stree);
+        printf("HTBL_STREE_FIO_EXPORT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+        if(with_count == 1) {
+            if(with_fio == 1) {
+                start = clock();
+                arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
+            }
+            else {
+                start = clock();
+                arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
+            }
+            uniq_count = fui_htable_stree_count(arr_input, num_elems_read, &err_flag);
+            end = clock();
+            free(arr_input);
+            printf("HTBL_STREE_FIO_COUNT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+        }
     }
-    free(out_ht_stree);
-    printf("HTBL_STREE:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     if(with_fio == 0) {
         start = clock();
         out_ht_dyn = fui_htable_stree_dyn(arr_gen, num_elems, &num_elems_out, &err_flag);
         end = clock();
+        free(out_ht_dyn);
+        printf("HTBL_STREE_DYN_NOF_E:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+        if(with_count == 1) {
+            start = clock();
+            uniq_count = fui_htable_stree_dyn_count(arr_gen, num_elems, &err_flag);
+            end = clock();
+            printf("HTBL_STREE_DYN_NOF_C:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+        }
     }
     else {
         if(with_fio == 1) {
             start = clock();
-            arr_input = import_1d_i32(data_file_bin, "", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
         }
         else {
             start = clock();
-            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
         }
-        out_ht_dyn = fui_htable_stree_dyn(arr_input, num_elems, &num_elems_out, &err_flag);
+        out_ht_dyn = fui_htable_stree_dyn(arr_input, num_elems_read, &num_elems_out, &err_flag);
         end = clock();
         free(arr_input);
-    }
-    free(out_ht_dyn);
-    printf("HTBL_STREE_DYN:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        free(out_ht_dyn);
+        printf("HTBL_STREE_DYN_FIO_E:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
+        if(with_count == 1) {
+            if(with_fio == 1) {
+                start = clock();
+                arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
+            }
+            else {
+                start = clock();
+                arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
+            }
+            uniq_count = fui_htable_stree_dyn_count(arr_input, num_elems_read, &err_flag);
+            end = clock();
+            free(arr_input);
+            printf("HTBL_STREE_DYN_FIO_C:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+        }
+    }
+    
     if(with_brute == 1) {
         if(with_fio == 0) {
             start = clock();
             out_brute_opt = fui_brute_opt(arr_gen, num_elems, &num_elems_out, &err_flag);
             end = clock();
+            free(out_brute_opt);
+            printf("BRUTE_OPT_NOF_EXPORT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+            if(with_count == 1) {
+                start = clock();
+                uniq_count = fui_brute_opt_count(arr_gen, num_elems, &err_flag);
+                end = clock();
+                printf("BRUTE_OPT_NOF_COUNT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            }
         }
         else {
             if(with_fio == 1) {
                 start = clock();
-                arr_input = import_1d_i32(data_file_bin, "", &num_elems_out, &err_flag);
+                arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
             }
             else {
                 start = clock();
-                arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_out, &err_flag);
+                arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
             }
-            out_brute_opt = fui_brute_opt(arr_input, num_elems, &num_elems_out, &err_flag);
+            out_brute_opt = fui_brute_opt(arr_input, num_elems_read, &num_elems_out, &err_flag);
             end = clock();
             free(arr_input);
-        }
-        free(out_brute_opt);
-        printf("BRUTE_OPT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+            free(out_brute_opt);
+            printf("BRUTE_OPT_FIO_EXPORT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
+            if(with_count == 1) {
+                if(with_fio == 1) {
+                    start = clock();
+                    arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
+                }
+                else {
+                    start = clock();
+                    arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
+                }
+                uniq_count = fui_brute_opt_count(arr_input, num_elems_read, &err_flag);
+                end = clock();
+                free(arr_input);
+                printf("BRUTE_OPT_FIO_COUNT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+            }
+        }
+        
         if(with_fio == 0) {
             start = clock();
             out_brute = fui_brute(arr_gen, num_elems, &num_elems_out, &err_flag);
             end = clock();
+            free(out_brute);
+            printf("BRUTE_ORIG_NOF_EXPORT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+            if(with_count == 1) {
+                start = clock();
+                out_brute = fui_brute(arr_gen, num_elems, &num_elems_out, &err_flag);
+                end = clock();
+                free(out_brute);
+                printf("BRUTE_ORIG_NOF_COUNT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+            }
         }
         else {
             if(with_fio == 1) {
                 start = clock();
-                arr_input = import_1d_i32(data_file_bin, "", &num_elems_out, &err_flag);
+                arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
             }
             else {
                 start = clock();
-                arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_out, &err_flag);
+                arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
             }
-            out_brute = fui_brute(arr_input, num_elems, &num_elems_out, &err_flag);
+            out_brute = fui_brute(arr_input, num_elems_read, &num_elems_out, &err_flag);
             end = clock();
             free(arr_input);
+            free(out_brute);
+            printf("BRUTE_ORIG_FIO_EXPORT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+            if(with_count == 1) {
+                if(with_fio == 1) {
+                    start = clock();
+                    arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
+                }
+                else {
+                    start = clock();
+                    arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
+                }
+                uniq_count = fui_brute_count(arr_input, num_elems_read, &err_flag);
+                end = clock();
+                free(arr_input);
+                printf("BRUTE_ORIG_FIO_COUNT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            }
         }
-        free(out_brute);
-        printf("BRUTE_ORIG:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
     }
     print_dup_idx_list(dup_idx_list1_1, 3);
     print_dup_idx_list(dup_idx_list1_2, 3);
@@ -345,198 +543,368 @@ int main(int argc, char** argv) {
     }
      
     printf("GROWING ARRAY INPUT:\n");
-    printf("ALGO_TYPE\tTIME_IN_SEC\tUNIQUE_INTEGERS\n");
+    printf("ALGO_TYPE\t\tTIME_IN_SEC\tUNIQUE_INTEGERS\n");
 
     if(with_fio == 0) {
         start = clock();
         out_bit_dyn = fui_bitmap_dyn_stree(arr_gen, num_elems, &num_elems_out, &err_flag);
         end = clock();
+        free(out_bit_dyn);
+        printf("BTAS_STREE_NOF_EXPORT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+        if(with_count == 1) {
+            start = clock();
+            uniq_count = fui_bitmap_dyn_stree_count(arr_gen, num_elems, &err_flag);
+            end = clock();
+            printf("BTAS_STREE_NOF_COUNT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+        }
     }
     else {
         if(with_fio == 1) {
             start = clock();
-            arr_input = import_1d_i32(data_file_bin, "", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
         }
         else {
             start = clock();
-            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
         }
-        out_bit_dyn = fui_bitmap_dyn_stree(arr_input, num_elems, &num_elems_out, &err_flag);
+        out_bit_dyn = fui_bitmap_dyn_stree(arr_input, num_elems_read, &num_elems_out, &err_flag);
         end = clock();
         free(arr_input);
-    }
-    free(out_bit_dyn);
-    printf("BTAS_STREE:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        free(out_bit_dyn);
+        printf("BTAS_STREE_FIO_EXPORT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
+        if(with_count == 1) {
+            if(with_fio == 1) {
+                start = clock();
+                arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
+            }
+            else {
+                start = clock();
+                arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
+            }
+            uniq_count = fui_bitmap_dyn_stree_count(arr_input, num_elems_read, &err_flag);
+            end = clock();
+            free(arr_input);
+            printf("BTAS_STREE_FIO_COUNT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+        }
+    }
+    
     if(with_fio == 0) {
         start = clock();
         out_bit_dyn = fui_bitmap_dyn_dtree(arr_gen, num_elems, &num_elems_out, &err_flag);
         end = clock();
+        free(out_bit_dyn);
+        printf("BTAS_DTREE_NOF_EXPORT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+        if(with_count == 1) {
+            start = clock();
+            uniq_count = fui_bitmap_dyn_dtree_count(arr_gen, num_elems, &err_flag);
+            end = clock();
+            printf("BTAS_DTREE_NOF_COUNT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+        }
     }
     else {
         if(with_fio == 1) {
             start = clock();
-            arr_input = import_1d_i32(data_file_bin, "", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
         }
         else {
             start = clock();
-            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
         }
-        out_bit_dyn = fui_bitmap_dyn_dtree(arr_input, num_elems, &num_elems_out, &err_flag);
+        out_bit_dyn = fui_bitmap_dyn_dtree(arr_input, num_elems_read, &num_elems_out, &err_flag);
         end = clock();
         free(arr_input);
+        free(out_bit_dyn);
+        printf("BTAS_DTREE_FIO_EXPORT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+        if(with_count == 1) {
+            if(with_fio == 1) {
+                start = clock();
+                arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
+            }
+            else {
+                start = clock();
+                arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
+            }
+            uniq_count = fui_bitmap_dyn_dtree_count(arr_input, num_elems_read, &err_flag);
+            end = clock();
+            free(arr_input);
+            printf("BTAS_DTREE_FIO_COUNT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+        }
     }
-    free(out_bit_dyn);
-    printf("BTAS_DTREE:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
     
     if(with_fio == 0) {
         start = clock();
         out_bit_dyn_idx = fui_bitmap_idx_stree(arr_gen, num_elems, &num_elems_out_idx, &err_flag, &dup_idx_list2_1);
         end = clock();
+        free(out_bit_dyn_idx);
+        printf("BTAS_SAIH_NOF_EXPORT:\t%lf\t%d\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
     }
     else {
         if(with_fio == 1) {
             start = clock();
-            arr_input = import_1d_i32(data_file_bin, "", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
         }
         else {
             start = clock();
-            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
         }
-        out_bit_dyn_idx = fui_bitmap_idx_stree(arr_input, num_elems, &num_elems_out_idx, &err_flag, &dup_idx_list2_1);
+        out_bit_dyn_idx = fui_bitmap_idx_stree(arr_input, num_elems_read, &num_elems_out_idx, &err_flag, &dup_idx_list2_1);
         end = clock();
         free(arr_input);
+        free(out_bit_dyn_idx);
+        printf("BTAS_SAIH_FIO_EXPORT:\t%lf\t%d\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
     }
-    free(out_bit_dyn_idx);
-    printf("BTAS_SAIH:\t%lf\t%d\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
 
     if(with_fio == 0) {
         start = clock();
         out_bit_dyn_idx = fui_bitmap_idx_dtree(arr_gen, num_elems, &num_elems_out_idx, &err_flag, &dup_idx_list2_2);
         end = clock();
+        printf("BTAS_DAIH_NOF_EXPORT:\t%lf\t%d\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
     }
     else {
         if(with_fio == 1) {
             start = clock();
-            arr_input = import_1d_i32(data_file_bin, "", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
         }
         else {
             start = clock();
-            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
         }
-        out_bit_dyn_idx = fui_bitmap_idx_dtree(arr_input, num_elems, &num_elems_out_idx, &err_flag, &dup_idx_list2_2);
+        out_bit_dyn_idx = fui_bitmap_idx_dtree(arr_input, num_elems_read, &num_elems_out_idx, &err_flag, &dup_idx_list2_2);
         end = clock();
         free(arr_input);
+        printf("BTAS_DAIH_FIO_EXPORT:\t%lf\t%d\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
     }
     //free(out_bit_dyn_idx);
-    printf("BTAS_DAIH:\t%lf\t%d\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
 
     if(with_fio == 0) {
         start = clock();
         out_bit_stc = fui_bitmap_stc_stree(arr_gen, num_elems, &num_elems_out, &err_flag);
         end = clock();
+        free(out_bit_stc);
+        printf("BTAS_STC_NOF_EXPORT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+        if(with_count == 1) {
+            start = clock();
+            uniq_count = fui_bitmap_stc_stree_count(arr_gen, num_elems, &err_flag);
+            end = clock();
+            printf("BTAS_STC_NOF_COUNT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+        }
     }
     else {
         if(with_fio == 1) {
             start = clock();
-            arr_input = import_1d_i32(data_file_bin, "", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
         }
         else {
             start = clock();
-            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
         }
-        out_bit_stc = fui_bitmap_stc_stree(arr_input, num_elems, &num_elems_out, &err_flag);
+        out_bit_stc = fui_bitmap_stc_stree(arr_input, num_elems_read, &num_elems_out, &err_flag);
         end = clock();
         free(arr_input);
-    }
-    free(out_bit_stc);
-    printf("BTAS_STC:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        free(out_bit_stc);
+        printf("BTAS_STC_FIO_EXPORT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
+        if(with_count == 1) {
+            if(with_fio == 1) {
+                start = clock();
+                arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
+            }
+            else {
+                start = clock();
+                arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
+            }
+            uniq_count = fui_bitmap_stc_stree_count(arr_input, num_elems_read, &err_flag);
+            end = clock();
+            free(arr_input);
+            printf("BTAS_STC_FIO_COUNT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+        }
+    }
+    
     if(with_fio == 0) {
         start = clock();
         out_ht_dtree = fui_htable_dtree(arr_gen, num_elems, &num_elems_out, &err_flag);
         end = clock();
+        free(out_ht_dtree);
+        printf("HTBL_DTREE_NOF_EXPORT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+        if(with_count == 1) {
+            start = clock();
+            uniq_count = fui_htable_dtree_count(arr_gen, num_elems, &err_flag);
+            end = clock();
+            printf("HTBL_DTREE_NOF_COUNT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+        }
     }
     else {
         if(with_fio == 1) {
             start = clock();
-            arr_input = import_1d_i32(data_file_bin, "", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
         }
         else {
             start = clock();
-            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
         }
-        out_ht_dtree = fui_htable_dtree(arr_input, num_elems, &num_elems_out, &err_flag);
+        out_ht_dtree = fui_htable_dtree(arr_input, num_elems_read, &num_elems_out, &err_flag);
         end = clock();
         free(arr_input);
+        free(out_ht_dtree);
+        printf("HTBL_DTREE_FIO_EXPORT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+        if(with_count == 1) {
+            if(with_fio == 1) {
+                start = clock();
+                arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
+            }
+            else {
+                start = clock();
+                arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
+            }
+            uniq_count = fui_htable_dtree_count(arr_input, num_elems_read, &err_flag);
+            end = clock();
+            free(arr_input);
+            printf("HTBL_DTREE_FIO_COUNT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+        }
     }
-    free(out_ht_dtree);
-    printf("HTBL_DTREE:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     if(with_fio == 0) {
         start = clock();
         out_ht_stree = fui_htable_stree(arr_gen, num_elems, &num_elems_out, &err_flag);
         end = clock();
+        free(out_ht_stree);
+        printf("HTBL_STREE_NOF_EXPORT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+        if(with_count == 1) {
+            start = clock();
+            uniq_count = fui_htable_stree_count(arr_gen, num_elems, &err_flag);
+            end = clock();
+            printf("HTBL_STREE_NOF_COUNT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+        }
     }
     else {
         if(with_fio == 1) {
             start = clock();
-            arr_input = import_1d_i32(data_file_bin, "", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
         }
         else {
             start = clock();
-            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
         }
-        out_ht_stree = fui_htable_stree(arr_input, num_elems, &num_elems_out, &err_flag);
+        out_ht_stree = fui_htable_stree(arr_input, num_elems_read, &num_elems_out, &err_flag);
         end = clock();
         free(arr_input);
+        free(out_ht_stree);
+        printf("HTBL_STREE_FIO_EXPORT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+        if(with_count == 1) {
+            if(with_fio == 1) {
+                start = clock();
+                arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
+            }
+            else {
+                start = clock();
+                arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
+            }
+            uniq_count = fui_htable_stree_count(arr_input, num_elems_read, &err_flag);
+            end = clock();
+            free(arr_input);
+            printf("HTBL_STREE_FIO_COUNT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+        }
     }
-    free(out_ht_stree);
-    printf("HTBL_STREE:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
     if(with_fio == 0) {
         start = clock();
         out_ht_dyn = fui_htable_stree_dyn(arr_gen, num_elems, &num_elems_out, &err_flag);
         end = clock();
+        free(out_ht_dyn);
+        printf("HTBL_STREE_DYN_NOF_E:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+        if(with_count == 1) {
+            start = clock();
+            uniq_count = fui_htable_stree_dyn_count(arr_gen, num_elems, &err_flag);
+            end = clock();
+            printf("HTBL_STREE_DYN_NOF_C:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+        }
     }
     else {
         if(with_fio == 1) {
             start = clock();
-            arr_input = import_1d_i32(data_file_bin, "", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
         }
         else {
             start = clock();
-            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_out, &err_flag);
+            arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
         }
-        out_ht_dyn = fui_htable_stree_dyn(arr_input, num_elems, &num_elems_out, &err_flag);
+        out_ht_dyn = fui_htable_stree_dyn(arr_input, num_elems_read, &num_elems_out, &err_flag);
         end = clock();
         free(arr_input);
-    }
-    free(out_ht_dyn);
-    printf("HTBL_STREE_DYN:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        free(out_ht_dyn);
+        printf("HTBL_STREE_DYN_FIO_E:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
+        if(with_count == 1) {
+            if(with_fio == 1) {
+                start = clock();
+                arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
+            }
+            else {
+                start = clock();
+                arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
+            }
+            uniq_count = fui_htable_stree_dyn_count(arr_input, num_elems_read, &err_flag);
+            end = clock();
+            free(arr_input);
+            printf("HTBL_STREE_DYN_FIO_C:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+        }
+    }
+    
     if(with_brute == 1) {
         if(with_fio == 0) {
             start = clock();
             out_brute_opt = fui_brute_opt(arr_gen, num_elems, &num_elems_out, &err_flag);
             end = clock();
+            free(out_brute_opt);
+            printf("BRUTE_OPT_NOF_EXPORT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+
+            if(with_count == 1) {
+                start = clock();
+                uniq_count = fui_brute_opt_count(arr_gen, num_elems, &err_flag);
+                end = clock();
+                printf("BRUTE_OPT_NOF_COUNT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            }
         }
         else {
             if(with_fio == 1) {
                 start = clock();
-                arr_input = import_1d_i32(data_file_bin, "", &num_elems_out, &err_flag);
+                arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
             }
             else {
                 start = clock();
-                arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_out, &err_flag);
+                arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
             }
-            out_brute_opt = fui_brute_opt(arr_input, num_elems, &num_elems_out, &err_flag);
+            out_brute_opt = fui_brute_opt(arr_input, num_elems_read, &num_elems_out, &err_flag);
             end = clock();
             free(arr_input);
-        }
-        free(out_brute_opt);
-        printf("BRUTE_OPT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+            free(out_brute_opt);
+            printf("BRUTE_OPT_FIO_EXPORT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
+            if(with_count == 1) {
+                if(with_fio == 1) {
+                    start = clock();
+                    arr_input = import_1d_i32(data_file_bin, "", &num_elems_read, &err_flag);
+                }
+                else {
+                    start = clock();
+                    arr_input = import_1d_i32(data_file_csv, "csv", &num_elems_read, &err_flag);
+                }
+                uniq_count = fui_brute_opt_count(arr_input, num_elems_read, &err_flag);
+                end = clock();
+                free(arr_input);
+                printf("BRUTE_OPT_FIO_COUNT:\t%lf\t%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+            }
+        }
     }
     print_dup_idx_list(dup_idx_list2_1, 3);
     print_dup_idx_list(dup_idx_list2_2, 3);
@@ -544,6 +912,7 @@ int main(int argc, char** argv) {
     free(out_bit_dyn_idx);
     free_dup_idx_list(dup_idx_list2_1);
     free_dup_idx_list(dup_idx_list2_2);
+
     printf("\nBenchmark done.\n\n");
     
     return 0;

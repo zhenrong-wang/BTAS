@@ -274,6 +274,40 @@ int32_t* fui_brute(const int32_t *input_arr, const uint32_t num_elems, uint32_t 
     return final_output_arr;
 }
 
+uint32_t fui_brute_count(const int32_t *input_arr, const uint32_t num_elems, int *err_flag) {
+    uint32_t i, j = 1, k;
+    int32_t tmp = 0;
+    *err_flag = 0;
+    if (input_arr == NULL) {
+        *err_flag = -5;
+        return 0;
+    }
+    if (num_elems < 1){
+        *err_flag = -3;
+        return 0;
+    }
+    int32_t *output_arr = (int32_t *)calloc(num_elems, sizeof(int32_t));
+    if (output_arr == NULL) {
+        *err_flag = -1;
+        return 0;
+    }
+    output_arr[0] = input_arr[0];
+    for(i = 1; i < num_elems; i++) {
+        tmp = input_arr[i];
+        for(k = 0; k < j; k++) {
+            if(tmp == output_arr[k]) {
+                break;
+            }
+        }
+        if(k == j) {
+            output_arr[j] = tmp;
+            j++;
+        }
+    }
+    free(output_arr);
+    return j;
+}
+
 /**
  * 
  * @brief Filter out the unique integers from a given array in improved
@@ -364,6 +398,72 @@ int32_t* fui_brute_opt(const int32_t *input_arr, const uint32_t num_elems, uint3
     }
     *num_elems_out = j;
     return final_output_arr;
+}
+
+uint32_t fui_brute_opt_count(const int32_t *input_arr, const uint32_t num_elems, int *err_flag) {
+    uint32_t i, j = 1, k;
+    int32_t max_current, min_current, diff_to_max = 0, diff_to_min = 0, tmp_diff_to_max = 0, tmp_diff_to_min = 0;
+    int32_t tmp = 0;
+    *err_flag = 0;
+    if (input_arr == NULL) {
+        *err_flag = -5;
+        return 0;
+    }
+    if (num_elems < 1){
+        *err_flag = -3;
+        return 0;
+    }
+    int32_t *output_arr = (int32_t *)calloc(num_elems, sizeof(int32_t));
+    if (output_arr == NULL) {
+        *err_flag = -1;
+        return 0;
+    }
+    max_current = input_arr[0];
+    min_current = input_arr[0];
+    output_arr[0] = input_arr[0];
+    for(i = 1; i < num_elems; i++) {
+        tmp = input_arr[i];
+        tmp_diff_to_max = max_current - tmp;
+        tmp_diff_to_min = tmp - min_current;
+        if(tmp_diff_to_max == 0 || tmp_diff_to_min == 0 || tmp_diff_to_max == diff_to_max || tmp_diff_to_min == diff_to_min) {
+            continue;
+        }
+        if(tmp_diff_to_max < 0 || tmp_diff_to_min < 0) {
+            output_arr[j] = tmp;
+            if(tmp_diff_to_max < 0) {
+                diff_to_max = -tmp_diff_to_max;
+                max_current = tmp;
+            }
+            else {
+                diff_to_min = -tmp_diff_to_min;
+                min_current = tmp;
+            }
+            j++;
+            continue;
+        }
+        if(tmp_diff_to_min < diff_to_min || tmp_diff_to_max < diff_to_max) {
+            output_arr[j] = tmp;
+            if(tmp_diff_to_min < diff_to_min) {
+                diff_to_min = tmp_diff_to_min;
+            }
+            else {
+                diff_to_max = tmp_diff_to_max;
+            }
+            j++;
+            continue;
+        }
+        for(k = 0; k < j; k++) {
+            if(tmp == output_arr[k]) {
+                break;
+            }
+        }
+        if(k == j) {
+            output_arr[j] = tmp;
+            j++;
+        }
+    }
+    free(output_arr);
+    return j;
 }
 
 void free_hash_table(uint8_t *hash_table[], uint32_t num_elems) {
@@ -465,6 +565,65 @@ free_memory:
     *num_elems_out = j;
     return final_output_arr;
 }
+
+uint32_t fui_htable_dtree_count(const int32_t *input_arr, const uint32_t num_elems, int *err_flag) {
+    uint32_t i, j = 0;
+    uint32_t tmp_quotient = 0, tmp_mod = 0;
+    int32_t tmp = 0;
+    uint8_t *hash_table_base_p[HASH_TABLE_SIZE] = {NULL,};
+    uint8_t *hash_table_base_n[HASH_TABLE_SIZE] = {NULL,};
+    *err_flag = 0;
+    if (input_arr == NULL) {
+        *err_flag = -5;
+        return 0;
+    }
+    if (num_elems < 1){
+        *err_flag = -3;
+        return 0;
+    }
+    for(i = 0; i < num_elems; i++) {
+        tmp = input_arr[i];
+        tmp_quotient = abs(tmp / MOD_TABLE_SIZE);
+        tmp_mod = abs(tmp % MOD_TABLE_SIZE);
+        if(tmp > 0) {
+            if(hash_table_base_p[tmp_quotient] == NULL) {
+                if((hash_table_base_p[tmp_quotient] = (uint8_t *)calloc(MOD_TABLE_SIZE, sizeof(uint8_t))) == NULL) {
+                    *err_flag = 1;
+                    goto free_memory;
+                }
+            }
+            if(hash_table_base_p[tmp_quotient] != NULL && (hash_table_base_p[tmp_quotient])[tmp_mod] != 0) {
+                continue;
+            }
+        }
+        else {
+            if(hash_table_base_n[tmp_quotient] == NULL) {
+                if((hash_table_base_n[tmp_quotient] = (uint8_t *)calloc(MOD_TABLE_SIZE, sizeof(uint8_t))) == NULL) {
+                    *err_flag = 1;
+                    goto free_memory;
+                }
+            }
+            if(hash_table_base_n[tmp_quotient] != NULL && (hash_table_base_n[tmp_quotient])[tmp_mod] != 0) {
+                continue;
+            }
+        }
+        j++;
+        if(tmp > 0) {
+            (hash_table_base_p[tmp_quotient])[tmp_mod] = 1;
+        }
+        else {
+            (hash_table_base_n[tmp_quotient])[tmp_mod] = 1;
+        }
+    }
+free_memory:
+    free_hash_table(hash_table_base_p, HASH_TABLE_SIZE);
+    free_hash_table(hash_table_base_n, HASH_TABLE_SIZE);
+    if(*err_flag != 0) {
+        return 0;
+    }
+    return j;
+}
+
 
 void free_hash_table_new(htable_base hash_table_new[], uint32_t num_elems) {
     for(uint32_t i = 0; i < num_elems; i++) {
@@ -598,6 +757,96 @@ free_memory:
     }
     *num_elems_out = j;
     return final_output_arr;
+}
+
+
+uint32_t fui_htable_stree_count(const int32_t *input_arr, const uint32_t num_elems, int *err_flag) {
+    uint32_t i, j = 0;
+    uint32_t tmp_quotient = 0, tmp_mod = 0;
+    int32_t tmp = 0;
+    uint8_t *tmp_realloc_ptr = NULL;
+    htable_base hash_table_base[HASH_TABLE_SIZE] = {{0, 0, NULL, NULL},};
+    *err_flag = 0;
+    if (input_arr == NULL) {
+        *err_flag = -5;
+        return 0;
+    }
+    if (num_elems < 1){
+        *err_flag = -3;
+        return 0;
+    }
+    for(i = 0; i < num_elems; i++) {
+        tmp = input_arr[i];
+        tmp_quotient = abs(tmp / MOD_TABLE_SIZE);
+        tmp_mod = abs(tmp % MOD_TABLE_SIZE);
+        if(tmp > 0) {
+            if(hash_table_base[tmp_quotient].ptr_branch_p == NULL) {
+                if((hash_table_base[tmp_quotient].ptr_branch_p = (uint8_t *)calloc(tmp_mod + 1, sizeof(uint8_t))) == NULL) {
+                    *err_flag = 1;
+                    goto free_memory;
+                }
+                else {
+                    hash_table_base[tmp_quotient].branch_size_p = tmp_mod + 1;
+                }
+            }
+            else {
+                if(hash_table_base[tmp_quotient].branch_size_p < (tmp_mod + 1)){
+                    if((tmp_realloc_ptr = (uint8_t *)realloc(hash_table_base[tmp_quotient].ptr_branch_p, (tmp_mod + 1)*sizeof(uint8_t))) == NULL) {
+                        *err_flag = 1;
+                        goto free_memory;
+                    }
+                    else {
+                        hash_table_base[tmp_quotient].ptr_branch_p = tmp_realloc_ptr;
+                        memset(tmp_realloc_ptr + hash_table_base[tmp_quotient].branch_size_p, 0, sizeof(uint8_t) * (tmp_mod + 1 - hash_table_base[tmp_quotient].branch_size_p));
+                        hash_table_base[tmp_quotient].branch_size_p = tmp_mod + 1;
+                    }
+                }
+            }
+            if(hash_table_base[tmp_quotient].ptr_branch_p != NULL && (hash_table_base[tmp_quotient].ptr_branch_p)[tmp_mod] != 0) {
+                continue;
+            }
+        }
+        else {
+            if(hash_table_base[tmp_quotient].ptr_branch_n == NULL) {
+                if((hash_table_base[tmp_quotient].ptr_branch_n = (uint8_t *)calloc(tmp_mod + 1, sizeof(uint8_t))) == NULL) {
+                    *err_flag = 1;
+                    goto free_memory;
+                }
+                else {
+                    hash_table_base[tmp_quotient].branch_size_n = tmp_mod + 1;
+                }
+            }
+            else {
+                if(hash_table_base[tmp_quotient].branch_size_n < (tmp_mod + 1)){
+                    if((tmp_realloc_ptr = (uint8_t *)realloc(hash_table_base[tmp_quotient].ptr_branch_n, (tmp_mod + 1) * sizeof(uint8_t))) == NULL) {
+                        *err_flag = 1;
+                        goto free_memory;
+                    }
+                    else {
+                        hash_table_base[tmp_quotient].ptr_branch_n = tmp_realloc_ptr;
+                        memset(tmp_realloc_ptr + hash_table_base[tmp_quotient].branch_size_n , 0, sizeof(uint8_t) * (tmp_mod + 1 - hash_table_base[tmp_quotient].branch_size_n));
+                        hash_table_base[tmp_quotient].branch_size_n = tmp_mod + 1;
+                    }
+                }
+            }
+            if(hash_table_base[tmp_quotient].ptr_branch_n != NULL && (hash_table_base[tmp_quotient].ptr_branch_n)[tmp_mod] != 0) {
+                continue;
+            }
+        }
+        j++;
+        if(tmp > 0) {
+            (hash_table_base[tmp_quotient].ptr_branch_p)[tmp_mod] = 1;
+        }
+        else {
+            (hash_table_base[tmp_quotient].ptr_branch_n)[tmp_mod] = 1;
+        }
+    }
+free_memory:
+    free_hash_table_new(hash_table_base, HASH_TABLE_SIZE);
+    if(*err_flag != 0) {
+        return 0;
+    }
+    return j;
 }
 
 /**
@@ -739,6 +988,111 @@ free_memory:
     }
     *num_elems_out = j;
     return final_output_arr;
+}
+
+uint32_t fui_htable_stree_dyn_count(const int32_t *input_arr, const uint32_t num_elems, int *err_flag) {
+    uint32_t i, j = 0;
+    uint32_t tmp_quotient = 0, tmp_mod = 0;
+    int32_t tmp = 0;
+    uint8_t *tmp_realloc_ptr = NULL;
+    htable_base *hash_table_base = NULL, *tmp_ht_realloc_ptr = NULL;
+    uint32_t ht_base_length = HT_DYN_INI_SIZE;
+    *err_flag = 0;
+    if (input_arr == NULL) {
+        *err_flag = -5;
+        return 0;
+    }
+    if (num_elems < 1){
+        *err_flag = -3;
+        return 0;
+    }
+    hash_table_base = (htable_base *)calloc(HT_DYN_INI_SIZE, sizeof(htable_base));
+    if(hash_table_base == NULL) {
+        *err_flag = 5;
+        return 0;
+    }
+    for(i = 0; i < num_elems; i++) {
+        tmp = input_arr[i];
+        tmp_quotient = abs(tmp / MOD_TABLE_SIZE);
+        tmp_mod = abs(tmp % MOD_TABLE_SIZE);
+        if((tmp_quotient + 1) > ht_base_length) {
+            tmp_ht_realloc_ptr = (htable_base *)realloc(hash_table_base, (tmp_quotient + 1) * sizeof(htable_base));
+            if(tmp_ht_realloc_ptr == NULL) {
+                *err_flag = 7;
+                goto free_memory;
+            }
+            memset(tmp_ht_realloc_ptr + ht_base_length, 0, (tmp_quotient + 1 - ht_base_length) * sizeof(htable_base));
+            hash_table_base = tmp_ht_realloc_ptr;
+            ht_base_length = (tmp_quotient + 1);
+        }
+        if(tmp > 0) {
+            if(hash_table_base[tmp_quotient].ptr_branch_p == NULL) {
+                if((hash_table_base[tmp_quotient].ptr_branch_p = (uint8_t *)calloc(tmp_mod + 1, sizeof(uint8_t))) == NULL) {
+                    *err_flag = 1;
+                    goto free_memory;
+                }
+                else {
+                    hash_table_base[tmp_quotient].branch_size_p = tmp_mod + 1;
+                }
+            }
+            else {
+                if(hash_table_base[tmp_quotient].branch_size_p < (tmp_mod + 1)){
+                    if((tmp_realloc_ptr = (uint8_t *)realloc(hash_table_base[tmp_quotient].ptr_branch_p, (tmp_mod + 1) * sizeof(uint8_t))) == NULL) {
+                        *err_flag = 1;
+                        goto free_memory;
+                    }
+                    else {
+                        hash_table_base[tmp_quotient].ptr_branch_p = tmp_realloc_ptr;
+                        memset(tmp_realloc_ptr + hash_table_base[tmp_quotient].branch_size_p, 0, sizeof(uint8_t) * (tmp_mod + 1 - hash_table_base[tmp_quotient].branch_size_p));
+                        hash_table_base[tmp_quotient].branch_size_p = tmp_mod + 1;
+                    }
+                }
+            }
+            if(hash_table_base[tmp_quotient].ptr_branch_p != NULL && (hash_table_base[tmp_quotient].ptr_branch_p)[tmp_mod] != 0) {
+                continue;
+            }
+        }
+        else {
+            if(hash_table_base[tmp_quotient].ptr_branch_n == NULL) {
+                if((hash_table_base[tmp_quotient].ptr_branch_n = (uint8_t *)calloc(tmp_mod + 1, sizeof(uint8_t))) == NULL) {
+                    *err_flag = 1;
+                    goto free_memory;
+                }
+                else {
+                    hash_table_base[tmp_quotient].branch_size_n = tmp_mod + 1;
+                }
+            }
+            else {
+                if(hash_table_base[tmp_quotient].branch_size_n < (tmp_mod + 1)){
+                    if((tmp_realloc_ptr = (uint8_t *)realloc(hash_table_base[tmp_quotient].ptr_branch_n, (tmp_mod + 1)*sizeof(uint8_t))) == NULL) {
+                        *err_flag = 1;
+                        goto free_memory;
+                    }
+                    else {
+                        hash_table_base[tmp_quotient].ptr_branch_n = tmp_realloc_ptr;
+                        memset(tmp_realloc_ptr + hash_table_base[tmp_quotient].branch_size_n , 0, sizeof(uint8_t) * (tmp_mod + 1 - hash_table_base[tmp_quotient].branch_size_n));
+                        hash_table_base[tmp_quotient].branch_size_n = tmp_mod + 1;
+                    }
+                }
+            }
+            if(hash_table_base[tmp_quotient].ptr_branch_n != NULL && (hash_table_base[tmp_quotient].ptr_branch_n)[tmp_mod] != 0) {
+                continue;
+            }
+        }
+        j++;
+        if(tmp > 0) {
+            (hash_table_base[tmp_quotient].ptr_branch_p)[tmp_mod] = 1;
+        }
+        else {
+            (hash_table_base[tmp_quotient].ptr_branch_n)[tmp_mod] = 1;
+        }
+    }
+free_memory:
+    free_hash_table_new(hash_table_base, ht_base_length);
+    if(*err_flag != 0) {
+        return 0;
+    }
+    return j;
 }
 
 /**
@@ -1078,6 +1432,48 @@ free_memory:
     return final_output_arr;
 }
 
+uint32_t fui_bitmap_stc_stree_count(const int32_t *input_arr, const uint32_t num_elems, int *err_flag) {
+    uint32_t i, j = 0;
+    uint32_t tmp_quotient = 0, tmp_mod = 0;
+    int32_t tmp = 0;
+    bitmap_base bitmap_head[BITMAP_LENGTH_MAX] = {{0, NULL},};
+    uint16_t tmp_byte_index = 0;
+    uint8_t tmp_bit_position = 0;
+    *err_flag = 0;
+    if (input_arr == NULL) {
+        *err_flag = -5;
+        return 0;
+    }
+    if (num_elems < 1){
+        *err_flag = -3;
+        return 0;
+    }
+    for(i = 0; i < num_elems; i++) {
+        tmp = input_arr[i];
+        tmp_quotient = abs(tmp / BIT_MOD_DIV_FACTOR);
+        tmp_mod = abs(tmp % BIT_MOD_DIV_FACTOR);
+        tmp_byte_index = (tmp < 0) ? (NEGATIVE_START_POS + (tmp_mod / 8)) : (tmp_mod / 8);
+        tmp_bit_position = tmp_mod % 8;
+        if(bitmap_head[tmp_quotient].ptr_branch == NULL) {
+            if((bitmap_head[tmp_quotient].ptr_branch = (uint8_t *)calloc(BIT_MOD_TABLE_SIZE, sizeof(uint8_t))) == NULL) {
+                *err_flag = 1;
+                goto free_memory;
+            }
+        }
+        if(bitmap_head[tmp_quotient].ptr_branch != NULL && check_bit((bitmap_head[tmp_quotient].ptr_branch)[tmp_byte_index], tmp_bit_position)) {
+            continue;
+        }
+        j++;
+        flip_bit((bitmap_head[tmp_quotient].ptr_branch)[tmp_byte_index], tmp_bit_position);
+    }
+free_memory:
+    free_bitmap(bitmap_head, BITMAP_LENGTH_MAX);
+    if(*err_flag != 0) {
+        return 0;
+    }
+    return j;
+}
+
 int32_t* fui_bitmap_dyn_stree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag) {
     uint32_t i, j = 0;
     uint32_t tmp_quotient = 0, tmp_mod = 0;
@@ -1152,6 +1548,66 @@ free_memory:
     }
     *num_elems_out = j;
     return final_output_arr;
+}
+
+uint32_t fui_bitmap_dyn_stree_count(const int32_t *input_arr, const uint32_t num_elems, int *err_flag) {
+    uint32_t i, j = 0;
+    uint32_t tmp_quotient = 0, tmp_mod = 0;
+    int32_t tmp = 0;
+    bitmap_base *bitmap_head = NULL, *tmp_bitmap_realloc = NULL;
+    uint16_t tmp_byte_index = 0, bitmap_base_size = BITMAP_INIT_LENGTH, bitmap_base_size_target = 0;
+    uint8_t tmp_bit_position = 0;
+    *err_flag = 0;
+    if (input_arr == NULL) {
+        *err_flag = -5;
+        return 0;
+    }
+    if (num_elems < 1){
+        *err_flag = -3;
+        return 0;
+    }
+    bitmap_head = (bitmap_base *)calloc(BITMAP_INIT_LENGTH, sizeof(bitmap_base));
+    if(bitmap_head == NULL) {
+        *err_flag = 5;
+        return 0;
+    }
+    for(i = 0; i < num_elems; i++) {
+        tmp = input_arr[i];
+        tmp_quotient = abs(tmp / BIT_MOD_DIV_FACTOR);
+        tmp_mod = abs(tmp % BIT_MOD_DIV_FACTOR);
+        tmp_byte_index = (tmp < 0) ? (NEGATIVE_START_POS + (tmp_mod / 8)) : (tmp_mod / 8);
+        tmp_bit_position = tmp_mod % 8;
+
+        /* Grow the tree if needed. */
+        if((tmp_quotient + 1) > bitmap_base_size) {
+            bitmap_base_size_target = (((tmp_quotient + 1) << 1) > BITMAP_LENGTH_MAX) ? BITMAP_LENGTH_MAX : ((tmp_quotient + 1) << 1);
+            if((tmp_bitmap_realloc = (bitmap_base *)realloc(bitmap_head, bitmap_base_size_target * sizeof(bitmap_base))) == NULL) {
+                *err_flag = 7;
+                goto free_memory;
+            }
+            memset(tmp_bitmap_realloc + bitmap_base_size, 0, (bitmap_base_size_target - bitmap_base_size) * sizeof(bitmap_base));
+            bitmap_head = tmp_bitmap_realloc;
+            bitmap_base_size = bitmap_base_size_target;
+        }
+        if(bitmap_head[tmp_quotient].ptr_branch == NULL) {
+            if((bitmap_head[tmp_quotient].ptr_branch = (uint8_t *)calloc(BIT_MOD_TABLE_SIZE, sizeof(uint8_t))) == NULL) {
+                *err_flag = 1;
+                goto free_memory;
+            }
+        }
+        if(bitmap_head[tmp_quotient].ptr_branch != NULL && check_bit((bitmap_head[tmp_quotient].ptr_branch)[tmp_byte_index], tmp_bit_position)) {
+            continue;
+        }
+        j++;
+        flip_bit((bitmap_head[tmp_quotient].ptr_branch)[tmp_byte_index], tmp_bit_position);
+    }
+free_memory:
+    free_bitmap(bitmap_head, bitmap_base_size);
+    free(bitmap_head);
+    if(*err_flag != 0) {
+        return 0;
+    }
+    return j;
 }
 
 int32_t* fui_bitmap_dyn_dtree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag) {
@@ -1230,6 +1686,68 @@ free_memory:
     }
     *num_elems_out = j;
     return final_output_arr;
+}
+
+uint32_t fui_bitmap_dyn_dtree_count(const int32_t *input_arr, const uint32_t num_elems, int *err_flag) {
+    uint32_t i, j = 0;
+    uint16_t tmp_quotient = 0, tmp_mod = 0;
+    int32_t tmp = 0;
+    bitmap_dtree *bitmap_head = NULL, *tmp_bitmap_realloc = NULL;
+    uint16_t tmp_byte_index = 0, bitmap_base_size = BITMAP_INIT_LENGTH, bitmap_base_size_target = 0;
+    uint8_t tmp_bit_position = 0;
+    uint8_t tree_index = 0;
+    *err_flag = 0;
+    if (input_arr == NULL) {
+        *err_flag = -5;
+        return 0;
+    }
+    if (num_elems < 1){
+        *err_flag = -3;
+        return 0;
+    }
+    bitmap_head = (bitmap_dtree *)calloc(BITMAP_INIT_LENGTH, sizeof(bitmap_dtree));
+    if(bitmap_head == NULL) {
+        *err_flag = 5;
+        return 0;
+    }
+    for(i = 0; i < num_elems; i++) {
+        tmp = input_arr[i];
+        tree_index = (tmp < 0) ? 1 : 0;
+        tmp_quotient = abs(tmp / BIT_MOD_DIV_FACTOR);
+        tmp_mod = abs(tmp % BIT_MOD_DIV_FACTOR);
+        tmp_byte_index = (tmp_mod / 8);
+        tmp_bit_position = tmp_mod % 8;
+
+        /* Grow the tree if needed. */
+        if((tmp_quotient + 1) > bitmap_base_size) {
+            bitmap_base_size_target = (((tmp_quotient + 1) << 1) > BITMAP_LENGTH_MAX) ? BITMAP_LENGTH_MAX : ((tmp_quotient + 1) << 1);
+            if((tmp_bitmap_realloc = (bitmap_dtree *)realloc(bitmap_head, bitmap_base_size_target * sizeof(bitmap_dtree))) == NULL) {
+                *err_flag = 7;
+                goto free_memory;
+            }
+            memset(tmp_bitmap_realloc + bitmap_base_size, 0, (bitmap_base_size_target - bitmap_base_size) * sizeof(bitmap_dtree));
+            bitmap_head = tmp_bitmap_realloc;
+            bitmap_base_size = bitmap_base_size_target;
+        }
+        if(bitmap_head[tmp_quotient].ptr_branch[tree_index] == NULL) {
+            if((bitmap_head[tmp_quotient].ptr_branch[tree_index] = (uint8_t *)calloc(BITMAP_BRCH_DTREE, sizeof(uint8_t))) == NULL) {
+                *err_flag = 1;
+                goto free_memory;
+            }
+        }
+        if(bitmap_head[tmp_quotient].ptr_branch[tree_index] != NULL && check_bit((bitmap_head[tmp_quotient].ptr_branch[tree_index])[tmp_byte_index], tmp_bit_position)) {
+            continue;
+        }
+        j++;
+        flip_bit((bitmap_head[tmp_quotient].ptr_branch[tree_index])[tmp_byte_index], tmp_bit_position);
+    }
+free_memory:
+    free_bitmap_dtree(bitmap_head, bitmap_base_size);
+    free(bitmap_head);
+    if(*err_flag != 0) {
+        return 0;
+    }
+    return j;
 }
 
 out_idx* fui_bitmap_idx_stree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head) {

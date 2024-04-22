@@ -63,7 +63,10 @@ int cmd_flag_parser(int argc, char **argv, const char *cmd_flag);
  * Section B. Brute and Brute-Opt algorithms
  */
 int32_t* fui_brute(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
+uint32_t fui_brute_count(const int32_t *input_arr, const uint32_t num_elems, int *err_flag);
 int32_t* fui_brute_opt(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
+uint32_t fui_brute_opt_count(const int32_t *input_arr, const uint32_t num_elems, int *err_flag);
+
 
 /**
  * Section C. HASH_TABLE algorithms. 
@@ -85,9 +88,15 @@ typedef struct {
 
 void free_hash_table(uint8_t *hash_table[], uint32_t num_elems);
 void free_hash_table_new(htable_base hash_table_new[], uint32_t num_elems);
+
 int32_t* fui_htable_dtree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
+uint32_t fui_htable_dtree_count(const int32_t *input_arr, const uint32_t num_elems, int *err_flag);
+
 int32_t* fui_htable_stree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
+uint32_t fui_htable_stree_count(const int32_t *input_arr, const uint32_t num_elems, int *err_flag);
+
 int32_t* fui_htable_stree_dyn(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
+uint32_t fui_htable_stree_dyn_count(const int32_t *input_arr, const uint32_t num_elems, int *err_flag);
 
 /**
  * Section D. BitTree Algorithms.
@@ -161,8 +170,14 @@ void free_idx_ht_16(idx_ht_16 *idx_ht_head, uint16_t num_elems);
 void free_idx_ht_32(idx_ht_32 *idx_ht_head, uint16_t num_elems);
 
 int32_t* fui_bitmap_stc_stree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
+uint32_t fui_bitmap_stc_stree_count(const int32_t *input_arr, const uint32_t num_elems, int *err_flag);
+
 int32_t* fui_bitmap_dyn_stree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
+uint32_t fui_bitmap_dyn_stree_count(const int32_t *input_arr, const uint32_t num_elems, int *err_flag);
+
 int32_t* fui_bitmap_dyn_dtree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
+uint32_t fui_bitmap_dyn_dtree_count(const int32_t *input_arr, const uint32_t num_elems, int *err_flag);
+
 out_idx* fui_bitmap_idx_stree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head);
 out_idx* fui_bitmap_idx_dtree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head);
 
