@@ -223,7 +223,7 @@ int main(int argc, char** argv) {
             start = clock();
             uniq_count = fui_htable_count(arr_gen, num_elems, &err_flag);
             end = clock();
-            printf("HTBL_NOF_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("HTBL_NOF_COUNT :\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     else {
@@ -550,7 +550,7 @@ int main(int argc, char** argv) {
             start = clock();
             uniq_count = fui_htable_count(arr_gen, num_elems, &err_flag);
             end = clock();
-            printf("HTBL_NOF_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("HTBL_NOF_COUNT :\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     else {
