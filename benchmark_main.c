@@ -262,13 +262,13 @@ int main(int argc, char** argv) {
         out_ht_dyn = fui_htable_dyn(arr_gen, num_elems, &num_elems_out, &err_flag);
         end = clock();
         free(out_ht_dyn);
-        printf("HTBL_DYN_NOF_E:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("HTBL_DYN_NOF_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             start = clock();
             uniq_count = fui_htable_dyn_count(arr_gen, num_elems, &err_flag);
             end = clock();
-            printf("HTBL_DYN_NOF_C:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("HTBL_DYN_NOF_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     else {
@@ -284,7 +284,7 @@ int main(int argc, char** argv) {
         end = clock();
         free(arr_input);
         free(out_ht_dyn);
-        printf("HTBL_DYN_FIO_E:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("HTBL_DYN_FIO_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             if(with_fio == 1) {
@@ -298,7 +298,7 @@ int main(int argc, char** argv) {
             uniq_count = fui_htable_dyn_count(arr_input, num_elems_read, &err_flag);
             end = clock();
             free(arr_input);
-            printf("HTBL_DYN_FIO_C:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("HTBL_DYN_FIO_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     
@@ -589,13 +589,13 @@ int main(int argc, char** argv) {
         out_ht_dyn = fui_htable_dyn(arr_gen, num_elems, &num_elems_out, &err_flag);
         end = clock();
         free(out_ht_dyn);
-        printf("HTBL_DYN_NOF_E:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("HTBL_DYN_NOF_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             start = clock();
             uniq_count = fui_htable_dyn_count(arr_gen, num_elems, &err_flag);
             end = clock();
-            printf("HTBL_DYN_NOF_C:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("HTBL_DYN_NOF_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     else {
@@ -611,7 +611,7 @@ int main(int argc, char** argv) {
         end = clock();
         free(arr_input);
         free(out_ht_dyn);
-        printf("HTBL_DYN_FIO_E:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("HTBL_DYN_FIO_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             if(with_fio == 1) {
@@ -625,7 +625,7 @@ int main(int argc, char** argv) {
             uniq_count = fui_htable_dyn_count(arr_input, num_elems_read, &err_flag);
             end = clock();
             free(arr_input);
-            printf("HTBL_DYN_FIO_C:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("HTBL_DYN_FIO_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     
