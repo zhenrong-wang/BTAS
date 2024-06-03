@@ -106,13 +106,13 @@ int main(int argc, char** argv) {
         out_bit_dyn = fui_bitmap_dyn(arr_gen, num_elems, &num_elems_out, &err_flag);
         end = clock();
         free(out_bit_dyn);
-        printf("BTAS_STREE_NOF_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("BTAS_DYN_NOF_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             start = clock();
             uniq_count = fui_bitmap_dyn_count(arr_gen, num_elems, &err_flag);
             end = clock();
-            printf("BTAS_STREE_NOF_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("BTAS_DYN_NOF_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     else {
@@ -128,7 +128,7 @@ int main(int argc, char** argv) {
         end = clock();
         free(arr_input);
         free(out_bit_dyn);
-        printf("BTAS_STREE_FIO_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("BTAS_DYN_FIO_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             if(with_fio == 1) {
@@ -142,7 +142,7 @@ int main(int argc, char** argv) {
             uniq_count = fui_bitmap_dyn_count(arr_input, num_elems_read, &err_flag);
             end = clock();
             free(arr_input);
-            printf("BTAS_STREE_FIO_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("BTAS_DYN_FIO_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     
@@ -150,7 +150,7 @@ int main(int argc, char** argv) {
         start = clock();
         out_bit_dyn_idx = fui_bitmap_idx(arr_gen, num_elems, &num_elems_out_idx, &err_flag, &dup_idx_list1);
         end = clock();
-        printf("BTAS_SAIH_NOF_EXPORT:\t%lf\t%ld\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
+        printf("BTAS_IDX_NOF_EXPORT:\t%lf\t%ld\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
     }
     else {
         if(with_fio == 1) {
@@ -164,7 +164,7 @@ int main(int argc, char** argv) {
         out_bit_dyn_idx = fui_bitmap_idx(arr_input, num_elems_read, &num_elems_out_idx, &err_flag, &dup_idx_list1);
         end = clock();
         free(arr_input);
-        printf("BTAS_SAIH_FIO_EXPORT:\t%lf\t%ld\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
+        printf("BTAS_IDX_FIO_EXPORT:\t%lf\t%ld\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
     }
 
     if(with_fio == 0) {
@@ -217,13 +217,13 @@ int main(int argc, char** argv) {
         out_ht_stree = fui_htable(arr_gen, num_elems, &num_elems_out, &err_flag);
         end = clock();
         free(out_ht_stree);
-        printf("HTBL_STREE_NOF_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("HTBL_NOF_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             start = clock();
             uniq_count = fui_htable_count(arr_gen, num_elems, &err_flag);
             end = clock();
-            printf("HTBL_STREE_NOF_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("HTBL_NOF_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     else {
@@ -239,7 +239,7 @@ int main(int argc, char** argv) {
         end = clock();
         free(arr_input);
         free(out_ht_stree);
-        printf("HTBL_STREE_FIO_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("HTBL_FIO_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             if(with_fio == 1) {
@@ -253,7 +253,7 @@ int main(int argc, char** argv) {
             uniq_count = fui_htable_count(arr_input, num_elems_read, &err_flag);
             end = clock();
             free(arr_input);
-            printf("HTBL_STREE_FIO_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("HTBL_FIO_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
 
@@ -262,13 +262,13 @@ int main(int argc, char** argv) {
         out_ht_dyn = fui_htable_dyn(arr_gen, num_elems, &num_elems_out, &err_flag);
         end = clock();
         free(out_ht_dyn);
-        printf("HTBL_STREE_DYN_NOF_E:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("HTBL_DYN_NOF_E:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             start = clock();
             uniq_count = fui_htable_dyn_count(arr_gen, num_elems, &err_flag);
             end = clock();
-            printf("HTBL_STREE_DYN_NOF_C:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("HTBL_DYN_NOF_C:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     else {
@@ -284,7 +284,7 @@ int main(int argc, char** argv) {
         end = clock();
         free(arr_input);
         free(out_ht_dyn);
-        printf("HTBL_STREE_DYN_FIO_E:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("HTBL_DYN_FIO_E:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             if(with_fio == 1) {
@@ -298,7 +298,7 @@ int main(int argc, char** argv) {
             uniq_count = fui_htable_dyn_count(arr_input, num_elems_read, &err_flag);
             end = clock();
             free(arr_input);
-            printf("HTBL_STREE_DYN_FIO_C:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("HTBL_DYN_FIO_C:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     
@@ -433,13 +433,13 @@ int main(int argc, char** argv) {
         out_bit_dyn = fui_bitmap_dyn(arr_gen, num_elems, &num_elems_out, &err_flag);
         end = clock();
         free(out_bit_dyn);
-        printf("BTAS_STREE_NOF_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("BTAS_DYN_NOF_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             start = clock();
             uniq_count = fui_bitmap_dyn_count(arr_gen, num_elems, &err_flag);
             end = clock();
-            printf("BTAS_STREE_NOF_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("BTAS_DYN_NOF_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     else {
@@ -455,7 +455,7 @@ int main(int argc, char** argv) {
         end = clock();
         free(arr_input);
         free(out_bit_dyn);
-        printf("BTAS_STREE_FIO_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("BTAS_DYN_FIO_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             if(with_fio == 1) {
@@ -469,7 +469,7 @@ int main(int argc, char** argv) {
             uniq_count = fui_bitmap_dyn_count(arr_input, num_elems_read, &err_flag);
             end = clock();
             free(arr_input);
-            printf("BTAS_STREE_FIO_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("BTAS_DYN_FIO_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     
@@ -477,7 +477,7 @@ int main(int argc, char** argv) {
         start = clock();
         out_bit_dyn_idx = fui_bitmap_idx(arr_gen, num_elems, &num_elems_out_idx, &err_flag, &dup_idx_list2);
         end = clock();
-        printf("BTAS_SAIH_NOF_EXPORT:\t%lf\t%ld\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
+        printf("BTAS_IDX_NOF_EXPORT:\t%lf\t%ld\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
     }
     else {
         if(with_fio == 1) {
@@ -491,7 +491,7 @@ int main(int argc, char** argv) {
         out_bit_dyn_idx = fui_bitmap_idx(arr_input, num_elems_read, &num_elems_out_idx, &err_flag, &dup_idx_list2);
         end = clock();
         free(arr_input);
-        printf("BTAS_SAIH_FIO_EXPORT:\t%lf\t%ld\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
+        printf("BTAS_IDX_FIO_EXPORT:\t%lf\t%ld\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
     }
 
     if(with_fio == 0) {
@@ -544,13 +544,13 @@ int main(int argc, char** argv) {
         out_ht_stree = fui_htable(arr_gen, num_elems, &num_elems_out, &err_flag);
         end = clock();
         free(out_ht_stree);
-        printf("HTBL_STREE_NOF_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("HTBL_NOF_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             start = clock();
             uniq_count = fui_htable_count(arr_gen, num_elems, &err_flag);
             end = clock();
-            printf("HTBL_STREE_NOF_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("HTBL_NOF_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     else {
@@ -566,7 +566,7 @@ int main(int argc, char** argv) {
         end = clock();
         free(arr_input);
         free(out_ht_stree);
-        printf("HTBL_STREE_FIO_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("HTBL_FIO_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             if(with_fio == 1) {
@@ -580,7 +580,7 @@ int main(int argc, char** argv) {
             uniq_count = fui_htable_count(arr_input, num_elems_read, &err_flag);
             end = clock();
             free(arr_input);
-            printf("HTBL_STREE_FIO_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("HTBL_FIO_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
 
@@ -589,13 +589,13 @@ int main(int argc, char** argv) {
         out_ht_dyn = fui_htable_dyn(arr_gen, num_elems, &num_elems_out, &err_flag);
         end = clock();
         free(out_ht_dyn);
-        printf("HTBL_STREE_DYN_NOF_E:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("HTBL_DYN_NOF_E:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             start = clock();
             uniq_count = fui_htable_dyn_count(arr_gen, num_elems, &err_flag);
             end = clock();
-            printf("HTBL_STREE_DYN_NOF_C:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("HTBL_DYN_NOF_C:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     else {
@@ -611,7 +611,7 @@ int main(int argc, char** argv) {
         end = clock();
         free(arr_input);
         free(out_ht_dyn);
-        printf("HTBL_STREE_DYN_FIO_E:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("HTBL_DYN_FIO_E:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             if(with_fio == 1) {
@@ -625,7 +625,7 @@ int main(int argc, char** argv) {
             uniq_count = fui_htable_dyn_count(arr_input, num_elems_read, &err_flag);
             end = clock();
             free(arr_input);
-            printf("HTBL_STREE_DYN_FIO_C:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("HTBL_DYN_FIO_C:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     
