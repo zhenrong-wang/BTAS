@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <inttypes.h>
 #include "btas.h"
 #include "data_io.h"
 
@@ -106,13 +107,13 @@ int main(int argc, char** argv) {
         out_bit_dyn = fui_bitmap_dyn(arr_gen, num_elems, &num_elems_out, &err_flag);
         end = clock();
         free(out_bit_dyn);
-        printf("BTAS_DYN_NOF_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("BTAS_DYN_NOF_EXPORT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             start = clock();
             uniq_count = fui_bitmap_dyn_count(arr_gen, num_elems, &err_flag);
             end = clock();
-            printf("BTAS_DYN_NOF_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("BTAS_DYN_NOF_COUNT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     else {
@@ -128,7 +129,7 @@ int main(int argc, char** argv) {
         end = clock();
         free(arr_input);
         free(out_bit_dyn);
-        printf("BTAS_DYN_FIO_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("BTAS_DYN_FIO_EXPORT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             if(with_fio == 1) {
@@ -142,7 +143,7 @@ int main(int argc, char** argv) {
             uniq_count = fui_bitmap_dyn_count(arr_input, num_elems_read, &err_flag);
             end = clock();
             free(arr_input);
-            printf("BTAS_DYN_FIO_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("BTAS_DYN_FIO_COUNT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     
@@ -150,7 +151,7 @@ int main(int argc, char** argv) {
         start = clock();
         out_bit_dyn_idx = fui_bitmap_idx(arr_gen, num_elems, &num_elems_out_idx, &err_flag, &dup_idx_list1);
         end = clock();
-        printf("BTAS_IDX_NOF_EXPORT:\t%lf\t%ld\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
+        printf("BTAS_IDX_NOF_EXPORT:\t%lf\t%" PRIu64 "\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
     }
     else {
         if(with_fio == 1) {
@@ -164,7 +165,7 @@ int main(int argc, char** argv) {
         out_bit_dyn_idx = fui_bitmap_idx(arr_input, num_elems_read, &num_elems_out_idx, &err_flag, &dup_idx_list1);
         end = clock();
         free(arr_input);
-        printf("BTAS_IDX_FIO_EXPORT:\t%lf\t%ld\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
+        printf("BTAS_IDX_FIO_EXPORT:\t%lf\t%" PRIu64 "\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
     }
 
     if(with_fio == 0) {
@@ -172,13 +173,13 @@ int main(int argc, char** argv) {
         out_bit_stc = fui_bitmap_stc(arr_gen, num_elems, &num_elems_out, &err_flag);
         end = clock();
         free(out_bit_stc);
-        printf("BTAS_STC_NOF_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("BTAS_STC_NOF_EXPORT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             start = clock();
             uniq_count = fui_bitmap_stc_count(arr_gen, num_elems, &err_flag);
             end = clock();
-            printf("BTAS_STC_NOF_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("BTAS_STC_NOF_COUNT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     else {
@@ -194,7 +195,7 @@ int main(int argc, char** argv) {
         end = clock();
         free(arr_input);
         free(out_bit_stc);
-        printf("BTAS_STC_FIO_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("BTAS_STC_FIO_EXPORT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             if(with_fio == 1) {
@@ -208,7 +209,7 @@ int main(int argc, char** argv) {
             uniq_count = fui_bitmap_stc_count(arr_input, num_elems_read, &err_flag);
             end = clock();
             free(arr_input);
-            printf("BTAS_STC_FIO_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("BTAS_STC_FIO_COUNT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
 
@@ -217,13 +218,13 @@ int main(int argc, char** argv) {
         out_ht_stree = fui_htable(arr_gen, num_elems, &num_elems_out, &err_flag);
         end = clock();
         free(out_ht_stree);
-        printf("HTBL_NOF_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("HTBL_NOF_EXPORT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             start = clock();
             uniq_count = fui_htable_count(arr_gen, num_elems, &err_flag);
             end = clock();
-            printf("HTBL_NOF_COUNT :\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("HTBL_NOF_COUNT :\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     else {
@@ -239,7 +240,7 @@ int main(int argc, char** argv) {
         end = clock();
         free(arr_input);
         free(out_ht_stree);
-        printf("HTBL_FIO_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("HTBL_FIO_EXPORT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             if(with_fio == 1) {
@@ -253,7 +254,7 @@ int main(int argc, char** argv) {
             uniq_count = fui_htable_count(arr_input, num_elems_read, &err_flag);
             end = clock();
             free(arr_input);
-            printf("HTBL_FIO_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("HTBL_FIO_COUNT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
 
@@ -262,13 +263,13 @@ int main(int argc, char** argv) {
         out_ht_dyn = fui_htable_dyn(arr_gen, num_elems, &num_elems_out, &err_flag);
         end = clock();
         free(out_ht_dyn);
-        printf("HTBL_DYN_NOF_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("HTBL_DYN_NOF_EXPORT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             start = clock();
             uniq_count = fui_htable_dyn_count(arr_gen, num_elems, &err_flag);
             end = clock();
-            printf("HTBL_DYN_NOF_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("HTBL_DYN_NOF_COUNT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     else {
@@ -284,7 +285,7 @@ int main(int argc, char** argv) {
         end = clock();
         free(arr_input);
         free(out_ht_dyn);
-        printf("HTBL_DYN_FIO_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("HTBL_DYN_FIO_EXPORT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             if(with_fio == 1) {
@@ -298,7 +299,7 @@ int main(int argc, char** argv) {
             uniq_count = fui_htable_dyn_count(arr_input, num_elems_read, &err_flag);
             end = clock();
             free(arr_input);
-            printf("HTBL_DYN_FIO_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("HTBL_DYN_FIO_COUNT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     
@@ -308,13 +309,13 @@ int main(int argc, char** argv) {
             out_brute_opt = fui_brute_opt(arr_gen, num_elems, &num_elems_out, &err_flag);
             end = clock();
             free(out_brute_opt);
-            printf("BRUTE_OPT_NOF_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+            printf("BRUTE_OPT_NOF_EXPORT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
             if(with_count == 1) {
                 start = clock();
                 uniq_count = fui_brute_opt_count(arr_gen, num_elems, &err_flag);
                 end = clock();
-                printf("BRUTE_OPT_NOF_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+                printf("BRUTE_OPT_NOF_COUNT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
             }
         }
         else {
@@ -330,7 +331,7 @@ int main(int argc, char** argv) {
             end = clock();
             free(arr_input);
             free(out_brute_opt);
-            printf("BRUTE_OPT_FIO_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+            printf("BRUTE_OPT_FIO_EXPORT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
             if(with_count == 1) {
                 if(with_fio == 1) {
@@ -344,7 +345,7 @@ int main(int argc, char** argv) {
                 uniq_count = fui_brute_opt_count(arr_input, num_elems_read, &err_flag);
                 end = clock();
                 free(arr_input);
-                printf("BRUTE_OPT_FIO_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+                printf("BRUTE_OPT_FIO_COUNT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
             }
         }
         
@@ -353,14 +354,14 @@ int main(int argc, char** argv) {
             out_brute = fui_brute(arr_gen, num_elems, &num_elems_out, &err_flag);
             end = clock();
             free(out_brute);
-            printf("BRUTE_ORIG_NOF_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+            printf("BRUTE_ORIG_NOF_EXPORT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
             if(with_count == 1) {
                 start = clock();
                 out_brute = fui_brute(arr_gen, num_elems, &num_elems_out, &err_flag);
                 end = clock();
                 free(out_brute);
-                printf("BRUTE_ORIG_NOF_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+                printf("BRUTE_ORIG_NOF_COUNT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
             }
         }
         else {
@@ -376,7 +377,7 @@ int main(int argc, char** argv) {
             end = clock();
             free(arr_input);
             free(out_brute);
-            printf("BRUTE_ORIG_FIO_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+            printf("BRUTE_ORIG_FIO_EXPORT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
             if(with_count == 1) {
                 if(with_fio == 1) {
@@ -390,7 +391,7 @@ int main(int argc, char** argv) {
                 uniq_count = fui_brute_count(arr_input, num_elems_read, &err_flag);
                 end = clock();
                 free(arr_input);
-                printf("BRUTE_ORIG_FIO_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+                printf("BRUTE_ORIG_FIO_COUNT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
             }
         }
     }
@@ -433,13 +434,13 @@ int main(int argc, char** argv) {
         out_bit_dyn = fui_bitmap_dyn(arr_gen, num_elems, &num_elems_out, &err_flag);
         end = clock();
         free(out_bit_dyn);
-        printf("BTAS_DYN_NOF_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("BTAS_DYN_NOF_EXPORT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             start = clock();
             uniq_count = fui_bitmap_dyn_count(arr_gen, num_elems, &err_flag);
             end = clock();
-            printf("BTAS_DYN_NOF_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("BTAS_DYN_NOF_COUNT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     else {
@@ -455,7 +456,7 @@ int main(int argc, char** argv) {
         end = clock();
         free(arr_input);
         free(out_bit_dyn);
-        printf("BTAS_DYN_FIO_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("BTAS_DYN_FIO_EXPORT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             if(with_fio == 1) {
@@ -469,7 +470,7 @@ int main(int argc, char** argv) {
             uniq_count = fui_bitmap_dyn_count(arr_input, num_elems_read, &err_flag);
             end = clock();
             free(arr_input);
-            printf("BTAS_DYN_FIO_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("BTAS_DYN_FIO_COUNT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     
@@ -477,7 +478,7 @@ int main(int argc, char** argv) {
         start = clock();
         out_bit_dyn_idx = fui_bitmap_idx(arr_gen, num_elems, &num_elems_out_idx, &err_flag, &dup_idx_list2);
         end = clock();
-        printf("BTAS_IDX_NOF_EXPORT:\t%lf\t%ld\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
+        printf("BTAS_IDX_NOF_EXPORT:\t%lf\t%" PRIu64 "\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
     }
     else {
         if(with_fio == 1) {
@@ -491,7 +492,7 @@ int main(int argc, char** argv) {
         out_bit_dyn_idx = fui_bitmap_idx(arr_input, num_elems_read, &num_elems_out_idx, &err_flag, &dup_idx_list2);
         end = clock();
         free(arr_input);
-        printf("BTAS_IDX_FIO_EXPORT:\t%lf\t%ld\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
+        printf("BTAS_IDX_FIO_EXPORT:\t%lf\t%" PRIu64 "\t::::%d\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out_idx, err_flag);
     }
 
     if(with_fio == 0) {
@@ -499,13 +500,13 @@ int main(int argc, char** argv) {
         out_bit_stc = fui_bitmap_stc(arr_gen, num_elems, &num_elems_out, &err_flag);
         end = clock();
         free(out_bit_stc);
-        printf("BTAS_STC_NOF_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("BTAS_STC_NOF_EXPORT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             start = clock();
             uniq_count = fui_bitmap_stc_count(arr_gen, num_elems, &err_flag);
             end = clock();
-            printf("BTAS_STC_NOF_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("BTAS_STC_NOF_COUNT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     else {
@@ -521,7 +522,7 @@ int main(int argc, char** argv) {
         end = clock();
         free(arr_input);
         free(out_bit_stc);
-        printf("BTAS_STC_FIO_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("BTAS_STC_FIO_EXPORT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             if(with_fio == 1) {
@@ -535,7 +536,7 @@ int main(int argc, char** argv) {
             uniq_count = fui_bitmap_stc_count(arr_input, num_elems_read, &err_flag);
             end = clock();
             free(arr_input);
-            printf("BTAS_STC_FIO_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("BTAS_STC_FIO_COUNT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     
@@ -544,13 +545,13 @@ int main(int argc, char** argv) {
         out_ht_stree = fui_htable(arr_gen, num_elems, &num_elems_out, &err_flag);
         end = clock();
         free(out_ht_stree);
-        printf("HTBL_NOF_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("HTBL_NOF_EXPORT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             start = clock();
             uniq_count = fui_htable_count(arr_gen, num_elems, &err_flag);
             end = clock();
-            printf("HTBL_NOF_COUNT :\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("HTBL_NOF_COUNT :\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     else {
@@ -566,7 +567,7 @@ int main(int argc, char** argv) {
         end = clock();
         free(arr_input);
         free(out_ht_stree);
-        printf("HTBL_FIO_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("HTBL_FIO_EXPORT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             if(with_fio == 1) {
@@ -580,7 +581,7 @@ int main(int argc, char** argv) {
             uniq_count = fui_htable_count(arr_input, num_elems_read, &err_flag);
             end = clock();
             free(arr_input);
-            printf("HTBL_FIO_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("HTBL_FIO_COUNT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
 
@@ -589,13 +590,13 @@ int main(int argc, char** argv) {
         out_ht_dyn = fui_htable_dyn(arr_gen, num_elems, &num_elems_out, &err_flag);
         end = clock();
         free(out_ht_dyn);
-        printf("HTBL_DYN_NOF_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("HTBL_DYN_NOF_EXPORT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             start = clock();
             uniq_count = fui_htable_dyn_count(arr_gen, num_elems, &err_flag);
             end = clock();
-            printf("HTBL_DYN_NOF_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("HTBL_DYN_NOF_COUNT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     else {
@@ -611,7 +612,7 @@ int main(int argc, char** argv) {
         end = clock();
         free(arr_input);
         free(out_ht_dyn);
-        printf("HTBL_DYN_FIO_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+        printf("HTBL_DYN_FIO_EXPORT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
         if(with_count == 1) {
             if(with_fio == 1) {
@@ -625,7 +626,7 @@ int main(int argc, char** argv) {
             uniq_count = fui_htable_dyn_count(arr_input, num_elems_read, &err_flag);
             end = clock();
             free(arr_input);
-            printf("HTBL_DYN_FIO_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+            printf("HTBL_DYN_FIO_COUNT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
         }
     }
     
@@ -635,13 +636,13 @@ int main(int argc, char** argv) {
             out_brute_opt = fui_brute_opt(arr_gen, num_elems, &num_elems_out, &err_flag);
             end = clock();
             free(out_brute_opt);
-            printf("BRUTE_OPT_NOF_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+            printf("BRUTE_OPT_NOF_EXPORT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
             if(with_count == 1) {
                 start = clock();
                 uniq_count = fui_brute_opt_count(arr_gen, num_elems, &err_flag);
                 end = clock();
-                printf("BRUTE_OPT_NOF_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
+                printf("BRUTE_OPT_NOF_COUNT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, uniq_count);
             }
         }
         else {
@@ -657,7 +658,7 @@ int main(int argc, char** argv) {
             end = clock();
             free(arr_input);
             free(out_brute_opt);
-            printf("BRUTE_OPT_FIO_EXPORT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+            printf("BRUTE_OPT_FIO_EXPORT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
 
             if(with_count == 1) {
                 if(with_fio == 1) {
@@ -671,7 +672,7 @@ int main(int argc, char** argv) {
                 uniq_count = fui_brute_opt_count(arr_input, num_elems_read, &err_flag);
                 end = clock();
                 free(arr_input);
-                printf("BRUTE_OPT_FIO_COUNT:\t%lf\t%ld\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+                printf("BRUTE_OPT_FIO_COUNT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
             }
         }
     }

@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <inttypes.h>
 #include "btas.h"
 
 /**
@@ -111,7 +112,7 @@ void print_arr(const uint32_t *arr, uint64_t num_elems, uint64_t max_elems) {
         }
     }
     if(num_elems != max_elems && i == max_elems) {
-        printf("... Remaining %lu elements not printed ...\n", num_elems-max_elems);
+        printf("... Remaining %" PRIu64 " elements not printed ...\n", num_elems-max_elems);
     }
     printf("\n");
 }
@@ -968,7 +969,7 @@ void print_dup_idx_list(dup_idx_list *dup_idx_head, uint64_t max_nodes) {
     uint64_t i = 0;
     printf("\nIndex pairs of duplicate elements:\n");
     while(ptr_current != NULL && i < max_nodes) {
-        printf("{%lu\t%lu}\n", ptr_current->index_a, ptr_current->index_b);
+        printf("{%" PRIu64 "\t%" PRIu64 "}\n", ptr_current->index_a, ptr_current->index_b);
         ptr_current = ptr_current->ptr_next;
         i++;
     }
@@ -988,10 +989,10 @@ void print_out_idx(out_idx *output_index, uint64_t num_elems, uint64_t max_elems
     uint64_t i;
     printf("\nRaw index and duplicate elements:\n");
     for(i = 0; i < max_elems && i < num_elems; i++) {
-        printf("%lu\t%u\n", output_index[i].raw_index, output_index[i].out_elem);
+        printf("%" PRIu64 "\t%u\n", output_index[i].raw_index, output_index[i].out_elem);
     }
     if(max_elems != num_elems && i == max_elems) {
-        printf("... %lu remaining elements not printed ...\n", num_elems - max_elems);
+        printf("... %" PRIu64 " remaining elements not printed ...\n", num_elems - max_elems);
     }
     else{
         printf("Print done.\n");
