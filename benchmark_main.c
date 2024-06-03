@@ -71,7 +71,7 @@ int main(int argc, char** argv) {
         printf("ERROR: arguments illegal. Make sure they are plain positive numbers and < 4,294,967,296.\n");
         return 3;
     }
-    printf("INPUT_ELEMS:\t%lu\nRANDOM_MAX:\t%u\n\n",num_elems, rand_max);
+    printf("INPUT_ELEMS:\t%" PRIu64 "\nRANDOM_MAX:\t%u\n\n",num_elems, rand_max);
     
     uint32_t *arr_gen = (uint32_t *)malloc(sizeof(uint32_t) * num_elems);
     if(arr_gen == NULL) {
