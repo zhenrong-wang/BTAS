@@ -56,6 +56,36 @@ int string_to_u64_num(const char* string, uint64_t *unsigned_num) {
     return (result == UINT64_MAX);
 }
 
+int string_to_u32_num(const char* string, uint32_t *unsigned_num) {
+    *unsigned_num = 0; /* Set the output to 0. */
+    if(string == NULL) {
+        /* If the string pointer is null, reject to proceed
+           because strlen(null) would cause stack overflow. */
+        return -3; 
+    }
+    size_t str_length = strlen(string);
+    uint64_t result = 0; /* Define a 64bit unsigned integer as a larger buffer. */
+    for(size_t i = 0; i < str_length; i++) {
+        /* Use chars '0' or '9' to guarantee the portability. */
+        if(string[i] < '0' || string[i] > '9') {
+            return -1; /* Illegal chars found. Reject to proceed. */
+        }
+        result = result * 10 + (string[i] - '0');
+        if(result > 0xFFFFFFFF) {
+            /* Overflow occurred. Set the output to UINT32_MAX and return,
+               Users can decide to use the UINT32_MAX but it is clear that
+               overflow has ocurred indicated by the return value 1. */
+            *unsigned_num = 0xFFFFFFFF;
+            return 1; 
+        }
+    }
+    /* Everything is good, return the lower-32 bit of the 64bit result. 
+       Or, just directly use *unsigned_num = (uint32_t)result to cast it.
+       Let's avoid cast and use bitwise operation to manually cast. */
+    *unsigned_num = result & 0xFFFFFFFF;
+    return 0;
+}
+
 /**
  * 
  * @brief Print out an integer array for debugging
@@ -81,7 +111,7 @@ void print_arr(const uint32_t *arr, uint64_t num_elems, uint64_t max_elems) {
         }
     }
     if(num_elems != max_elems && i == max_elems) {
-        printf("... Remaining %u elements not printed ...\n", num_elems-max_elems);
+        printf("... Remaining %lu elements not printed ...\n", num_elems-max_elems);
     }
     printf("\n");
 }
@@ -118,7 +148,7 @@ int compare_arr(const uint32_t *arr_a, const uint32_t *arr_b, uint64_t num_elems
  * 
  */
 int generate_random_input_arr(uint32_t *arr, uint64_t num_elems, uint32_t rand_max) {
-    int32_t sign_flag, rand_num;
+    uint32_t rand_num = 0;
     if(arr == NULL) {
         return -5;
     }
@@ -130,19 +160,13 @@ int generate_random_input_arr(uint32_t *arr, uint64_t num_elems, uint32_t rand_m
     }
     srand(time(0));
     for(uint64_t i = 0; i < num_elems; i++) {
-        sign_flag = rand();
         if(RAND_MAX == 0x7fff) {
-            rand_num = ((rand() << 16) | rand()) % rand_max;
+            rand_num = (((uint32_t)rand() << 16) | (uint32_t)rand()) % rand_max;
         }
         else{
-            rand_num = rand() % rand_max;
+            rand_num = (uint32_t)rand() % rand_max;
         }
-        if(sign_flag%2 == 0) {
-            arr[i] = rand_num;
-        }
-        else {
-            arr[i] = 0 - rand_num;
-        }
+        arr[i] = rand_num;
     }
     //print_arr(arr, num_elems);
     return 0;
@@ -684,11 +708,11 @@ uint64_t fui_htable_new_count(const uint32_t *input_arr, const uint64_t num_elem
     *err_flag = 0;
     if (input_arr == NULL) {
         *err_flag = -5;
-        return NULL;
+        return 0;
     }
     if (num_elems < 1){
         *err_flag = -3;
-        return NULL;
+        return 0;
     }
     for(i = 0; i < num_elems; i++) {
         tmp = input_arr[i];
@@ -847,16 +871,16 @@ uint64_t fui_htable_dyn_count(const uint32_t *input_arr, const uint64_t num_elem
     *err_flag = 0;
     if (input_arr == NULL) {
         *err_flag = -5;
-        return NULL;
+        return 0;
     }
     if (num_elems < 1){
         *err_flag = -3;
-        return NULL;
+        return 0;
     }
     hash_table_base = (htable_base *)calloc(HT_DYN_INI_SIZE, sizeof(htable_base));
     if(hash_table_base == NULL) {
         *err_flag = 5;
-        return NULL;
+        return 0;
     }
     for(i = 0; i < num_elems; i++) {
         tmp = input_arr[i];
@@ -945,7 +969,7 @@ void print_dup_idx_list(dup_idx_list *dup_idx_head, uint64_t max_nodes) {
     uint64_t i = 0;
     printf("\nIndex pairs of duplicate elements:\n");
     while(ptr_current != NULL && i < max_nodes) {
-        printf("{%u\t%u}\n", ptr_current->index_a, ptr_current->index_b);
+        printf("{%lu\t%lu}\n", ptr_current->index_a, ptr_current->index_b);
         ptr_current = ptr_current->ptr_next;
         i++;
     }
@@ -965,10 +989,10 @@ void print_out_idx(out_idx *output_index, uint64_t num_elems, uint64_t max_elems
     uint64_t i;
     printf("\nRaw index and duplicate elements:\n");
     for(i = 0; i < max_elems && i < num_elems; i++) {
-        printf("%u\t%d\n", output_index[i].raw_index, output_index[i].out_elem);
+        printf("%lu\t%u\n", output_index[i].raw_index, output_index[i].out_elem);
     }
     if(max_elems != num_elems && i == max_elems) {
-        printf("... %u remaining elements not printed ...\n", num_elems - max_elems);
+        printf("... %lu remaining elements not printed ...\n", num_elems - max_elems);
     }
     else{
         printf("Print done.\n");
@@ -1093,11 +1117,11 @@ uint64_t fui_bitmap_stc_count(const uint32_t *input_arr, const uint64_t num_elem
     *err_flag = 0;
     if (input_arr == NULL) {
         *err_flag = -5;
-        return NULL;
+        return 0;
     }
     if (num_elems < 1){
         *err_flag = -3;
-        return NULL;
+        return 0;
     }
     for(i = 0; i < num_elems; i++) {
         tmp = input_arr[i];
@@ -1212,16 +1236,16 @@ uint64_t fui_bitmap_dyn_count(const uint32_t *input_arr, const uint64_t num_elem
     *err_flag = 0;
     if (input_arr == NULL) {
         *err_flag = -5;
-        return NULL;
+        return 0;
     }
     if (num_elems < 1){
         *err_flag = -3;
-        return NULL;
+        return 0;
     }
     bitmap_head = (bitmap_base *)calloc(BITMAP_INIT_LENGTH, sizeof(bitmap_base));
     if(bitmap_head == NULL) {
         *err_flag = 5;
-        return NULL;
+        return 0;
     }
     for(i = 0; i < num_elems; i++) {
         tmp = input_arr[i];

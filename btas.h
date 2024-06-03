@@ -53,6 +53,7 @@ typedef signed char         int8_t;
  *  - Generate a GROWING input signed integer array
  */
 int string_to_u64_num(const char* string, uint64_t *unsigned_num);
+int string_to_u32_num(const char* string, uint32_t *unsigned_num);
 void print_arr(const uint32_t *arr, uint64_t num_elems, uint64_t max_elems);
 int compare_arr(const uint32_t *arr_a, const uint32_t *arr_b, uint64_t num_elems);
 int generate_random_input_arr(uint32_t *arr, uint64_t num_elems, uint32_t rand_max);
