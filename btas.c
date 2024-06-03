@@ -301,7 +301,7 @@ uint64_t fui_brute_count(const uint32_t *input_arr, const uint64_t num_elems, in
         *err_flag = -3;
         return 0;
     }
-    uint32_t *output_arr = (int32_t *)calloc(num_elems, sizeof(int32_t));
+    uint32_t *output_arr = (uint32_t *)calloc(num_elems, sizeof(uint32_t));
     if (output_arr == NULL) {
         *err_flag = -1;
         return 0;
@@ -575,7 +575,6 @@ uint64_t fui_htable_count(const uint32_t *input_arr, const uint64_t num_elems, i
     uint64_t i, j = 0;
     uint16_t h16 = 0, l16 = 0;
     uint32_t tmp = 0;
-    uint32_t *final_output_arr = NULL;
     uint8_t *hash_table_base[HT_STEM_SIZE] = {NULL,};
     *err_flag = 0;
     if (input_arr == NULL) {

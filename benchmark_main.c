@@ -399,7 +399,7 @@ int main(int argc, char** argv) {
     free(out_bit_dyn_idx);
     free_dup_idx_list(dup_idx_list1);
     
-    arr_gen = (int32_t *)malloc(sizeof(int32_t) * num_elems);
+    arr_gen = (uint32_t *)malloc(sizeof(uint32_t) * num_elems);
     if(arr_gen == NULL) {
         printf("ERROR: Failed to allocate memory for input array.\n");
         return 5;
