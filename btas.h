@@ -52,20 +52,20 @@ typedef signed char         int8_t;
  *  - Generate a RANDOM input signed integer array
  *  - Generate a GROWING input signed integer array
  */
-int string_to_u32_num(const char* string, uint32_t *unsigned_num);
-void print_arr(const int32_t *arr, uint32_t num_elems, uint32_t max_elems);
-int compare_arr(const int32_t *arr_a, const int32_t *arr_b, uint32_t num_elems);
-int generate_random_input_arr(int32_t *arr, uint32_t num_elems, uint32_t rand_max);
-int generate_growing_arr(int32_t *arr, uint32_t num_elems);
+int string_to_u64_num(const char* string, uint64_t *unsigned_num);
+void print_arr(const uint32_t *arr, uint64_t num_elems, uint64_t max_elems);
+int compare_arr(const uint32_t *arr_a, const uint32_t *arr_b, uint64_t num_elems);
+int generate_random_input_arr(uint32_t *arr, uint64_t num_elems, uint32_t rand_max);
+int generate_growing_arr(uint32_t *arr, uint64_t num_elems);
 int cmd_flag_parser(int argc, char **argv, const char *cmd_flag);
 
 /**
  * Section B. Brute and Brute-Opt algorithms
  */
-int32_t* fui_brute(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
-uint32_t fui_brute_count(const int32_t *input_arr, const uint32_t num_elems, int *err_flag);
-int32_t* fui_brute_opt(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
-uint32_t fui_brute_opt_count(const int32_t *input_arr, const uint32_t num_elems, int *err_flag);
+uint32_t* fui_brute(const uint32_t *input_arr, const uint64_t num_elems, uint64_t *num_elems_out, int *err_flag);
+uint64_t fui_brute_count(const uint32_t *input_arr, const uint64_t num_elems, int *err_flag);
+uint32_t* fui_brute_opt(const uint32_t *input_arr, const uint64_t num_elems, uint64_t *num_elems_out, int *err_flag);
+uint64_t fui_brute_opt_count(const uint32_t *input_arr, const uint64_t num_elems, int *err_flag);
 
 
 /**
@@ -75,28 +75,26 @@ uint32_t fui_brute_opt_count(const int32_t *input_arr, const uint32_t num_elems,
  * efficient but not memory efficient (space optimized)
  * 
  */
-#define HASH_TABLE_SIZE 32769
-#define MOD_TABLE_SIZE  65536
+#define HT_STEM_SIZE 65536
+#define HT_BRANCH_SIZE 65536
 #define HT_DYN_INI_SIZE 32
 
 typedef struct {
-    uint32_t branch_size_p;
-    uint32_t branch_size_n;
-    uint8_t *ptr_branch_p;
-    uint8_t *ptr_branch_n;
+    uint32_t branch_size;
+    uint8_t *ptr_branch;
 } htable_base;
 
 void free_hash_table(uint8_t *hash_table[], uint32_t num_elems);
 void free_hash_table_new(htable_base hash_table_new[], uint32_t num_elems);
 
-int32_t* fui_htable_dtree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
-uint32_t fui_htable_dtree_count(const int32_t *input_arr, const uint32_t num_elems, int *err_flag);
+uint32_t* fui_htable(const uint32_t *input_arr, const uint64_t num_elems, uint64_t *num_elems_out, int *err_flag);
+uint64_t fui_htable_count(const uint32_t *input_arr, const uint64_t num_elems, int *err_flag);
 
-int32_t* fui_htable_stree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
-uint32_t fui_htable_stree_count(const int32_t *input_arr, const uint32_t num_elems, int *err_flag);
+uint32_t* fui_htable_new(const uint32_t *input_arr, const uint64_t num_elems, uint64_t *num_elems_out, int *err_flag);
+uint64_t fui_htable_new_count(const uint32_t *input_arr, const uint64_t num_elems, int *err_flag);
 
-int32_t* fui_htable_stree_dyn(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
-uint32_t fui_htable_stree_dyn_count(const int32_t *input_arr, const uint32_t num_elems, int *err_flag);
+uint32_t* fui_htable_dyn(const uint32_t *input_arr, const uint64_t num_elems, uint64_t *num_elems_out, int *err_flag);
+uint64_t fui_htable_dyn_count(const uint32_t *input_arr, const uint64_t num_elems, int *err_flag);
 
 /**
  * Section D. BitTree Algorithms.
@@ -105,28 +103,23 @@ uint32_t fui_htable_stree_dyn_count(const int32_t *input_arr, const uint32_t num
  * efficiency.
  * 
  */
-#define NEGATIVE_START_POS  8192
-#define BIT_MOD_TABLE_SIZE  16384
-#define BIT_MOD_DIV_FACTOR  65536
+#define BITMAP_BRANCH_SIZE  8192
 #define BITMAP_INIT_LENGTH  1024
-#define BITMAP_LENGTH_MAX   32769
-
-#define UINT_16_MAX         65536
-#define UINT_8_MAX          256
+#define BITMAP_LENGTH_MAX   65536
 #define IDX_ADJ_BRCH_SIZE   65536
-#define BITMAP_BRCH_DTREE   65536
+#define BITMAP_BRCH_TREE    65536
 
 struct dup_idx_struct {
-    uint32_t index_a;
-    uint32_t index_b;
+    uint64_t index_a;
+    uint64_t index_b;
     struct dup_idx_struct *ptr_next;
 };
 
-typedef struct dup_idx_struct       dup_idx_list;
+typedef struct dup_idx_struct dup_idx_list;
 
 typedef struct {
-    int32_t out_elem;
-    uint32_t raw_index;
+    uint32_t out_elem;
+    uint64_t raw_index;
 } out_idx;
 
 typedef struct {
@@ -134,96 +127,44 @@ typedef struct {
     uint8_t *ptr_branch;
 } bitmap_base;
 
-typedef struct {
-    uint16_t branch_size[2];
-    uint8_t *ptr_branch[2];
-} bitmap_dtree;
-
 /* Adjacent index hashtable */
 typedef struct {
-    uint16_t branch_size[2];
-    uint8_t *ptr_branch[2];
+    uint32_t branch_size;
+    uint8_t *ptr_branch;
 } idx_ht_8;
 
 typedef struct {
-    uint16_t branch_size[2];
-    uint16_t *ptr_branch[2];
+    uint32_t branch_size;
+    uint16_t *ptr_branch;
 } idx_ht_16;
 
 typedef struct {
-    uint16_t branch_size[2];
-    uint32_t *ptr_branch[2];
+    uint32_t branch_size;
+    uint32_t *ptr_branch;
 } idx_ht_32;
+
+typedef struct {
+    uint32_t branch_size;
+    uint64_t *ptr_branch;
+} idx_ht_64;
 
 #define flip_bit(byte_a, bit_position) ((byte_a) |= (0x80 >> (bit_position)))
 #define check_bit(byte_a, bit_position) ((byte_a) & (0x80 >> (bit_position)))
 
 void free_dup_idx_list(dup_idx_list *dup_idx_head);
-int insert_dup_idx_list(dup_idx_list **dup_idx_head, uint32_t idx_a, uint32_t idx_b);
-void print_dup_idx_list(dup_idx_list *dup_idx_head, uint32_t max_nodes);
-void print_out_idx(out_idx *output_index, uint32_t num_elems, uint32_t max_elems);
+int insert_dup_idx_list(dup_idx_list **dup_idx_head, uint64_t idx_a, uint64_t idx_b);
+void print_dup_idx_list(dup_idx_list *dup_idx_head, uint64_t max_nodes);
+void print_out_idx(out_idx *output_index, uint64_t num_elems, uint64_t max_elems);
 
-void free_bitmap(bitmap_base *bitmap_head, uint16_t num_elems);
-void free_bitmap_dtree(bitmap_dtree *bitmap_head, uint16_t num_elems);
-void free_idx_ht_8(idx_ht_8 *idx_ht_head, uint16_t num_elems);
-void free_idx_ht_16(idx_ht_16 *idx_ht_head, uint16_t num_elems);
-void free_idx_ht_32(idx_ht_32 *idx_ht_head, uint16_t num_elems);
+void free_bitmap(bitmap_base *bitmap_head, uint32_t num_elems);
+void free_idx_ht_8(idx_ht_8 *idx_ht_head, uint32_t num_elems);
+void free_idx_ht_16(idx_ht_16 *idx_ht_head, uint32_t num_elems);
+void free_idx_ht_32(idx_ht_32 *idx_ht_head, uint32_t num_elems);
 
-int32_t* fui_bitmap_stc_stree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
-uint32_t fui_bitmap_stc_stree_count(const int32_t *input_arr, const uint32_t num_elems, int *err_flag);
-
-int32_t* fui_bitmap_dyn_stree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
-uint32_t fui_bitmap_dyn_stree_count(const int32_t *input_arr, const uint32_t num_elems, int *err_flag);
-
-int32_t* fui_bitmap_dyn_dtree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag);
-uint32_t fui_bitmap_dyn_dtree_count(const int32_t *input_arr, const uint32_t num_elems, int *err_flag);
-
-out_idx* fui_bitmap_idx_stree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head);
-out_idx* fui_bitmap_idx_dtree(const int32_t *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head);
-
-
-/**
- * Extending the algo to 64bit or even longer input element. Quite Challanging.
- * 
- 
- typedef struct {
-    int out_elem;
-    uint32_t raw_index;
-} out_idx_i64;
-
-int assemble_h32(int_64bit a);
-int assemble_l32(int_64bit a);
-
-int hash_64_to_32(int_64bit in64);
-int_64bit* transform_32_to_64_arr(const int *arr_input_32, uint32_t num_elems, const char *option);
-out_idx_i64* fui_bitmap_dtree_idx_64(const int_64bit *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head);
-*/
-
-/**
- * Using linked-list makes the performance really bad when the 
- * Original inpu array is medium and large. Abandon it. If you
- * would like to test this algorithm (int* fui_bitmap_idx_llist),
- * Please uncomment the contents below. * 
- * 
-struct bmap_idx_tbl_struct {
-    uint16_t byte_index;
-    uint8_t bit_position;
-    uint32_t raw_index;
-    struct bmap_idx_tbl_struct *ptr_next;
-};*/
-
-/* typedef struct bmap_idx_tbl_struct  bmap_idx_brch; */
-
-/* typedef struct {
-    uint16_t bit_branch_size;
-    uint8_t *ptr_bit_branch;
-    bmap_idx_brch *ptr_idx_branch;
-} bitmap_idx_base; */
-
-/* void free_bmap_idx_branch(bmap_idx_brch *bmap_idx_head); */
-/* int insert_idx_branch(bmap_idx_brch **bmap_idx_head, uint16_t byte_idx, uint8_t bit_pos, uint32_t raw_idx); */
-/* int get_raw_idx(bmap_idx_brch *bmap_idx_head, uint16_t byte_idx, uint8_t bit_pos, uint32_t *raw_idx); */
-/* void free_bitmap_idx(bitmap_idx_base *bitmap_head, uint16_t num_elems); */
-/* int* fui_bitmap_idx_llist(const int *input_arr, const uint32_t num_elems, uint32_t *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head); */
+uint32_t* fui_bitmap_stc(const uint32_t *input_arr, const uint64_t num_elems, uint64_t *num_elems_out, int *err_flag);
+uint64_t fui_bitmap_stc_count(const uint32_t *input_arr, const uint64_t num_elems, int *err_flag);
+uint32_t* fui_bitmap_dyn(const uint32_t *input_arr, const uint64_t num_elems, uint64_t *num_elems_out, int *err_flag);
+uint64_t fui_bitmap_dyn_count(const uint32_t *input_arr, const uint64_t num_elems, int *err_flag);
+out_idx* fui_bitmap_idx(const uint32_t *input_arr, const uint64_t num_elems, uint64_t *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head);
 
 #endif
