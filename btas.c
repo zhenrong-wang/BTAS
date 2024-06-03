@@ -1075,8 +1075,8 @@ uint32_t* fui_bitmap_stc(const uint32_t *input_arr, const uint64_t num_elems, ui
         tmp = input_arr[i];
         h16 = (uint16_t)(tmp >> 16);
         l16 = (uint16_t)(tmp & 0xFFFF);
-        tmp_byte_index = l16 / 8;
-        tmp_bit_position = l16 % 8;
+        tmp_byte_index = l16 >> 3;
+        tmp_bit_position = l16 & 0x07;
         if(bitmap_head[h16].ptr_branch == NULL) {
             if((bitmap_head[h16].ptr_branch = (uint8_t *)calloc(BITMAP_BRANCH_SIZE, sizeof(uint8_t))) == NULL) {
                 *err_flag = 1;
@@ -1126,8 +1126,8 @@ uint64_t fui_bitmap_stc_count(const uint32_t *input_arr, const uint64_t num_elem
         tmp = input_arr[i];
         h16 = (uint16_t)(tmp >> 16);
         l16 = (uint16_t)(tmp & 0xFFFF);
-        tmp_byte_index = l16 / 8;
-        tmp_bit_position = l16 % 8;
+        tmp_byte_index = l16 >> 3;
+        tmp_bit_position = l16 & 0x07;
         if(bitmap_head[h16].ptr_branch == NULL) {
             if((bitmap_head[h16].ptr_branch = (uint8_t *)calloc(BITMAP_BRANCH_SIZE, sizeof(uint8_t))) == NULL) {
                 *err_flag = 1;
@@ -1181,8 +1181,8 @@ uint32_t* fui_bitmap_dyn(const uint32_t *input_arr, const uint64_t num_elems, ui
         tmp = input_arr[i];
         h16 = (uint16_t)(tmp >> 16);
         l16 = (uint16_t)(tmp & 0xFFFF);
-        tmp_byte_index = l16 / 8;
-        tmp_bit_position = l16 % 8;
+        tmp_byte_index = l16 >> 3;
+        tmp_bit_position = l16 & 0x07;
         /* Grow the tree if needed. */
         if((h16 + 1) > bitmap_base_size) {
             bitmap_base_size_target = (((h16 + 1) << 1) > BITMAP_LENGTH_MAX) ? BITMAP_LENGTH_MAX : ((h16 + 1) << 1);
@@ -1250,8 +1250,8 @@ uint64_t fui_bitmap_dyn_count(const uint32_t *input_arr, const uint64_t num_elem
         tmp = input_arr[i];
         h16 = (uint16_t)(tmp >> 16);
         l16 = (uint16_t)(tmp & 0xFFFF);
-        tmp_byte_index = l16 / 8;
-        tmp_bit_position = l16 % 8;
+        tmp_byte_index = l16 >> 3;
+        tmp_bit_position = l16 & 0x07;
         /* Grow the tree if needed. */
         if((h16 + 1) > bitmap_base_size) {
             bitmap_base_size_target = (((h16 + 1) << 1) > BITMAP_LENGTH_MAX) ? BITMAP_LENGTH_MAX : ((h16 + 1) << 1);
@@ -1362,8 +1362,8 @@ out_idx* fui_bitmap_idx(const uint32_t *input_arr, const uint64_t num_elems, uin
         tmp = input_arr[i];
         h16 = (uint16_t)(tmp >> 16);
         l16 = (uint16_t)(tmp & 0xFFFF);
-        tmp_byte = l16 / 8;
-        tmp_bit_position = l16 % 8;
+        tmp_byte = l16 >> 3;
+        tmp_bit_position = l16 & 0x07;
 
         /* Grow the tree if needed. */
         if((h16 + 1) > bitmap_base_size) {
