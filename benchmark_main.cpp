@@ -11,12 +11,19 @@
 #include "btas.h"
 #include "data_io.h"
 
-std::vector<uint32_t> removeDuplicates(const uint32_t* arr, size_t size, size_t *output_elems) {  
-    std::unordered_set<uint32_t> uniqueElements(arr, arr + size);  
-    std::vector<uint32_t> newArray(uniqueElements.begin(), uniqueElements.end());
-    *output_elems = newArray.size();
-    return newArray;  
-}  
+std::vector<uint32_t> fui_cpp_32(const uint32_t* arr, size_t size, size_t *output_elems) {
+    std::unordered_set<uint32_t> unique(arr, arr + size);  
+    std::vector<uint32_t> output(unique.begin(), unique.end());
+    *output_elems = output.size();
+    return output;
+}
+
+std::vector<uint64_t> fui_cpp_64(const uint64_t* arr, size_t size, size_t *output_elems) {
+    std::unordered_set<uint64_t> unique(arr, arr + size);  
+    std::vector<uint64_t> output(unique.begin(), unique.end());
+    *output_elems = output.size();
+    return output;
+}
 
 /**
  * @brief
@@ -42,10 +49,10 @@ std::vector<uint32_t> removeDuplicates(const uint32_t* arr, size_t size, size_t 
  *   9 : Failed to write data to the csv files
  *  
  */
+
 int main(int argc, char** argv) {
-    
     int with_brute = 0, with_fio = 0, with_count = 0;
-    uint32_t rand_max;
+    uint64_t rand_max;
     dup_idx_list *dup_idx_list1 = NULL;
     dup_idx_list *dup_idx_list2 = NULL;
     char data_file_bin[512] = "", data_file_csv[512] = "";
@@ -61,13 +68,14 @@ int main(int argc, char** argv) {
     out_idx *out_bit_dyn_idx = NULL;
     uint32_t *arr_input = NULL;
 
-    std::vector<uint32_t> cpp_output;
+    std::vector<uint64_t> cpp_output;
+    uint64_t *out64 = NULL;
 
     if(argc < 3) {
         printf("ERROR: not enough args. USAGE: ./command argv[1] argv[2] CMD_FLAGS \n");
         return 1;
     }
-    if(cmd_flag_parser(argc, argv, "--brute") == 0) {
+    /*if(cmd_flag_parser(argc, argv, "--brute") == 0) {
         with_brute = 1;
     }
     if(cmd_flag_parser(argc, argv, "--fio-bin") == 0) {
@@ -80,22 +88,22 @@ int main(int argc, char** argv) {
     }
     if(cmd_flag_parser(argc, argv, "--count") == 0) {
         with_count = 1;
-    }
-    if(string_to_u64_num(argv[1], &num_elems) != 0 || string_to_u32_num(argv[2], &rand_max) != 0) {
+    }*/
+    if(string_to_u64_num(argv[1], &num_elems) != 0 || string_to_u64_num(argv[2], &rand_max) != 0) {
         printf("ERROR: arguments illegal. Make sure they are plain positive numbers and < 4,294,967,296.\n");
         return 3;
     }
-    printf("INPUT_ELEMS:\t%" PRIu64 "\nRANDOM_MAX:\t%u\n\n",num_elems, rand_max);
+    printf("INPUT_ELEMS:\t%" PRIu64 "\nRANDOM_MAX:\t%" PRIu64 "\n\n",num_elems, rand_max);
     
-    uint32_t *arr_gen = (uint32_t *)malloc(sizeof(uint32_t) * num_elems);
+    uint64_t *arr_gen = (uint64_t *)malloc(sizeof(uint64_t) * num_elems);
     if(arr_gen == NULL) {
         printf("ERROR: Failed to allocate memory for input array.\n");
         return 5;
     }
     
     printf("Generating a random array for benchmarking ...\n");
-    generate_random_input_arr(arr_gen, num_elems, rand_max);
-    if(with_fio != 0) {
+    generate_random_input_arr64(arr_gen, num_elems, rand_max);
+    /*if(with_fio != 0) {
         printf("Writing data to files ...\n");
         snprintf(data_file_bin, 512, "random_%s_%s.bin", argv[1], argv[2]);
         if(export_1d_u32(data_file_bin, "", arr_gen, num_elems) != 0) {
@@ -111,14 +119,27 @@ int main(int argc, char** argv) {
         }
         free(arr_gen);
         printf("The binary and csv data files generated.\n\n");
-    }
+    }*/
 
     printf("RANDOM ARRAY INPUT:\n");
     printf("ALGO_TYPE\t\tTIME_IN_SEC\tUNIQUE_INTEGERS\n");
 
-    if(with_fio == 0) {
+    start = clock();
+    out64 = fui_bitmap_dyn64(arr_gen, num_elems, &num_elems_out, &err_flag);
+    end = clock();
+    printf("BITMAP_DYN_64BIT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    free(out64);
+
+    start = clock();
+    cpp_output = fui_cpp_64(arr_gen, num_elems, &num_elems_out);
+    end = clock();
+    printf("CPP_UNSORTED_SET:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    
+    return 0;
+
+    /*if(with_fio == 0) {
         start = clock();
-        cpp_output = removeDuplicates(arr_gen, num_elems, &num_elems_out);
+        cpp_output = fui_cpp_32(arr_gen, num_elems, &num_elems_out);
         end = clock();
         printf("CPP_UNSORTED_SET:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
     }
@@ -131,7 +152,7 @@ int main(int argc, char** argv) {
             start = clock();
             arr_input = import_1d_u32(data_file_csv, "csv", &num_elems_read, &err_flag);
         }
-        cpp_output = removeDuplicates(arr_gen, num_elems, &num_elems_out);
+        cpp_output = fui_cpp_32(arr_gen, num_elems, &num_elems_out);
         end = clock();
         free(arr_input);
         printf("CPP_UNSORTED_SET:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
@@ -716,5 +737,5 @@ int main(int argc, char** argv) {
     free_dup_idx_list(dup_idx_list2);
     free(out_bit_dyn_idx);
     printf("\nBenchmark done.\n\n");
-    return 0;
+    return 0;*/
 }

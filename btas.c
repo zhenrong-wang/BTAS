@@ -173,6 +173,31 @@ int generate_random_input_arr(uint32_t *arr, uint64_t num_elems, uint32_t rand_m
     return 0;
 }
 
+int generate_random_input_arr64(uint64_t *arr, uint64_t num_elems, uint64_t rand_max) {
+    uint64_t rand_num = 0;
+    if(arr == NULL) {
+        return -5;
+    }
+    if(num_elems < 1) {
+        return -3;
+    }
+    if(rand_max < 1) {
+        return -1;
+    }
+    srand(time(0));
+    for(uint64_t i = 0; i < num_elems; i++) {
+        if(RAND_MAX == 0x7fff) {
+            rand_num = ((((uint64_t)rand() << 48)) | ((uint64_t)rand() << 32) | ((uint64_t)rand() << 16) | ((uint64_t)rand())) % rand_max;
+        }
+        else{
+            rand_num = (((uint64_t)rand() << 32) | ((uint64_t)rand())) % rand_max;
+        }
+        arr[i] = rand_num;
+    }
+    //print_arr(arr, num_elems);
+    return 0;
+}
+
 /**
  * 
  * @brief Generate a single-direction growing integer array
@@ -1511,7 +1536,92 @@ free_memory:
 }
 
 uint64_t* fui_bitmap_dyn64(const uint64_t *input_arr, const uint64_t num_elems, uint64_t *num_elems_out, int *err_flag) {
-    
+    uint64_t i, j = 0;
+    uint16_t highest16 = 0, higher16 = 0, lower16 = 0, lowest16 = 0;
+    uint64_t tmp = 0, *final_output_arr = NULL;
+    uint8_t ***stem[STEM_BRANCH_SIZE] = {NULL, };
+    uint16_t byte_pos = 0;
+    uint8_t bit_pos = 0;
+    *err_flag = 0;
+    *num_elems_out = 0;
+    if (input_arr == NULL) {
+        *err_flag = -5;
+        return NULL;
+    }
+    if (num_elems < 1){
+        *err_flag = -3;
+        return NULL;
+    }
+    uint64_t *output_arr = (uint64_t *)calloc(num_elems, sizeof(uint64_t));
+    if (output_arr == NULL) {
+        *err_flag = -1;
+        return NULL;
+    }
+    for(i = 0; i < num_elems; i++) {
+        tmp = input_arr[i];
+        highest16 = (uint16_t)(tmp >> 48);
+        higher16 = (uint16_t)((tmp >> 32) & 0xFFFF);
+        lower16 = (uint16_t)((tmp >> 16) & 0xFFFF);
+        lowest16 = (uint16_t)(tmp & 0xFFFF);
+        byte_pos = lowest16 >> 3;
+        bit_pos = lowest16 & 0x07;
+        /* Grow the tree if needed. */
+        if(stem[highest16] == NULL) {
+            if((stem[highest16] = (uint8_t ***)calloc(STEM_BRANCH_SIZE, sizeof(uint8_t **))) == NULL) {
+                *err_flag = 1;
+                goto free_memory;
+            }
+        }
+        if((stem[highest16])[higher16] == NULL) {
+            if(((stem[highest16])[higher16] = (uint8_t **)calloc(STEM_BRANCH_SIZE, sizeof(uint8_t *))) == NULL) {
+                *err_flag = 1;
+                goto free_memory;
+            }
+        }
+        if(((stem[highest16])[higher16])[lower16] == NULL) {
+            if((((stem[highest16])[higher16])[lower16] = (uint8_t *)calloc(LEAF_SIZE_BYTE, sizeof(uint8_t))) == NULL) {
+                *err_flag = 1;
+                goto free_memory;
+            }
+        }
+
+        if(stem[highest16] && stem[highest16][higher16] && stem[highest16][higher16][lower16] && check_bit(stem[highest16][higher16][lower16][byte_pos], bit_pos)) {
+            continue;
+        }
+        output_arr[j] = tmp;
+        j++;
+        flip_bit(stem[highest16][higher16][lower16][byte_pos], bit_pos);
+    }
+free_memory:
+    for(uint32_t k = 0; k < STEM_BRANCH_SIZE; k++) {
+        if(stem[k] == NULL) {
+            continue;
+        }
+        for(uint32_t kk = 0; kk < STEM_BRANCH_SIZE; kk++) {
+            if(stem[k][kk] == NULL) {
+                continue;
+            }
+            for(uint32_t kkk = 0; kkk < STEM_BRANCH_SIZE; kkk++) {
+                if(stem[k][kk][kkk] != NULL) {
+                    free(stem[k][kk][kkk]);
+                }
+            }
+            free(stem[k][kk]);
+        }
+        free(stem[k]);
+    }
+    if(*err_flag != 0) {
+        free(output_arr);
+        return NULL;
+    }
+    final_output_arr = (uint64_t *)realloc(output_arr, j * sizeof(uint64_t));
+    if(final_output_arr == NULL) {
+        free(output_arr);
+        *err_flag = 3;
+        return NULL;
+    }
+    *num_elems_out = j;
+    return final_output_arr;
 }
 
 /*

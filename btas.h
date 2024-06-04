@@ -57,6 +57,7 @@ int string_to_u32_num(const char* string, uint32_t *unsigned_num);
 void print_arr(const uint32_t *arr, uint64_t num_elems, uint64_t max_elems);
 int compare_arr(const uint32_t *arr_a, const uint32_t *arr_b, uint64_t num_elems);
 int generate_random_input_arr(uint32_t *arr, uint64_t num_elems, uint32_t rand_max);
+int generate_random_input_arr64(uint64_t *arr, uint64_t num_elems, uint64_t rand_max);
 int generate_growing_arr(uint32_t *arr, uint64_t num_elems);
 int cmd_flag_parser(int argc, char **argv, const char *cmd_flag);
 
@@ -167,6 +168,10 @@ uint64_t fui_bitmap_stc_count(const uint32_t *input_arr, const uint64_t num_elem
 uint32_t* fui_bitmap_dyn(const uint32_t *input_arr, const uint64_t num_elems, uint64_t *num_elems_out, int *err_flag);
 uint64_t fui_bitmap_dyn_count(const uint32_t *input_arr, const uint64_t num_elems, int *err_flag);
 out_idx* fui_bitmap_idx(const uint32_t *input_arr, const uint64_t num_elems, uint64_t *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head);
+
+
+#define STEM_BRANCH_SIZE 65536
+#define LEAF_SIZE_BYTE 8192
 
 uint64_t* fui_bitmap_dyn64(const uint64_t *input_arr, const uint64_t num_elems, uint64_t *num_elems_out, int *err_flag);
 
