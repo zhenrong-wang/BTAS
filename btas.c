@@ -1510,6 +1510,9 @@ free_memory:
     return final_output_arr;
 }
 
+uint64_t* fui_bitmap_dyn64(const uint64_t *input_arr, const uint64_t num_elems, uint64_t *num_elems_out, int *err_flag) {
+    
+}
 
 /*
 int assemble_h32(int_64bit a) {

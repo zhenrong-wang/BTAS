@@ -103,7 +103,7 @@ Low 16bit:     |         |         |         |                 |
 
 The growth stratety is also important for performance. Frequent memory (re)allocation would undermine the performance significantly. 
 
-For the bitmap, each branch takes 8/16 KiB memory, therefore, in the current implementation, we allocate 8/16 KiB when needed. This means a branch either exists with its maximum length or doesn't exist. While for the stem, we start from a minumum length `1024` (modifiable) and grow it exponentially until to the maximum length `65536`. That is, if `Stem[2048]` needs to be allocated, we directly allocate to `Stem[4096]`. 
+For the bitmap, each branch takes 8 KiB memory, therefore, in the current implementation, we allocate 8 KiB when needed. This means a branch either exists with its maximum length or doesn't exist. While for the stem, we start from a minumum length `1024` (modifiable) and grow it exponentially until to the maximum length `65536`. That is, if `Stem[2048]` needs to be allocated, we directly allocate to `Stem[4096]`. 
 
 But the Adjacent Index Hashmap is another story. It may need very large memory space so we need to design the growth strategy delibrately. For both the stem and branch array, we adopt the exponential growth stratey to balance memory usage and performance.
 
