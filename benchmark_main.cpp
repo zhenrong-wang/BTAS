@@ -1,3 +1,8 @@
+#include <iostream> 
+#include <unordered_set> 
+#include <vector> 
+#include <algorithm> 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,6 +10,13 @@
 #include <inttypes.h>
 #include "btas.h"
 #include "data_io.h"
+
+std::vector<uint32_t> removeDuplicates(const uint32_t* arr, size_t size, size_t *output_elems) {  
+    std::unordered_set<uint32_t> uniqueElements(arr, arr + size);  
+    std::vector<uint32_t> newArray(uniqueElements.begin(), uniqueElements.end());
+    *output_elems = newArray.size();
+    return newArray;  
+}  
 
 /**
  * @brief
@@ -48,6 +60,8 @@ int main(int argc, char** argv) {
     uint32_t *out_bit_stc = NULL;
     out_idx *out_bit_dyn_idx = NULL;
     uint32_t *arr_input = NULL;
+
+    std::vector<uint32_t> cpp_output;
 
     if(argc < 3) {
         printf("ERROR: not enough args. USAGE: ./command argv[1] argv[2] CMD_FLAGS \n");
@@ -101,6 +115,27 @@ int main(int argc, char** argv) {
 
     printf("RANDOM ARRAY INPUT:\n");
     printf("ALGO_TYPE\t\tTIME_IN_SEC\tUNIQUE_INTEGERS\n");
+
+    if(with_fio == 0) {
+        start = clock();
+        cpp_output = removeDuplicates(arr_gen, num_elems, &num_elems_out);
+        end = clock();
+        printf("CPP_UNSORTED_SET:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    }
+    else {
+        if(with_fio == 1) {
+            start = clock();
+            arr_input = import_1d_u32(data_file_bin, "", &num_elems_read, &err_flag);
+        }
+        else {
+            start = clock();
+            arr_input = import_1d_u32(data_file_csv, "csv", &num_elems_read, &err_flag);
+        }
+        cpp_output = removeDuplicates(arr_gen, num_elems, &num_elems_out);
+        end = clock();
+        free(arr_input);
+        printf("CPP_UNSORTED_SET:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    }
 
     if(with_fio == 0) {
         start = clock();
