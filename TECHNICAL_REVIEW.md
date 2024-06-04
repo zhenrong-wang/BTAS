@@ -56,14 +56,11 @@ If we dive deeper, it is obvious that, in order to record whether an element alr
 
 Compare with Hash Table with 4,294,967,296 integers, the bitmap can suppress the memory usage to 32 times smaller.
 
-Meanwhle, it is unnecessary to allocate a full bitmap with 512 MiB. Using a dynamic method with growing trees and branches can further suppress the memory usage. Given that every integer `N` can be expressed as a quotient and a modulus to another given integer `M`:
+Meanwhle, it is unnecessary to allocate a full bitmap with 512 MiB. Using a dynamic method with growing trees and branches can further suppress the memory usage. Given that every 32bit integer `N` can be expressed as High 16bit and Low 16bit:
 
-`(a = N / M, b = N Mod M )`
+`(a = h16, b = l16)`
 
-Therefore, we can use the 2 indexes `a`, `b` to divide the integer space. Take signed integers for an example, if we let `M = 65536`, the absolute range of quotient would be `[0, 32768]`, and the absolute modulus would be `[0, 65535]`. So we can either choose a single-tree with the absolute quotient, or choose a double-tree with one for positive integers or 0 and the other for negative integers. 
-
-- For a single-tree, the maximum length of the modulus branch would be `2*65536 = 131,072 bit = 16KiB` (NOTE: Here we have 1 bit unused).
-- For a double-tree, the maximum length of the modulus branch would be `65536 bit = 8 KiB`. (As mentioned, we also wasted 1 bit).
+Therefore, we can use the 2 indexes `a`, `b` to divide the 32bit integer space. We can then use `a` as the stem and `b` as the branch. 
 
 With the method described above and the dynamic memory management, it is ready to implement in C or other programming languages. 
 
@@ -83,28 +80,22 @@ In order to resolve this issue, we need an Adjacent Index Hashmap to record the 
 
 ## 3.1 Current Implementation
 
-Currently, we implemented 4 algorithms that combined as the **BitTree Algorithm Set (BTAS)**, they are:
+Currently, we implemented several algorithms that combined as the **BitTree Algorithm Set (BTAS)**, mainly are:
 
-- BitTree with single-tree (BTS)
-- BitTree with double-tree (BTD)
-- BitTree with single-tree and an Adjacent Index Hashmap (BTSAIH)
-- BitTree with double-tree and an Adjacent Index Hashmap (BTDAIH)
+- BitTree STC (Semi-static BitTree)
+- BitTree DYN (Dynamic BitTree)
+- BitTree IDX (BitTree with Index Hashmap)
+- HTBL DYN (dynamic Hash Table)
 
 In order to save memory, the Adjacent Index Hashmap uses a double-tree architecture and it is also self-adjustable according to the size of the original array.
 
 The diagram below shows the architecture of a single-tree BitTree:
 
 ```
-Quotient: Stem[0] - Stem[1] - Stem[2] - Stem[3] - ... - Stem[32768]
+High 16bit: Stem[0] - Stem[1] - Stem[2] - Stem[3] - ... - Stem[65535]
                |         |         |         |                 |               
-Modulus:      [1]       [1]       [1]       [1]               [1]
-  Positive     |         |         |         |                 |
-              [2]       [2]       [2]       [2]               [2]
-              ...       ...       ...       ...               ...
-            [65535]   [65535]   [65535]   [65535]           [65535]
-----------     +         +         +         +                 +
-Modulus:      [1]       [1]       [1]       [1]               [1]
-  Negative     |         |         |         |                 |
+              [1]       [1]       [1]       [1]               [1]
+Low 16bit:     |         |         |         |                 |
               [2]       [2]       [2]       [2]               [2]
               ...       ...       ...       ...               ...
             [65535]   [65535]   [65535]   [65535]           [65535]
@@ -112,11 +103,11 @@ Modulus:      [1]       [1]       [1]       [1]               [1]
 
 The growth stratety is also important for performance. Frequent memory (re)allocation would undermine the performance significantly. 
 
-For the bitmap, each branch takes 8/16 KiB memory, therefore, in the current implementation, we allocate 8/16 KiB when needed. This means a branch either exists with its maximum length or doesn't exist. While for the quotient stem, we start from a minumum length `1024` (modifiable) and grow it exponentially until to the maximum length `32769`. That is, if `Stem[2048]` needs to be allocated, we directly allocate to `Stem[4096]`. 
+For the bitmap, each branch takes 8/16 KiB memory, therefore, in the current implementation, we allocate 8/16 KiB when needed. This means a branch either exists with its maximum length or doesn't exist. While for the stem, we start from a minumum length `1024` (modifiable) and grow it exponentially until to the maximum length `65536`. That is, if `Stem[2048]` needs to be allocated, we directly allocate to `Stem[4096]`. 
 
 But the Adjacent Index Hashmap is another story. It may need very large memory space so we need to design the growth strategy delibrately. For both the stem and branch array, we adopt the exponential growth stratey to balance memory usage and performance.
 
-Please check the [repository](https://github.com/zhenrong-wang/filter-uniq-ints) for the source code implemented and maintained.
+Please check the [repository](https://github.com/zhenrong-wang/BTAS) for the source code implemented and maintained.
 
 ## 3.2 Preliminery Benchmark
 
@@ -124,7 +115,7 @@ Please check the [repository](https://github.com/zhenrong-wang/filter-uniq-ints)
 
 We did benchmark with 2 rounds:
 
-- **RANDOM  round:** an array with randomly-generated signed integers.
+- **RANDOM  round:** an array with randomly-generated unsigned integers.
 - **GROWING round:** an perfectly sorted array {0, 1, 2, 3,...}.
 
 There are 3 sets of benchmark environment:
@@ -277,4 +268,4 @@ The methods and implementations are not the best in terms of memory management a
 - **Multi-layer data structure:** Currently there is only stems with branches, it is possible that by adopting a leaf layer the algorithms could be better handling sparse values.
 - **Extend to 64bit** 64bit migration is another story but it worths efforts because the widely-used hash algorithms start from 64bit up to 256 or even more. Therefore, extending to 64bit has big technical values.
 
-Any review and feedback is highly appreciated and welcomed. Please check the [GitHub repository](https://github.com/zhenrong-wang/filter-uniq-ints) or contact me through X/twitter(@wangzhr4), or email (zhenrongwang@live.com).
+Any review and feedback is highly appreciated and welcomed. Please check the [GitHub repository](https://github.com/zhenrong-wang/BTAS) or contact me through X/twitter(@wangzhr4), or email (zhenrongwang@live.com).
