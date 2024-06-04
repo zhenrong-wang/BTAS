@@ -8,7 +8,7 @@ We strongly suggest you to read the [Technical Review](./TECHNICAL_REVIEW.md).
 
 # 2. Brief Intro
 
-**Program Name**: Filter-Uniq-Ints
+**Program Name**: BTAS - BitTree Algorithm Set
 
 **Purpose**: filter out unique integers from an **unsorted** integer array. E.g. {1,2,1,3} should be filtered to {1,2,3}
 
@@ -30,26 +30,29 @@ You need a C compiler to build the `c-branch`. For the `cpp-branch`, you also ne
 
 **NOTE**: Please choose a branch before build this project.
 
-1. Use git to clone this code: `git clone https://github.com/zhenrong-wang/filter-uniq-ints.git`
-2. Change your directory: `cd filter-uniq-ints`
+1. Use git to clone this code: `git clone https://github.com/zhenrong-wang/BTAS.git`
+2. Change your directory: `cd BTAS`
 
 **For the c-branch**
 
-3. a. Build with the C compiler: `gcc *.c -Ofast -Wall -o YOUR_PROGRAM_NAME`
+3. a. Build the benchmark with a `C++` compiler because we added `C++` method to the benchmark_main.cpp.
+3. b. Command: `g++ *.c *.cpp -Ofast -Wall -o btas.run`
+4. The `C source code` can be compiled and built to libraries with a `standard C compiler`. No `C++` compiler would be needed for this purpose.
 
 **For the cpp-branch:**
 
-3. b. Configure CMake: `cmake -B cmake-build-release -DCMAKE_BUILD_TYPE=Release`
-4. b. Build command example: `cmake --build cmake-build-release --config Release --target all`
-5. b. Change your directory: `cd cmake-build-release`
-6. b. Build with make: `make`
+1. b. Configure CMake: `cmake -B cmake-build-release -DCMAKE_BUILD_TYPE=Release`
+2. b. Build command example: `cmake --build cmake-build-release --config Release --target all`
+3. b. Change your directory: `cd cmake-build-release`
+4. b. Build with make: `make`
 
 ## 3.2 Run
 
-Command Format: `cmd argv[1] argv[2]`
+Command Format: `cmd argv[1] argv[2] OPTION`
 
 - `argv[1]`: A string to specify an integer as the number of elems input. E.g. 10032 
 - `argv[2]`: A string to specify an integer as the maximum random number generated. E.g. 1000
+- `OPTION` : `--brute` (execute the brute algorithms), `--fio-bin` `--fio-csv` (With File I/O), `--count` (execute the counting functions)
 
 # 4 Bugs and Communications
 
