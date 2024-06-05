@@ -169,7 +169,6 @@ uint32_t* fui_bitmap_dyn(const uint32_t *input_arr, const uint64_t num_elems, ui
 uint64_t fui_bitmap_dyn_count(const uint32_t *input_arr, const uint64_t num_elems, int *err_flag);
 out_idx* fui_bitmap_idx(const uint32_t *input_arr, const uint64_t num_elems, uint64_t *num_elems_out, int *err_flag, dup_idx_list **dup_idx_head);
 
-
 #define STEM_BRANCH_SIZE 65536
 #define LEAF_SIZE_BYTE 8192
 

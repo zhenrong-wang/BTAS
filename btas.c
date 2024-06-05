@@ -1584,7 +1584,6 @@ uint64_t* fui_bitmap_dyn64(const uint64_t *input_arr, const uint64_t num_elems, 
                 goto free_memory;
             }
         }
-
         if(stem[highest16] && stem[highest16][higher16] && stem[highest16][higher16][lower16] && check_bit(stem[highest16][higher16][lower16][byte_pos], bit_pos)) {
             continue;
         }
