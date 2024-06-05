@@ -1537,9 +1537,9 @@ free_memory:
 
 uint64_t* fui_bitmap_dyn64(const uint64_t *input_arr, const uint64_t num_elems, uint64_t *num_elems_out, int *err_flag) {
     uint64_t i, j = 0;
-    uint32_t higher20 = 0, middle20 = 0, lower24 = 0;
+    uint16_t highest16 = 0, higher16 = 0, lower16 = 0, lowest16 = 0;
     uint64_t tmp = 0, *final_output_arr = NULL;
-    uint8_t **stem[STEM_SIZE] = {NULL, };
+    uint8_t ***stem[STEM_BRANCH_SIZE] = {NULL, };
     uint16_t byte_pos = 0;
     uint8_t bit_pos = 0;
     *err_flag = 0;
@@ -1559,39 +1559,52 @@ uint64_t* fui_bitmap_dyn64(const uint64_t *input_arr, const uint64_t num_elems, 
     }
     for(i = 0; i < num_elems; i++) {
         tmp = input_arr[i];
-        higher20 = (uint32_t)(tmp >> 44);
-        middle20 = (uint32_t)((tmp >> 24) & 0x0FFFFF);
-        lower24 = (uint32_t)(tmp & 0xFFFFFF);
-        byte_pos = lower24 >> 3;
-        bit_pos = lower24 & 0x07;
+        highest16 = (uint16_t)(tmp >> 48);
+        higher16 = (uint16_t)((tmp >> 32) & 0xFFFF);
+        lower16 = (uint16_t)((tmp >> 16) & 0xFFFF);
+        lowest16 = (uint16_t)(tmp & 0xFFFF);
+        byte_pos = lowest16 >> 3;
+        bit_pos = lowest16 & 0x07;
         /* Grow the tree if needed. */
-        if(stem[higher20] == NULL) {
-            if((stem[higher20] = (uint8_t **)calloc(BRANCH_SIZE, sizeof(uint8_t *))) == NULL) {
+        if(stem[highest16] == NULL) {
+            if((stem[highest16] = (uint8_t ***)calloc(STEM_BRANCH_SIZE, sizeof(uint8_t **))) == NULL) {
                 *err_flag = 1;
                 goto free_memory;
             }
         }
-        if(stem[higher20][middle20] == NULL) {
-            if((stem[higher20][middle20] = (uint8_t *)calloc(LEAF_SIZE_BYTE, sizeof(uint8_t))) == NULL) {
+        if((stem[highest16])[higher16] == NULL) {
+            if(((stem[highest16])[higher16] = (uint8_t **)calloc(STEM_BRANCH_SIZE, sizeof(uint8_t *))) == NULL) {
                 *err_flag = 1;
                 goto free_memory;
             }
         }
-        if(stem[higher20] && stem[higher20][middle20] && check_bit(stem[higher20][middle20][byte_pos], bit_pos)) {
+        if(((stem[highest16])[higher16])[lower16] == NULL) {
+            if((((stem[highest16])[higher16])[lower16] = (uint8_t *)calloc(LEAF_SIZE_BYTE, sizeof(uint8_t))) == NULL) {
+                *err_flag = 1;
+                goto free_memory;
+            }
+        }
+
+        if(stem[highest16] && stem[highest16][higher16] && stem[highest16][higher16][lower16] && check_bit(stem[highest16][higher16][lower16][byte_pos], bit_pos)) {
             continue;
         }
         output_arr[j] = tmp;
         j++;
-        flip_bit(stem[higher20][middle20][byte_pos], bit_pos);
+        flip_bit(stem[highest16][higher16][lower16][byte_pos], bit_pos);
     }
 free_memory:
-    for(uint32_t k = 0; k < STEM_SIZE; k++) {
+    for(uint32_t k = 0; k < STEM_BRANCH_SIZE; k++) {
         if(stem[k] == NULL) {
             continue;
         }
-        for(uint32_t kk = 0; kk < BRANCH_SIZE; kk++) {
+        for(uint32_t kk = 0; kk < STEM_BRANCH_SIZE; kk++) {
             if(stem[k][kk] == NULL) {
                 continue;
+            }
+            for(uint32_t kkk = 0; kkk < STEM_BRANCH_SIZE; kkk++) {
+                if(stem[k][kk][kkk] != NULL) {
+                    free(stem[k][kk][kkk]);
+                }
             }
             free(stem[k][kk]);
         }
