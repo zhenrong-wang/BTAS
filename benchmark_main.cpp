@@ -125,15 +125,15 @@ int main(int argc, char** argv) {
     printf("ALGO_TYPE\t\tTIME_IN_SEC\tUNIQUE_INTEGERS\n");
 
     start = clock();
+    cpp_output = fui_cpp_64(arr_gen, num_elems, &num_elems_out);
+    end = clock();
+    printf("CPP_UNSORTED_SET:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
+    
+    start = clock();
     out64 = fui_bitmap_dyn64(arr_gen, num_elems, &num_elems_out, &err_flag);
     end = clock();
     printf("BITMAP_DYN_64BIT:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
     free(out64);
-
-    start = clock();
-    cpp_output = fui_cpp_64(arr_gen, num_elems, &num_elems_out);
-    end = clock();
-    printf("CPP_UNSORTED_SET:\t%lf\t%" PRIu64 "\n", (double)(end - start)/CLOCKS_PER_SEC, num_elems_out);
     
     return 0;
 
